@@ -5,6 +5,9 @@
 /.pnp
 .pnp.js
 
+#firebase connection
+/src/firebase/firebase.js
+
 # testing
 /coverage
 
