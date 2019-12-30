@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
-import { db, storage } from '../../firebase/firebase';
+import { db } from '../../firebase/firebase';
 import ImageThumb1 from '../layout/ImageThumb1';
 import CompositionMenu from '../layout/CompositionMenu';
-import FileUploader from "react-firebase-file-uploader";
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
+import ImageUploader from '../layout/ImageUploader';
 
 export class CompositionBackground extends Component {
     
@@ -11,43 +11,7 @@ export class CompositionBackground extends Component {
         compositionId: this.props.match.params.compositionId,
         toEditor: false,
         images: [],
-        isUploading: false,
-        progress: 0,
-        uploadedBackgroundFile: '',
-        uploadedBackgroundUrl: ''
-    }
-     
-    handleUploadStart = () => this.setState({ isUploading: true, progress: 0 });
-    
-    handleProgress = progress => this.setState({ progress });
-    
-    handleUploadError = error => {
-        this.setState({ isUploading: false });
-        console.error(error);
-    };
-    
-    handleUploadSuccess = filename => {
-        this.setState({ uploadedBackgroundFile: filename, progress: 100, isUploading: false });
-        storage
-          .ref("images")
-          .child(filename)
-          .getDownloadURL()
-          .then(url => this.setState({ uploadedBackgroundUrl: url }));
-    };
-
-    useBackground = () => {
-        const backgroundFile =  this.state.uploadedBackgroundFile;
-        const thumbnailFile = backgroundFile.split('.')[0] + '_128x128.'+ backgroundFile.split('.')[1];
-        db.collection('compositions').doc(this.state.compositionId).set({
-            backgroundImage: 'images/' + backgroundFile,
-            thumbnailImage: 'images/' + thumbnailFile,
-            hasBackgroundImage: true,
-        }, {merge: true})
-        .then( _=> {
-            this.setState({
-                toEditor: true
-            })
-        })
+        hasUnlockedCustomImageUpload: false
     }
     
     componentDidMount(){
@@ -59,6 +23,13 @@ export class CompositionBackground extends Component {
             snapshots.forEach(snap => imageData.push(snap.data()));
             this.setState({
                 images: imageData
+            })
+        })
+        db.collection('compositions').doc(this.state.compositionId).get()
+        .then(snap => {
+            const composition = snap.data();
+            this.setState({
+                hasUnlockedCustomImageUpload: composition.hasUnlockedCustomImageUpload ? true : false
             })
         })
     }
@@ -83,44 +54,21 @@ export class CompositionBackground extends Component {
                     <CompositionMenu id={this.state.compositionId} />
                 </div>
                 <div className="column">
-                    <div className="buttons">
-                    <button className="button" onClick={this.removeBackground}>Remove background</button>
-                    <label className="button">
-                    Upload background
-                    <FileUploader
-                        accept="image/*"
-                        name="avatar"
-                        hidden
-                        randomizeFilename
-                        storageRef={storage.ref("images")}
-                        onUploadStart={this.handleUploadStart}
-                        onUploadError={this.handleUploadError}
-                        onUploadSuccess={this.handleUploadSuccess}
-                        onProgress={this.handleProgress}
-                    />
-                    </label>
-                    </div>
-                    {this.state.isUploading && <progress className="progress is-primary" 
-                    value={this.state.progress} max="100">{this.state.progress}%</progress>}
-                    {this.state.uploadedBackgroundUrl && 
-                        <div className="columns">
-                            <div className="column is-three-quarters">
-                                <img className="image is-3-by-2" src={this.state.uploadedBackgroundUrl} alt=""></img>
-                            </div>
-                            <div className="column is-one-quarter">
-                                <button className="button" onClick={this.useBackground}>Use this background</button>
+                <div className="container" style={{marginTop: "10px"}}>
+                        <div className="title">Customize Background</div>
+                            <button className="button" onClick={this.removeBackground}>Remove background</button>
+                            {this.state.hasUnlockedCustomImageUpload ? 
+                            <ImageUploader compositionId={this.state.compositionId} /> :
+                            <Link to={`/compositions/${this.state.compositionId}/unlock/custom-image-upload`} className="button">Unlock upload €1</Link>}
+                            <hr></hr>
+                            <div className="columns is-multiline">
+                                {this.state.images.map((image) => (
+                                    <ImageThumb1 key={image.id} image={image} compositionId={this.state.compositionId}/>
+                                ))}
                             </div>
                         </div>
-                    }
-                    
-                    <hr></hr>
-                    <div className="columns is-multiline">
-                        {this.state.images.map((image) => (
-                            <ImageThumb1 key={image.id} image={image} compositionId={this.state.compositionId}/>
-                        ))}
                     </div>
                 </div>
-            </div>
         )
     }
 }

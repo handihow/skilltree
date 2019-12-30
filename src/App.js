@@ -11,6 +11,7 @@ import NavBar from './components/layout/Navbar';
 import Composition from './components/compositions/Composition';
 import CompositionBackground from './components/compositions/CompositionBackground';
 import CompositionTheme from './components/compositions/CompositionTheme';
+import Payments from './components/payments/Payments';
 
 import './App.sass';
 
@@ -44,6 +45,12 @@ function App(props) {
       <ProtectedRoute 
         path="/compositions/:compositionId/theme"
         component={CompositionTheme}
+        isAuthenticated={isAuthenticated}
+        isVerifying={isVerifying}
+      />
+      <ProtectedRoute 
+        path="/compositions/:compositionId/unlock/:featureId"
+        component={Payments}
         isAuthenticated={isAuthenticated}
         isVerifying={isVerifying}
       />
