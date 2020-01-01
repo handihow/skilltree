@@ -5,8 +5,8 @@ import {
     SkillTreeGroup,
     SkillTree,
     SkillProvider,
-    SkillType,
-    SkillGroupDataType,
+    // SkillType,
+    // SkillGroupDataType,
   } from 'beautiful-skill-tree';
 
 class CompositionDisplay extends Component {
@@ -14,7 +14,7 @@ class CompositionDisplay extends Component {
     render(){
         return (
             <SkillProvider>
-                <SkillTreeGroup theme={this.props.composition.theme}>
+                <SkillTreeGroup theme={this.props.theme}>
                 {({ skillCount }) => (
                     <React.Fragment>
                       {this.props.skilltrees.map((skilltree) =>(
@@ -34,5 +34,10 @@ class CompositionDisplay extends Component {
         )
     }
 }
+
+CompositionDisplay.propTypes = {
+    theme: PropTypes.object.isRequired,
+    skilltrees: PropTypes.array.isRequired,
+  };
 
 export default CompositionDisplay;

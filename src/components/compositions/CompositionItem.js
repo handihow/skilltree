@@ -32,7 +32,7 @@ export class CompositionItem extends Component {
     render() {
         const { id, title, username } = this.props.composition;
         return (
-            <React.Fragment>
+            <div className="box">
             <div className="media">
             <div className="media-left">
                 <p className="image is-64x64">
@@ -76,7 +76,7 @@ export class CompositionItem extends Component {
                 </footer>
                 </div>
             </div>
-            </React.Fragment>
+            </div>
         )
     }
 }

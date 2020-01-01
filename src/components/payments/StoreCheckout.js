@@ -7,7 +7,10 @@ class StoreCheckout extends React.Component {
   render() {
     return (
       <Elements>
-        <CheckoutForm clientSecret={this.props.clientSecret} />
+        <CheckoutForm 
+        clientSecret={this.props.clientSecret} 
+        compositionId={this.props.compositionId}
+        featureId={this.props.featureId} />
       </Elements>
     );
   }

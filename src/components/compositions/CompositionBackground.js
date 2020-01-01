@@ -11,27 +11,49 @@ export class CompositionBackground extends Component {
         compositionId: this.props.match.params.compositionId,
         toEditor: false,
         images: [],
-        hasUnlockedCustomImageUpload: false
+        hasUnlockedCustomImageUpload: false,
+        featureId: 'custom-image-upload',
+        unsubscribe: null
     }
     
     componentDidMount(){
+        const currentComponent = this;
         db.collection('backgrounds')
         .orderBy('title')
         .get()
         .then(snapshots => {
             const imageData = [];
             snapshots.forEach(snap => imageData.push(snap.data()));
-            this.setState({
+            currentComponent.setState({
                 images: imageData
             })
         })
-        db.collection('compositions').doc(this.state.compositionId).get()
+        db.collection('compositions').doc(currentComponent.state.compositionId).get()
         .then(snap => {
             const composition = snap.data();
-            this.setState({
+            currentComponent.setState({
                 hasUnlockedCustomImageUpload: composition.hasUnlockedCustomImageUpload ? true : false
             })
         })
+        const unsubscribe = db.collection('payments')
+        .doc(currentComponent.state.compositionId+'_'+currentComponent.state.featureId)
+        .onSnapshot(function(doc) {
+            if(doc.exists){
+                const paymentRecord = doc.data();
+                if(paymentRecord.success){
+                    currentComponent.setState({
+                        hasUnlockedCustomImageUpload: true,
+                    })
+                }
+            }
+        });
+        currentComponent.setState({
+            unsubscribe: unsubscribe
+        })
+    }
+
+    componentWillUnmount(){
+        this.state.unsubscribe();
     }
 
     removeBackground = () => {

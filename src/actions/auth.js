@@ -1,5 +1,6 @@
 
 import { myFirebase, googleProvider, microsoftProvider } from "../firebase/firebase";
+import { toast } from 'react-toastify';
 
 export const LOGIN_REQUEST = "LOGIN_REQUEST";
 export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
@@ -67,7 +68,7 @@ export const loginUser = (email, password) => dispatch => {
     .auth()
     .signInWithEmailAndPassword(email, password)
     .catch(error => {
-      //Do something with the error if you want!
+      toast.error(error.message);
       dispatch(loginError());
     });
 };
@@ -78,6 +79,7 @@ export const loginWithGoogle = () => dispatch => {
     .auth()
     .signInWithPopup(googleProvider)
     .catch(error => {
+      toast.error(error.message);
       //Do something with the error if you want!
       dispatch(loginError());
     });
@@ -89,6 +91,7 @@ export const loginWithMicrosoft = () => dispatch => {
     .auth()
     .signInWithPopup(microsoftProvider)
     .catch(error => {
+      toast.error(error.message);
       //Do something with the error if you want!
       dispatch(loginError());
     });
@@ -103,6 +106,7 @@ export const logoutUser = () => dispatch => {
       dispatch(receiveLogout());
     })
     .catch(error => {
+      toast.error(error.message);
       //Do something with the error if you want!
       dispatch(logoutError());
     });

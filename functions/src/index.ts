@@ -10,10 +10,20 @@ exports.events = functions.https.onRequest((request, response) => {
   let event;
   try {
     event = request.body;
-    if(event.type==='payment_intent.succeeded'){
-      return db.collection('payments').add(event)
+    if((event.type==='payment_intent.succeeded' || event.type==='payment_intent.payment_failed') && 
+        event.data && event.data.object &&
+        event.data.object.metadata && 
+        event.data.object.metadata.compositionId && 
+        event.data.object.metadata.featureId){
+      const compositionId = event.data.object.metadata.compositionId;
+      const featureId = event.data.object.metadata.featureId;
+      const referenceId = compositionId+'_'+featureId;
+      return db.collection('payments').doc(referenceId).set({
+        event,
+        success: event.type==='payment_intent.succeeded' ? true : false
+      })
       .then((doc) => {
-        return response.json({ received: true, ref: doc.id });
+        return response.json({ received: true, ref: referenceId });
       })
       .catch((err) => {
         console.error(err);
@@ -36,11 +46,18 @@ exports.secret = functions.https.onCall((data, context) => {
             error: "Request denied. You need to be logged in to request Stripe payment intent."
         }
     }
-    const amount = data.amount;
+    const amount = data.amount * 100; //amount is in cents
+    const currency = data.currency;
+    const compositionId = data.compositionId;
+    const featureId = data.featureId;
     return stripe.paymentIntents.create({
         amount: amount,
-        currency: 'eur',
+        currency: currency,
         payment_method_types: ['card'],
+        metadata: {
+          compositionId,
+          featureId
+        }
     })
     .then((intent: any) => {
         return {

@@ -12,8 +12,14 @@ import Composition from './components/compositions/Composition';
 import CompositionBackground from './components/compositions/CompositionBackground';
 import CompositionTheme from './components/compositions/CompositionTheme';
 import Payments from './components/payments/Payments';
+import PaymentConfirmation from './components/payments/PaymentConfirmation';
 
 import './App.sass';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+// Call it once in your app. At the root of your app is the best place
+toast.configure()
 
 
 function App(props) {
@@ -51,6 +57,12 @@ function App(props) {
       <ProtectedRoute 
         path="/compositions/:compositionId/unlock/:featureId"
         component={Payments}
+        isAuthenticated={isAuthenticated}
+        isVerifying={isVerifying}
+      />
+      <ProtectedRoute 
+        path="/compositions/:compositionId/confirmation/:featureId"
+        component={PaymentConfirmation}
         isAuthenticated={isAuthenticated}
         isVerifying={isVerifying}
       />

@@ -26,8 +26,14 @@ export class Payments extends Component {
         const compositionId = this.props.match.params.compositionId;
         const featureId = this.props.match.params.featureId;
         const amount = features[featureId].amount;
+        const currency = features[featureId].currency;
         const secretRequest = functions.httpsCallable('secret');
-        secretRequest({amount: amount * 100}).then(function(result) {
+        secretRequest({
+            amount,
+            currency,
+            compositionId,
+            featureId
+        }).then(function(result) {
             if(result.data.error){
                 return console.error(result.data.error);
             }
@@ -36,6 +42,7 @@ export class Payments extends Component {
                 title: features[featureId].title,
                 description: features[featureId].description,
                 amount: amount,
+                currency: currency,
                 clientSecret: result.data.result,
                 featureId: featureId,
                 compositionId: compositionId,
@@ -60,18 +67,22 @@ export class Payments extends Component {
                             {this.state.title}
                         </h1>
                         <h2 className="subtitle">
-                            Pay €{this.state.amount},- to unlock
+                            Pay ${this.state.amount},- to unlock
                         </h2>
                         {this.state.description}
                     </div>
                 </div>
+                
             </section>
             <section className="section">
                 <div className="container">
                     <div className="box">
                         <div className="title is-5">Enter your credit card information</div>
                         <StripeProvider apiKey="pk_test_2mPZastNCiUv7dQQmesE21G8003EqXrrN3">
-                            <StoreCheckout clientSecret={this.state.clientSecret} />
+                            <StoreCheckout 
+                            clientSecret={this.state.clientSecret}
+                            compositionId={this.state.compositionId}
+                            featureId={this.state.featureId} />
                         </StripeProvider>
                     </div>
                 </div>

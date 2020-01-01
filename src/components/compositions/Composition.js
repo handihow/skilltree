@@ -58,7 +58,7 @@ export class Composition extends Component {
                                                     backgroundSize: 'cover'
                                                 }
                                                 : null}>
-                    <CompositionDisplay composition={this.state.composition} skilltrees={this.state.skilltrees} />
+                    <CompositionDisplay theme={this.state.composition.theme} skilltrees={this.state.skilltrees} />
                 </div>
             </div>
         )

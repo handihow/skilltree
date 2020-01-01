@@ -52,7 +52,6 @@ class Login extends Component {
               </p>
             </div>
           );
-
         if (isAuthenticated) {
             return <Redirect to="/" />;
         } else {
@@ -70,9 +69,6 @@ class Login extends Component {
                             </div>
                         </div>
                     </section>
-                    {loginError ? <div className="notification">
-                            Email or password is incorrect
-                            </div> : null}
                     <section className="section">
                     <div className="has-text-centered">
                     <LoginButton icon="google" name="Google" onClick={this.handleLoginWithGoogle} color="is-danger" />
