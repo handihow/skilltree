@@ -4,6 +4,7 @@ import ImageThumb1 from '../layout/ImageThumb1';
 import CompositionMenu from '../layout/CompositionMenu';
 import { Redirect, Link } from 'react-router-dom';
 import ImageUploader from '../layout/ImageUploader';
+import features from '../payments/Features';
 
 export class CompositionBackground extends Component {
     
@@ -35,8 +36,10 @@ export class CompositionBackground extends Component {
                 hasUnlockedCustomImageUpload: composition.hasUnlockedCustomImageUpload ? true : false
             })
         })
-        const unsubscribe = db.collection('payments')
-        .doc(currentComponent.state.compositionId+'_'+currentComponent.state.featureId)
+        const unsubscribe = db.collection('compositions')
+        .doc(currentComponent.state.compositionId)
+        .collection('payments')
+        .doc(currentComponent.state.featureId)
         .onSnapshot(function(doc) {
             if(doc.exists){
                 const paymentRecord = doc.data();
@@ -81,7 +84,8 @@ export class CompositionBackground extends Component {
                             <button className="button" onClick={this.removeBackground}>Remove background</button>
                             {this.state.hasUnlockedCustomImageUpload ? 
                             <ImageUploader compositionId={this.state.compositionId} /> :
-                            <Link to={`/compositions/${this.state.compositionId}/unlock/custom-image-upload`} className="button">Unlock upload €1</Link>}
+                            <Link to={`/compositions/${this.state.compositionId}/unlock/custom-image-upload`} className="button">
+                                Unlock upload ${features[this.state.featureId].amount}</Link>}
                             <hr></hr>
                             <div className="columns is-multiline">
                                 {this.state.images.map((image) => (

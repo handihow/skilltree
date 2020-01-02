@@ -1,20 +1,16 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Redirect, Link } from "react-router-dom";
-import { loginUser, loginWithGoogle, loginWithMicrosoft } from "../actions";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Redirect } from "react-router-dom";
+import { registerUser } from "../actions";
+import { toast } from 'react-toastify';
 
-const hrStyle =  {
-    display: 'inline-block',
-    margin: 0,
-    padding: 0,
-    verticalAlign: 'middle',
-    width: '100px'
-}
+class Register extends Component {
+    state = { displayName: "", email: "", password: "", repeatPassword: "" };
 
-class Login extends Component {
-    state = { email: "", password: "" };
-
+    handleDisplayNameChange = ({ target }) => {
+        this.setState({ displayName: target.value });
+    };
+    
     handleEmailChange = ({ target }) => {
         this.setState({ email: target.value });
     };
@@ -23,35 +19,31 @@ class Login extends Component {
         this.setState({ password: target.value });
     };
 
+    handleRepeatPasswordChange = ({ target }) => {
+        this.setState({ repeatPassword: target.value });
+    };
+
     handleSubmit = () => {
-        const { dispatch } = this.props;
-        const { email, password } = this.state;
+        const { displayName, email, password, repeatPassword } = this.state;
+        //form validation
+        if( displayName === '' ){
+            return toast.error('Full name is required')
+        } else if(email === ''){
+            return toast.error('Email is required')
+        } else if(password.length < 8){
+            return toast.error('Password must have minimum 8 characters')
+        } else if(repeatPassword !== password){
+            return toast.error('Passwords do not match');
+        }
 
-        dispatch(loginUser(email, password));
-    };
+        const { dispatch } = this.props; 
 
-    handleLoginWithGoogle = () => {
-        const { dispatch } = this.props;
-        dispatch(loginWithGoogle());
-    };
-
-    handleLoginWithMicrosoft = () => {
-        const { dispatch } = this.props;
-        dispatch(loginWithMicrosoft());
+        dispatch(registerUser(displayName, email, password));
     };
 
     render() {
         const { isAuthenticated } = this.props;
-        const LoginButton = ({ icon, name, onClick, color }) => (
-            <div className="field">
-              <p className={`control button is-medium ${color}`} style={{ width: '300px' }} onClick={onClick}>
-                <span className="icon">
-                <FontAwesomeIcon icon={['fab', icon]} />
-                </span>
-                <span>{`Sign in with ${name}`}</span>
-              </p>
-            </div>
-          );
+
         if (isAuthenticated) {
             return <Redirect to="/" />;
         } else {
@@ -64,23 +56,20 @@ class Login extends Component {
                                     Skill tree
                                 </h1>
                                 <h2 className="subtitle">
-                                    Sign in to create awesome skill trees
+                                    Create an account and start creating awesome skill trees
                                 </h2>
                             </div>
                         </div>
                     </section>
                     <section className="section">
-                    <div className="has-text-centered">
-                    <LoginButton icon="google" name="Google" onClick={this.handleLoginWithGoogle} color="is-danger" />
-                    <LoginButton icon="microsoft" name="Microsoft" onClick={this.handleLoginWithMicrosoft} color="is-info" />
-                    </div>
-
-                    <div className="has-text-centered" style={{ margin: '10px 0' }}>
-                    <hr style={hrStyle}/>
-                    <span style={{ verticalAlign: 'middle', padding: '0 10px' }}>OR</span>
-                    <hr style={hrStyle}/>
-                    </div>
                         <div className="container has-text-centered box" style={{ maxWidth: '350px' }}>
+                            <div className="field">
+                                <label className="label" htmlFor="displayName">Full name</label>
+                                <div className="control">
+                                    <input className="input" name="displayName" type="text" placeholder="full name" required onChange={this.handleDisplayNameChange} />
+                                </div>
+                            </div>
+
                             <div className="field">
                                 <label className="label" htmlFor="email">Email</label>
                                 <div className="control">
@@ -94,15 +83,20 @@ class Login extends Component {
                                     <input className="input" name="password" type="password" placeholder="password" required onChange={this.handlePasswordChange} />
                                 </div>
                             </div>
+
+                            <div className="field">
+                                <label className="label" htmlFor="repeatPassword">Repeat Password</label>
+                                <div className="control">
+                                    <input className="input" name="repeatPassword" type="password" placeholder="repeat password" required onChange={this.handleRepeatPasswordChange} />
+                                </div>
+                            </div>
                             
                             <div className="field">
                                 <div className="control buttons is-centered">
-                                    <input className="button is-medium is-primary is-fullwidth" type="button" value="Sign In" onClick={this.handleSubmit} />
+                                    <input className="button is-medium is-primary is-fullwidth" type="button" value="Register" onClick={this.handleSubmit} />
                                 </div>
                             </div>
-                            <Link to="/register">Click here to create an account</Link>
                         </div>
-                        
                     </section>
                 </React.Fragment>
             );
@@ -112,9 +106,8 @@ class Login extends Component {
 
 function mapStateToProps(state) {
     return {
-        isLoggingIn: state.auth.isLoggingIn,
         isAuthenticated: state.auth.isAuthenticated
     }
 };
 
-export default (connect(mapStateToProps)(Login));
+export default (connect(mapStateToProps)(Register));

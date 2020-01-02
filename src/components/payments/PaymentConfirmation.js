@@ -19,7 +19,7 @@ export class PaymentConfirmation extends Component {
         const featureId = this.props.match.params.featureId;
         console.log(featureId);
         console.log(compositionId);
-        const unsubscribe = db.collection('payments').doc(compositionId+'_'+featureId).onSnapshot(function(doc) {
+        const unsubscribe = db.collection('compositions').doc(compositionId).collection('payments').doc(featureId).onSnapshot(function(doc) {
             if(doc.exists){
                 const paymentRecord = doc.data();
                 currentComponent.setState({
@@ -51,13 +51,13 @@ export class PaymentConfirmation extends Component {
                             this.state.status ==='success' ? 'Thank you for your purchase. ' + features[this.state.featureId].success : 
                             'Payment failed. See below more information about the reason of rejection.'}
                         </h2>
-                            {this.state.status ==='success' ? 
+                            {this.state.status==='success' && 
                             <div className="button">
                                 <Link to={`/compositions/${this.state.compositionId}/${features[this.state.featureId].redirect}`}>
                                     Try it out!
                                 </Link>
-                            </div> : 
-                            'Payment failed. See below more information about the reason of rejection.'}
+                            </div>}
+                            {this.state.status==='failed' && 'Payment failed. See below more information about the reason of rejection.'}
                     </div>
                 </div>
             </section>

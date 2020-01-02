@@ -5,6 +5,7 @@ import Header from './layout/Header';
 import { db } from '../firebase/firebase';
 import uuid from 'uuid';
 import { connect } from "react-redux";
+import {toast} from 'react-toastify';
 
 class Home extends Component {
   
@@ -38,7 +39,8 @@ class Home extends Component {
         title,
         data,
         description: 'More information about my skill tree',
-        collapsible: true 
+        collapsible: true,
+        order: 0
       }
       db.collection('compositions')
       .doc(newComposition.id)
@@ -50,38 +52,42 @@ class Home extends Component {
       })
     })
     .catch(err => {
-        console.log(err)
+        toast(err.message);
     })
   }
 
-  delComposition = (id) => {
+  delComposition = async (id) => {
     const batch = db.batch();
-    db.collection('compositions').doc(id).collection('skilltrees').get()
-    .then(querySnapshot => {
-      querySnapshot.docs.forEach(doc => {
+    const paymentSnapshot = await db.collection('compositions').doc(id).collection('payments').get();
+    if(!paymentSnapshot.empty){
+      paymentSnapshot.docs.forEach(doc => {
+        const paymentRef = db.collection('compositions').doc(id).collection('payments').doc(doc.id);
+        batch.delete(paymentRef);
+      })
+    }
+    const skilltreeSnapshot = await db.collection('compositions').doc(id).collection('skilltrees').get()
+    if(!skilltreeSnapshot.empty){
+      skilltreeSnapshot.docs.forEach(doc => {
         const skilltreeRef = db.collection('compositions').doc(id).collection('skilltrees').doc(doc.id);
         batch.delete(skilltreeRef);
       });
-      batch.commit()
-      .then(_ => {
-        db.collection('compositions').doc(id).delete()
-        .then((res) =>
-          this.setState({
-            compositions: [...this.state.compositions.filter((composition) => composition.id !== id)]
-          })
-        )
-        .catch(e => {
-          console.log(e)
-        });
-      })
-      .catch(err => {
-        console.log(err)
-      })
+    }
+    const compositionRef = db.collection('compositions').doc(id);
+    batch.delete(compositionRef);
+    batch.commit()
+    .then(_ => {
+        toast.info('Skill tree deleted successfully');
+        this.setState({
+          compositions: [...this.state.compositions.filter((composition) => composition.id !== id)]
+        })
+    })
+    .catch(err => {
+      toast.error(err.message)
     })
   }
 
   render() {
-    const header = "Skill trees"
+    const header = "Skill tree pages"
 
     return (
       <section className="section">

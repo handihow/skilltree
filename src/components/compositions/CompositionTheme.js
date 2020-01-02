@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { db, storage, googleFontAPIKey } from '../../firebase/firebase';
+import { db, googleFontAPIKey } from '../../firebase/firebase';
 import CompositionMenu from '../layout/CompositionMenu';
 import { Redirect, Link } from 'react-router-dom';
 import { SketchPicker } from 'react-color';
 import SelectFieldWithColumn from '../layout/SelectFieldWithColumn';
 import CompositionDisplay from '../layout/CompositionDisplay';
 import {standardSkilltree, allColors, gradients} from './StandardData';
+import features from '../payments/Features';
 
 export class CompositionTheme extends Component {
 
@@ -78,8 +79,10 @@ export class CompositionTheme extends Component {
             .catch(e => {
                 console.error(e)
             })
-        const unsubscribe = db.collection('payments')
-            .doc(currentComponent.state.compositionId+'_'+currentComponent.state.featureId)
+        const unsubscribe = db.collection('compositions')
+            .doc(currentComponent.state.compositionId)
+            .collection('payments')
+            .doc(currentComponent.state.featureId)
             .onSnapshot(function(doc) {
                 if(doc.exists){
                     const paymentRecord = doc.data();
@@ -212,7 +215,7 @@ export class CompositionTheme extends Component {
                                 <button className="button" onClick={this.saveChanges}>Save Changes</button>
                                 {!this.state.hasUnlockedAllCustomThemeOptions && 
                                 <Link to={`/compositions/${this.state.compositionId}/unlock/custom-theme-options`} 
-                                className="button">Unlock all options €1</Link>}
+                                className="button">Unlock all options ${features[this.state.featureId].amount}</Link>}
                             </div>
                             <div className="column is-half">
                                 {this.state.theme && <CompositionDisplay theme={this.state.theme} skilltrees={[standardSkilltree]} />} 

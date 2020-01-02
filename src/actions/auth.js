@@ -62,6 +62,25 @@ const verifySuccess = () => {
   };
 };
 
+export const registerUser = (displayName, email, password) => dispatch => {
+  dispatch(requestLogin());
+  myFirebase
+    .auth()
+    .createUserWithEmailAndPassword(email, password)
+    .then(result => {
+      result.user.updateProfile({
+        displayName: displayName
+      })
+      .catch(error => {
+        toast.error(error.message);
+      });
+    })
+    .catch(error => {
+      toast.error(error.message);
+      dispatch(loginError());
+    });
+};
+
 export const loginUser = (email, password) => dispatch => {
   dispatch(requestLogin());
   myFirebase

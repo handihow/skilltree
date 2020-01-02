@@ -1,5 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 export default function CompositionMenu(props) {
   return (
@@ -14,15 +15,20 @@ export default function CompositionMenu(props) {
         <p className="menu-label">
           Content
         </p>
-          <li><a>Skill trees</a></li>
-          <li><a>Skills</a></li>
+          <li><NavLink to={"/compositions/"+props.id +"/skilltrees"} activeClassName='is-active'>Skilltrees</NavLink></li>
+          <li><NavLink to={"/compositions/"+props.id +"/skills"} activeClassName='is-active'>Skills</NavLink></li>
         <p className="menu-label">
           Share
         </p>
-          <li><a>Publish</a></li>
-          <li><a>Export</a></li>
+          <li><NavLink to={"/compositions/"+props.id +"/publish"} activeClassName='is-active'>Publish</NavLink></li>
+          <li><NavLink to={"/compositions/"+props.id +"/export"} activeClassName='is-active'>Export</NavLink></li>
         </ul>
         
       </aside>
   )
+}
+
+// Proptypes
+CompositionMenu.propTypes = {
+  id: PropTypes.string.isRequired
 }

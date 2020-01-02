@@ -7,7 +7,7 @@ export class SelectFieldWithColumn extends Component {
                 <div className="field">
                 <label className="label">{this.props.title}</label>
                     <div className="control">
-                        <div className="select is-primary">
+                        <div className="select">
                             <select name={this.props.name}
                                 value={this.props.value}
                                 onChange={this.props.onChange}>

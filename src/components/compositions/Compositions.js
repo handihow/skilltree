@@ -7,7 +7,7 @@ export class Compositions extends Component {
     render() {
         return (
             this.props.compositions.length === 0 ? 
-            <div>Start by adding a skill tree...</div> : 
+            <div>Start by adding a skill tree page...</div> : 
             this.props.compositions.map(composition => (
                 <CompositionItem key={composition.id} composition={composition} delComposition={this.props.delComposition} />
             ))

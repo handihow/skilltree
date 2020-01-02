@@ -23,7 +23,7 @@ export class AddComposition extends Component {
                 <input 
                     className="input" 
                     type="text" 
-                    placeholder="Title of skill tree..."
+                    placeholder="Title of skill tree page..."
                     value={this.state.title}
                     onChange={this.onChange} />
                 </div>

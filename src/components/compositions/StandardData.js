@@ -1,4 +1,3 @@
-import {SkillTheme} from 'beautiful-skill-tree';
 export const standardTheme  = {
     backgroundColor: 'transparent',
     border: '2px solid white',
@@ -85,7 +84,8 @@ export const standardData = [
     data: standardData,
     description: "More information about my skill tree",
     id: '1',
-    title: 'Example'
+    title: 'Example',
+    order: 0
   }
 
   const cssColors = [
@@ -252,4 +252,7 @@ export const gradients = [{value: "linear-gradient(to right, #59c173, #a17fe0, #
         {value: "linear-gradient(to right, #4e54c8, #8f94fb)", title: "Moon Purple"},
         {value: "linear-gradient(to right, #355c7d, #6c5b7b, #c06c84)", title:"Red Sunset"},
         {value: "linear-gradient(to right, #40e0d0, #ff8c00, #ff0080)", title: "Wedding Day Blues"},
-        {value: "linear-gradient(to right, #3e5151, #decba4)", title: "Sand to Blue"}];
+        {value: "linear-gradient(to right, #3e5151, #decba4)", title: "Sand to Blue"},
+        {value: "linear-gradient(to right, #283048, #859398)", title: "Titanium"},
+        {value: "linear-gradient(to right, #232526, #414345)", title: "Midnight City"},
+        {value: "linear-gradient(to right, #ff512f, #dd2476)", title: "Bloody Mary"}];

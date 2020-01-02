@@ -17,13 +17,12 @@ exports.events = functions.https.onRequest((request, response) => {
         event.data.object.metadata.featureId){
       const compositionId = event.data.object.metadata.compositionId;
       const featureId = event.data.object.metadata.featureId;
-      const referenceId = compositionId+'_'+featureId;
-      return db.collection('payments').doc(referenceId).set({
+      return db.collection('compositions').doc(compositionId).collection('payments').doc(featureId).set({
         event,
         success: event.type==='payment_intent.succeeded' ? true : false
       })
       .then((doc) => {
-        return response.json({ received: true, ref: referenceId });
+        return response.json({ received: true, ref: compositionId + '_' + featureId });
       })
       .catch((err) => {
         console.error(err);

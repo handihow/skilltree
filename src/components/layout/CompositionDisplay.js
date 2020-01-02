@@ -38,6 +38,6 @@ class CompositionDisplay extends Component {
 CompositionDisplay.propTypes = {
     theme: PropTypes.object.isRequired,
     skilltrees: PropTypes.array.isRequired,
-  };
+};
 
 export default CompositionDisplay;

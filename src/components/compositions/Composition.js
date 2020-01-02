@@ -20,7 +20,7 @@ export class Composition extends Component {
         .then(doc => {
             const composition = doc.data();
             db.collection("compositions").doc(compositionId)
-            .collection("skilltrees").get()
+            .collection("skilltrees").orderBy('order').get()
             .then(querySnapshot => {
                 const data = querySnapshot.docs.map(doc => doc.data());
                 if(composition.hasBackgroundImage){
@@ -48,17 +48,22 @@ export class Composition extends Component {
         return (
             this.state.skilltrees.length===0 ? 
             <Loading /> :
-            <div className="columns" style={{height:"95vh"}}>
+            <div className="columns">
                 <div className="column is-one-fifth">
                     <CompositionMenu id={this.state.id}/>
                 </div>
                 <div className="column" style={this.state.hasBackgroundImage ? 
                                                 {
                                                     backgroundImage: `url(${this.state.backgroundImage})`,
-                                                    backgroundSize: 'cover'
+                                                    backgroundSize: 'cover',
+                                                    position : 'relative',
+                                                    height:"95vh"
                                                 }
                                                 : null}>
-                    <CompositionDisplay theme={this.state.composition.theme} skilltrees={this.state.skilltrees} />
+                    <div style={{maxHeight:'100%',overflow:'auto'}}>
+                    <CompositionDisplay
+                    theme={this.state.composition.theme} 
+                    skilltrees={this.state.skilltrees} /></div>
                 </div>
             </div>
         )

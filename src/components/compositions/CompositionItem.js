@@ -36,7 +36,7 @@ export class CompositionItem extends Component {
             <div className="media">
             <div className="media-left">
                 <p className="image is-64x64">
-                <img className="is-rounded" src={this.state.thumbnail}></img>
+                <img className="is-rounded" src={this.state.thumbnail} alt="thumbnail"></img>
                 </p>
             </div>
             <div className="media-content">
@@ -83,7 +83,8 @@ export class CompositionItem extends Component {
 
 // Proptypes
 CompositionItem.propTypes = {
-    composition: PropTypes.object.isRequired
+    composition: PropTypes.object.isRequired,
+    delComposition: PropTypes.func.isRequired
 }
 
 export default CompositionItem
