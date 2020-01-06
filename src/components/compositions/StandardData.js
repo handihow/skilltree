@@ -53,16 +53,24 @@ export const standardData = [
       id: 'hello-world',
       title: 'Hello World',
       tooltip: {
-        content:
+        description:
           'This node is the top most level, and will be unlocked, and ready to be clicked.',
+        links: []
       },
       children: [
         {
           id: 'hello-sun',
           title: 'Hello Sun',
           tooltip: {
-            content:
+            description:
               'This is a child of the top node, and will be locked while the parent isn’t in a selected state.',
+            links: [{
+                id: '1',
+                reference: 'https://youtube.com', 
+                title: 'Link to YouYube', 
+                icon: 'youtube-square',
+                iconLibrary: 'fab'
+            }]
           },
           children: [],
         },
@@ -70,8 +78,15 @@ export const standardData = [
           id: 'hello-stars',
           title: 'Hello Stars',
           tooltip: {
-            content:
+            description:
               'This is the child of ‘Hello World and the sibling of ‘Hello Sun’. Notice how the app takes care of the layout automatically?',
+            links: [{
+                id: '1',
+                reference: 'https://youtube.com', 
+                title: 'Link to YouYube', 
+                icon: 'youtube-square',
+                iconLibrary: 'fab' 
+            }]
           },
           children: [],
         },

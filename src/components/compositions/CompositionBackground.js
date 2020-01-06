@@ -75,26 +75,24 @@ export class CompositionBackground extends Component {
             this.state.toEditor ? 
             <Redirect to={`/compositions/${this.state.compositionId}`}/> :
             <div className="columns" style={{height:"95vh"}}>
-                <div className="column is-one-fifth">
+                <div className="column is-2">
                     <CompositionMenu id={this.state.compositionId} />
                 </div>
-                <div className="column">
-                <div className="container" style={{marginTop: "10px"}}>
+                <div className="column" style={{marginTop: "10px"}}>
                         <div className="title">Customize Background</div>
-                            <button className="button" onClick={this.removeBackground}>Remove background</button>
-                            {this.state.hasUnlockedCustomImageUpload ? 
-                            <ImageUploader compositionId={this.state.compositionId} /> :
-                            <Link to={`/compositions/${this.state.compositionId}/unlock/custom-image-upload`} className="button">
-                                Unlock upload ${features[this.state.featureId].amount}</Link>}
-                            <hr></hr>
-                            <div className="columns is-multiline">
-                                {this.state.images.map((image) => (
-                                    <ImageThumb1 key={image.id} image={image} compositionId={this.state.compositionId}/>
-                                ))}
-                            </div>
+                        <button className="button" onClick={this.removeBackground}>Remove background</button>
+                        {this.state.hasUnlockedCustomImageUpload ? 
+                        <ImageUploader compositionId={this.state.compositionId} /> :
+                        <Link to={`/compositions/${this.state.compositionId}/unlock/custom-image-upload`} className="button">
+                            Unlock upload ${features[this.state.featureId].amount}</Link>}
+                        <hr></hr>
+                        <div className="columns is-multiline is-mobile">
+                            {this.state.images.map((image) => (
+                                <ImageThumb1 key={image.id} image={image} compositionId={this.state.compositionId}/>
+                            ))}
                         </div>
-                    </div>
                 </div>
+            </div>
         )
     }
 }

@@ -23,7 +23,7 @@ export class SkilltreeCard extends Component {
 
     render() {
         return (
-            <div className="column is-half">
+            <div className="column is-one-third-desktop is-one-half-tablet">
             <div className="card">
                 <header className="card-header">
                 <p className="card-header-title">

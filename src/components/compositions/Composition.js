@@ -3,6 +3,7 @@ import { db, storage } from '../../firebase/firebase';
 import CompositionDisplay from '../layout/CompositionDisplay';
 import CompositionMenu from '../layout/CompositionMenu';
 import Loading from '../layout/Loading';
+import {skillTreeToSkillArray, skillArrayToSkillTree} from './StandardFunctions';
 
 export class Composition extends Component {
     
@@ -22,7 +23,11 @@ export class Composition extends Component {
             db.collection("compositions").doc(compositionId)
             .collection("skilltrees").orderBy('order').get()
             .then(querySnapshot => {
-                const data = querySnapshot.docs.map(doc => doc.data());
+                const skilltrees = querySnapshot.docs.map(doc => doc.data());
+                skilltrees.forEach(skilltree => {
+                    const flatSkills = skillTreeToSkillArray(skilltree.data);
+                    skilltree.data = skillArrayToSkillTree(flatSkills, false);
+                });
                 if(composition.hasBackgroundImage){
                     //fetch the background image
                     const storageRef = storage.ref();
@@ -34,11 +39,11 @@ export class Composition extends Component {
                             composition, 
                             hasBackgroundImage: true, 
                             backgroundImage: url, 
-                            skilltrees: data
+                            skilltrees: skilltrees
                         });
                     });
                 } else {
-                    this.setState({id: compositionId, composition, skilltrees: data });
+                    this.setState({id: compositionId, composition, skilltrees: skilltrees });
                 }
             });
         });
@@ -48,8 +53,8 @@ export class Composition extends Component {
         return (
             this.state.skilltrees.length===0 ? 
             <Loading /> :
-            <div className="columns">
-                <div className="column is-one-fifth">
+            <div className="columns" style={{marginBottom: '0rem'}}>
+                <div className="column is-2">
                     <CompositionMenu id={this.state.id}/>
                 </div>
                 <div className="column" style={this.state.hasBackgroundImage ? 
@@ -57,7 +62,9 @@ export class Composition extends Component {
                                                     backgroundImage: `url(${this.state.backgroundImage})`,
                                                     backgroundSize: 'cover',
                                                     position : 'relative',
-                                                    height:"95vh"
+                                                    height:"calc(100vh - 3.5rem)",
+                                                    padding: '0px',
+                                                    marginTop: '0.75rem'
                                                 }
                                                 : null}>
                     <div style={{maxHeight:'100%',overflow:'auto'}}>

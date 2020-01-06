@@ -9,7 +9,7 @@ export default function CompositionMenu(props) {
         <p className="menu-label">
           Appearance
         </p>
-          <li><NavLink to={"/compositions/"+props.id} activeClassName='is-active' exact={true}>Editor</NavLink></li>
+          <li><NavLink to={"/compositions/"+props.id} activeClassName='is-active' exact={true}>Viewer</NavLink></li>
           <li><NavLink to={"/compositions/"+props.id +"/background"} activeClassName='is-active'>Background Image</NavLink></li>
           <li><NavLink to={"/compositions/"+props.id +"/theme"} activeClassName='is-active'>Theme</NavLink></li>
         <p className="menu-label">

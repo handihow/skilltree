@@ -34,7 +34,7 @@ export class ImageThumb1 extends Component {
         return (
             this.state.toEditor ? 
             <Redirect to={`/compositions/${this.props.compositionId}`}/> :
-            <div className="column is-one-third">
+            <div className="column is-one-quarter-desktop is-one-third-tablet is-half-mobile">
                 <div className="card">
                     <div className="card-image">
                         <figure className="image is-3-by-2">

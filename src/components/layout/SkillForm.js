@@ -3,35 +3,22 @@ import PropTypes from 'prop-types';
 import {standardData} from '../compositions/StandardData';
 import uuid from 'uuid';
 
-export class  SkilltreeForm extends Component {
+export class  SkillForm extends Component {
 
     state = { 
-        skilltree: null
+        skill: null
     };
 
     componentDidMount(){
-        if(this.props.isEditing){
-            this.setState({
-                skilltree: this.props.skilltree
-            })
-        } else {
-            this.setState({
-                skilltree: {
-                    collapsible: true,
-                    data: standardData,
-                    description: '',
-                    title: '',
-                    id: uuid.v4(),
-                    order: this.props.order
-                }
-            })
-        }
+        this.setState({
+            skill: this.props.skilltree
+        })
     }
 
     handleChange = ({ target }) => {
         this.setState({
-            skilltree: {
-                ...this.state.skilltree,
+            skill: {
+                ...this.state.skill,
                 [target.name]: target.type === 'checkbox' ? target.checked : target.value
             }
         });
@@ -39,7 +26,7 @@ export class  SkilltreeForm extends Component {
 
     onSubmit = (e) => {
         e.preventDefault();
-        this.props.updateSkilltree(this.state.skilltree);
+        this.props.updateSkill(this.state.skill);
     }
 
     render(){
@@ -48,7 +35,7 @@ export class  SkilltreeForm extends Component {
             <div className="modal-background"></div>
             <div className="modal-card">
                 <header className="modal-card-head">
-                <p className="modal-card-title">{this.props.isEditing ? 'Edit skilltree' : 'Add skilltree'}</p>
+                <p className="modal-card-title">{this.props.isEditing ? 'Edit skill' : 'Add skill'}</p>
                 <button className="delete" aria-label="close" onClick={this.props.closeModal}></button>
                 </header>
                 <form onSubmit={this.onSubmit}>
@@ -90,12 +77,12 @@ export class  SkilltreeForm extends Component {
     }
 }
 
-SkilltreeForm.propTypes = {
-    skilltree: PropTypes.object,
+SkillForm.propTypes = {
+    skill: PropTypes.object,
+    skills: PropTypes.array.isRequired,
     isEditing: PropTypes.bool.isRequired,
-    updateSkilltree: PropTypes.func.isRequired,
-    closeModal: PropTypes.func.isRequired,
-    order: PropTypes.number.isRequired
+    updateSkill: PropTypes.func.isRequired,
+    closeModal: PropTypes.func.isRequired
 };
 
-export default SkilltreeForm
+export default SkillForm

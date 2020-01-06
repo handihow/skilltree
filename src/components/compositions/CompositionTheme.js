@@ -204,24 +204,20 @@ export class CompositionTheme extends Component {
         return (
             this.state.toEditor ?
                 <Redirect to={`/compositions/${this.state.compositionId}`} /> :
-                <div className="columns" style={{ marginTop: "10px" }}>
-                    <div className="column is-one-fifth">
+                <div className="columns">
+                    <div className="column is-2">
                         <CompositionMenu id={this.state.compositionId} />
                     </div>
-                    <div className="column">
+                    <div className="column" style={{ marginTop: "10px" }}>
+                        <div className="title">Customize Appearance</div>
+                        <button className="button" onClick={this.saveChanges}>Save Changes</button>
+                        {!this.state.hasUnlockedAllCustomThemeOptions && 
+                        <Link to={`/compositions/${this.state.compositionId}/unlock/custom-theme-options`} 
+                        className="button">Unlock all options ${features[this.state.featureId].amount}</Link>}
+                        <hr></hr>
                         <div className="columns">
-                            <div className="column is-half">
-                                <div className="title">Customize Appearance</div>
-                                <button className="button" onClick={this.saveChanges}>Save Changes</button>
-                                {!this.state.hasUnlockedAllCustomThemeOptions && 
-                                <Link to={`/compositions/${this.state.compositionId}/unlock/custom-theme-options`} 
-                                className="button">Unlock all options ${features[this.state.featureId].amount}</Link>}
-                            </div>
-                            <div className="column is-half">
-                                {this.state.theme && <CompositionDisplay theme={this.state.theme} skilltrees={[standardSkilltree]} />} 
-                            </div>
-                        </div>
-                        <div className="columns is-multiline">
+                            <div className="column">
+                                <div className="columns is-multiline">
                                 {defaultSelectOptions.map((selectOption) => (
                                     <SelectFieldWithColumn
                                     key={selectOption.name}
@@ -253,7 +249,12 @@ export class CompositionTheme extends Component {
                                     </div>
                                 </div>
                             </div>
-                            
+                            </div>
+                            <div className="column is-narrow">
+                                {this.state.theme && <CompositionDisplay theme={this.state.theme} skilltrees={[standardSkilltree]} />} 
+                            </div>
+                        </div>
+                        
                         </div>
                     </div>
                     

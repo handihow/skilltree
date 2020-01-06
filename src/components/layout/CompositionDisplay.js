@@ -15,8 +15,8 @@ class CompositionDisplay extends Component {
         return (
             <SkillProvider>
                 <SkillTreeGroup theme={this.props.theme}>
-                {({ skillCount }) => (
-                    <React.Fragment>
+                {() => (
+                    <React.Fragment>                      
                       {this.props.skilltrees.map((skilltree) =>(
                         <SkillTree
                             key={skilltree.id}

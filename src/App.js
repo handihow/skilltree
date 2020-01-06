@@ -13,6 +13,7 @@ import Composition from './components/compositions/Composition';
 import CompositionBackground from './components/compositions/CompositionBackground';
 import CompositionTheme from './components/compositions/CompositionTheme';
 import CompositionSkilltrees from './components/compositions/CompositionSkilltrees';
+import CompositionSkills from './components/compositions/CompositionSkills';
 import Payments from './components/payments/Payments';
 import PaymentConfirmation from './components/payments/PaymentConfirmation';
 
@@ -60,6 +61,12 @@ function App(props) {
       <ProtectedRoute 
         path="/compositions/:compositionId/skilltrees"
         component={CompositionSkilltrees}
+        isAuthenticated={isAuthenticated}
+        isVerifying={isVerifying}
+      />
+      <ProtectedRoute 
+        path="/compositions/:compositionId/skills"
+        component={CompositionSkills}
         isAuthenticated={isAuthenticated}
         isVerifying={isVerifying}
       />

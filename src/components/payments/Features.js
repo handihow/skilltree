@@ -22,6 +22,14 @@ const features = {
         'currency': 'usd',
         'success': 'Unlimited skill trees feature is now unlocked!',
         'redirect': 'skilltrees'
+    },
+    'unlimited-skills': {
+        'title': 'Unlock unlimited skills',
+        'description': 'After payment, you can have unlimited skills in your skill trees. Payment is valid only for the current skill tree page.',
+        'amount': 1,
+        'currency': 'usd',
+        'success': 'Unlimited skills feature is now unlocked!',
+        'redirect': 'skills'
     }
 }
 
