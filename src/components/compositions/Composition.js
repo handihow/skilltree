@@ -3,7 +3,7 @@ import { db, storage } from '../../firebase/firebase';
 import CompositionDisplay from '../layout/CompositionDisplay';
 import CompositionMenu from '../layout/CompositionMenu';
 import Loading from '../layout/Loading';
-import {skillTreeToSkillArray, skillArrayToSkillTree} from './StandardFunctions';
+import {skillArrayToSkillTree, skillTreeToSkillArray} from './StandardFunctions';
 
 export class Composition extends Component {
     
@@ -22,29 +22,41 @@ export class Composition extends Component {
             const composition = doc.data();
             db.collection("compositions").doc(compositionId)
             .collection("skilltrees").orderBy('order').get()
-            .then(querySnapshot => {
+            .then(async querySnapshot => {
                 const skilltrees = querySnapshot.docs.map(doc => doc.data());
-                skilltrees.forEach(skilltree => {
-                    const flatSkills = skillTreeToSkillArray(skilltree.data);
-                    skilltree.data = skillArrayToSkillTree(flatSkills, false);
-                });
-                if(composition.hasBackgroundImage){
-                    //fetch the background image
-                    const storageRef = storage.ref();
-                    const imageRef = storageRef.child(composition.backgroundImage);
-                    imageRef.getDownloadURL()
-                    .then(url => {
-                        this.setState({
-                            id: compositionId, 
-                            composition, 
-                            hasBackgroundImage: true, 
-                            backgroundImage: url, 
-                            skilltrees: skilltrees
-                        });
+                db.collectionGroup('skills').where('composition', '==', compositionId).orderBy('order').get()
+                .then((querySnapshot) => {
+                    const skills = [];
+                    querySnapshot.docs.forEach((doc) => {
+                        const skill = {
+                            parent: doc.ref.path.split('/'),
+                            path: doc.ref.path,
+                            ...doc.data()
+                        }
+                        skills.push(skill);
                     });
-                } else {
-                    this.setState({id: compositionId, composition, skilltrees: skilltrees });
-                }
+                    skilltrees.forEach((skilltree) => {
+                        skilltree.data = skillArrayToSkillTree(skills.filter(s => s.skilltree===skilltree.id));
+                    });
+                    if(composition.hasBackgroundImage){
+                        //fetch the background image
+                        const storageRef = storage.ref();
+                        const imageRef = storageRef.child(composition.backgroundImage);
+                        imageRef.getDownloadURL()
+                        .then(url => {
+                            this.setState({
+                                id: compositionId, 
+                                composition, 
+                                hasBackgroundImage: true, 
+                                backgroundImage: url, 
+                                skilltrees: skilltrees
+                            });
+                        });
+                    } else {
+                        this.setState({id: compositionId, composition, skilltrees: skilltrees });
+                    }
+                })
+                
             });
         });
     }

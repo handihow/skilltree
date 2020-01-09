@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import SkillContent from './SkillContent';
+import { linkIcons } from '../compositions/StandardData';
 
 export class SkillCard extends Component {
 
@@ -39,11 +39,26 @@ export class SkillCard extends Component {
                     <div>
                         <strong>{skill.title}</strong>
                         <br></br>
-                        {skill.tooltip.content}
+                        {skill.description}
                         <br></br>
+                        <ul style={{listStyleType: 'none', margin: '10px'}}>
+                        {skill.links.map((link) => (
+                            <li key={link.id}>
+                                <a href={link.reference} target="_blank" rel="noopener noreferrer">
+                                <span style={{marginRight: '10px'}}>
+                                <FontAwesomeIcon icon={[linkIcons[link.icon].iconLibrary, linkIcons[link.icon].icon]} />
+                                </span>
+                                {link.title}
+                                </a>
+                            </li>
+                        ))}
+                        </ul>
                     </div>
                     <nav className="level is-mobile">
                     <div className="level-left">
+                        <a className="level-item" onClick={this.addChild}>
+                        <span className="icon is-small"><FontAwesomeIcon icon='plus' /></span>
+                        </a>
                         <a className="level-item" onClick={this.editSkill}>
                         <span className="icon is-small"><FontAwesomeIcon icon='edit' /></span>
                         </a>
@@ -56,9 +71,9 @@ export class SkillCard extends Component {
                 </div>
                 <div className="media-right">
                     <small>{this.props.skill.optional ? 'Optional' : 'Not optional'}</small>
-                        {skill.tooltip.direction && 
+                        {skill.direction && 
                         <React.Fragment> <span style={{marginLeft:'5px', marginRight:'5px'}}>|</span> 
-                        <small>Tooltip @{skill.tooltip.direction}</small></React.Fragment>}
+                        <small>Tooltip @{skill.direction}</small></React.Fragment>}
                 </div>
             </article>
             <div className={`modal ${this.state.isActive ? "is-active" : ""}`}>
@@ -69,7 +84,7 @@ export class SkillCard extends Component {
                     <button className="delete" aria-label="close" onClick={this.toggleIsActive}></button>
                 </header>
                 <section className="modal-card-body">
-                    You are about to delete skill {this.props.skill.title}. Do you want to delete?
+                    You are about to delete skill {skill.title}. Do you want to delete?
                 </section>
                 <footer className="modal-card-foot">
                     <button className="button is-danger" onClick={this.deleteSkill}>Delete</button>

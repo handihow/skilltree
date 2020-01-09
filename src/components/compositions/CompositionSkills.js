@@ -9,6 +9,7 @@ import {toast} from 'react-toastify';
 import features from '../payments/Features';
 
 import {skillTreeToSkillArray, skillArrayToSkillTree} from './StandardFunctions';
+import update from 'react-addons-update';
 
 export class CompositionSkills extends Component {
 
@@ -20,7 +21,8 @@ export class CompositionSkills extends Component {
         isEditing: false,
         skilltrees: [],
         currentSkilltree: null,
-        flatSkills: [],
+        skills: [],
+        filteredSkills: [],
         currentSkill: null,
         featureId: 'unlimited-skills'
     }
@@ -31,13 +33,27 @@ export class CompositionSkills extends Component {
         .collection("skilltrees")
         .orderBy('order').get()
         .then(querySnapshot => {
-            const data = querySnapshot.docs.map(doc => doc.data());
-            const currentSkilltree = data[0]
-            const flatSkills = skillTreeToSkillArray(data[0].data);
-            currentComponent.setState({
-                skilltrees: data,
-                currentSkilltree: currentSkilltree,
-                flatSkills: flatSkills
+            const skilltrees = querySnapshot.docs.map(doc => doc.data());
+            db.collectionGroup('skills').where('composition', '==', currentComponent.state.compositionId)
+            .orderBy('order').get()
+            .then((querySnapshot) => {
+                const skills = [];
+                querySnapshot.docs.forEach((doc) => {
+                    const parent = doc.ref.path.split('/');
+                    const skill = {
+                        parent: parent,
+                        path: doc.ref.path,
+                        parentPath: [...parent.filter((p,i,a) => i < a.length-2)].join('/'),
+                        ...doc.data()
+                    }
+                    skills.push(skill);
+                });
+                currentComponent.setState({
+                    skilltrees: skilltrees,
+                    currentSkilltree: skilltrees[0],
+                    skills: skills,
+                    filteredSkills: skills.filter(s => s.skilltree === skilltrees[0].id)
+                });
             });
         })
         .catch(error => {
@@ -68,12 +84,13 @@ export class CompositionSkills extends Component {
 
     addSkill = () => {
         //maximum number of skills is 10 unless the unlimited feature is paid
-        if(this.state.flatSkills.length === 10 && !this.state.hasUnlockedUnlimitedSkills){
-            return toast.error('You cannot have more than 10 skills per skill tree. You can pay $1,- to unlock unlimited skills feature.');
+        if(this.state.filteredSkills.length === 10 && !this.state.hasUnlockedUnlimitedSkills){
+            toast.error('You cannot have more than 10 skills per skill tree. You can pay $1,- to unlock unlimited skills feature.');
+        } else {
+            this.setState({
+                showEditor: true
+            });
         }
-        this.setState({
-            showEditor: true
-        });
     }
 
     editSkill = (skill) => {
@@ -85,57 +102,98 @@ export class CompositionSkills extends Component {
     }
 
     updateSkill = (updatedSkill) => {
-        const skilltree = this.state.currentSkilltree.data.map((skill) => {
-            let foundIndex = skill.findIndex(s => s.id === updatedSkill.id);
-            if(foundIndex > -1){
-
-            }
-        })
-        db.collection('compositions')
-        .doc(this.state.compositionId)
-        .collection('skilltrees')
-        .doc(skilltree.id).set(skilltree, {merge: true})
-        .then(_=> {
-            if(this.state.isEditing){
-                const index = this.state.skilltrees.findIndex(st => st.id === skilltree.id);
-                this.setState({
-                    skilltrees: this.state.skilltrees.map((st) => {
-                        if(st.id === skilltree.id){
-                            st = skilltree
+        console.log(updatedSkill);
+        if(this.state.isEditing){
+            db.doc(updatedSkill.path).set({
+                description: updatedSkill.description,
+                title: updatedSkill.title,
+                links: updatedSkill.links,
+                optional: updatedSkill.optional,
+                direction: updatedSkill.direction
+            }, {merge: true})
+            .then( _ => {
+                const skillIndex = this.state.skills.findIndex(s => s.id === updatedSkill.id);
+                const filteredSkillIndex = this.state.filteredSkills.findIndex(fs => fs.id === updatedSkill.id);
+                if(skillIndex > -1){
+                    toast.info('Update succesvol');
+                    this.setState({
+                        showEditor: false,
+                        currentSkill: null,
+                        isEditing: false,
+                        skills: update(this.state.skills, {
+                                [skillIndex]: {
+                                    description: {$set: updatedSkill.description },
+                                    title: {$set: updatedSkill.title },
+                                    links: {$set: updatedSkill.links },
+                                    optional: {$set: updatedSkill.optional },
+                                    direction: {$set: updatedSkill.direction }
+                            }
+                        }),
+                        filteredSkills: update(this.state.filteredSkills, {
+                            [filteredSkillIndex]: {
+                                description: {$set: updatedSkill.description },
+                                title: {$set: updatedSkill.title },
+                                links: {$set: updatedSkill.links },
+                                optional: {$set: updatedSkill.optional },
+                                direction: {$set: updatedSkill.direction }
                         }
-                        return st;
-                    }),
-                    showEditor: false,
-                    currentSkilltree: null
-                });
-            } else {
-                this.setState({
-                    skilltrees: [...this.state.skilltrees, skilltree],
-                    showEditor: false
-                })
-            }
-        })
-        .catch(error => {
-            toast.error('Something went wrong...' + error.message);
-        })
+                    })
+                    })
+                } else {
+                    toast.info('Update succesvol, but skill not updated on the page. Please reload the page to reflect changes.');
+                    //something went wrong, could not find skill in skills anymore
+                    this.setState({
+                        showEditor: false,
+                        currentSkill: null,
+                        isEditing: false
+                    })
+                }
+                
+            })
+        }
     }  
 
     deleteSkill = (skill) => {
-        //check if at least one skilltree would remain
-        // if(this.state.skilltrees.length === 1){
-        //     return toast.error('You need to have at least one skilltree');
-        // }
-        // db.collection('compositions').doc(this.state.compositionId)
-        // .collection('skilltrees').doc(skilltree.id)
-        // .delete()
-        // .then(_ => {
-        //     this.setState({
-        //         skilltrees: [...this.state.skilltrees.filter((st) => st.id !== skilltree.id)]
-        //     })
-        // })
-        // .catch(error => {
-        //     toast.error('Something went wrong...' + error.message);
-        // });
+        // check if at least one skill would remain
+        if(skill.childCount > 0){
+            toast.error('This skill has children. Delete the child skills first');
+        } else {
+            db.doc(skill.path).delete()
+            .then(_ => {
+                if(skill.parent.length > 6){
+                    //need to update the child count on the parent document
+                    db.doc(skill.parentPath).get()
+                    .then(snapshot => {
+                        const parentSkill = snapshot.data();
+                        const childCount = parentSkill.childCount - 1;
+                        db.doc(skill.parentPath).set({
+                            childCount: childCount
+                        })
+                        .then( _ => {
+                            this.setState({
+                                skills: [...this.state.skills.filter((s) => s.id !== skill.id)],
+                                filteredSkills: [...this.state.filteredSkills.filter((fs) => fs.id !== skill.id)]
+                            })
+                        })
+                        .catch(err => {
+                            toast.error(err.message);
+                        })
+                    })
+                    .catch(err => {
+                        toast.error(err.message);
+                    })
+                } else {
+                    this.setState({
+                        skills: [...this.state.skills.filter((s) => s.id !== skill.id)],
+                        filteredSkills: [...this.state.filteredSkills.filter((fs) => fs.id !== skill.id)]
+                    })
+                }
+                
+            })
+            .catch(error => {
+                toast.error('Something went wrong...' + error.message);
+            });
+        }
     }
 
     closeModal = () => {
@@ -157,14 +215,14 @@ export class CompositionSkills extends Component {
                     <div className="column" style={{ marginTop: "10px" }}>
                         <div className="title">Skills</div>
                         <div className="buttons">
-                        <button className="button" onClick={this.addSkill}>Add skill</button>
+                        <button className="button" onClick={this.addSkill}>Add root skill</button>
                         {!this.state.hasUnlockedUnlimitedSkills && 
                         <Link to={`/compositions/${this.state.compositionId}/unlock/${this.state.featureId}`} 
                         className="button">Unlimited skills ${features[this.state.featureId].amount}</Link>}
                         </div>
                         <hr></hr>
                         <div className="container">
-                        {this.state.flatSkills && this.state.flatSkills.map((skill, index) =>(
+                        {this.state.filteredSkills && this.state.filteredSkills.map((skill, index) =>(
                             <SkillCard key={skill.id} 
                             skill={skill} editSkill={this.editSkill} 
                             deleteSkill={this.deleteSkill}/>
@@ -174,10 +232,11 @@ export class CompositionSkills extends Component {
                 </div>
                 {this.state.showEditor && <SkillForm 
                 isEditing={this.state.isEditing} 
-                skilltree={this.state.currentSkilltree} 
-                updateSkilltree={this.updateSkilltree}
+                skill={this.state.currentSkill} 
+                skills={this.state.filteredSkills}
+                updateSkill={this.updateSkill}
                 closeModal={this.closeModal}
-                order={this.state.skilltrees.length}/>}
+                />}
                 </React.Fragment>
                 
         )

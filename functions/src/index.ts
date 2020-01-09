@@ -1,5 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+const client = require('firebase-tools');
 admin.initializeApp(functions.config().firebase);
 
 const stripe = require("stripe")("sk_test_NBsrImMpFMEJboledtXIgBni00M9Z3A95l");
@@ -70,4 +71,34 @@ exports.secret = functions.https.onCall((data, context) => {
     });
   });
 
+  exports.deleteComposition = functions.https.onCall((data, context) => {
+    const composition = data.composition;
+
+    if(!context.auth || !context.auth.uid || context.auth.uid !== composition.user){
+        return {
+            error: "Request denied. You are not authorized to delete this composition."
+        }
+    }
+    
+    const compositionPath = `compositions/${composition.id}`;
+
+    return client.firestore
+          .delete(compositionPath, {
+            project: process.env.GCLOUD_PROJECT,
+            recursive: true,
+            yes: true
+          })
+          .then(() => {
+            return {
+              result: 'Skilltree page deleted successfully' 
+            };
+          })
+          .catch((error: any) => {
+              return {
+                  error: "Problem deleting skill tree page " + error
+              }
+          });
+  });
+
+  
 

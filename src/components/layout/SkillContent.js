@@ -1,5 +1,6 @@
 import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { linkIcons } from '../compositions/StandardData';
 
 export default function SkillContent(props) {
     return (
@@ -10,7 +11,7 @@ export default function SkillContent(props) {
                     <li key={link.id}>
                         <a href={link.reference} target="_blank" rel="noopener noreferrer">
                         <span style={{marginRight: '10px'}}>
-                        <FontAwesomeIcon icon={[link.iconLibrary, link.icon]} />
+                        <FontAwesomeIcon icon={[linkIcons[link.icon].iconLibrary, linkIcons[link.icon].icon]} />
                         </span>
                         {link.title}
                         </a>

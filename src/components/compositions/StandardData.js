@@ -80,19 +80,61 @@ export const standardData = [
           tooltip: {
             description:
               'This is the child of ‘Hello World and the sibling of ‘Hello Sun’. Notice how the app takes care of the layout automatically?',
-            links: [{
-                id: '1',
-                reference: 'https://youtube.com', 
-                title: 'Link to YouYube', 
-                icon: 'youtube-square',
-                iconLibrary: 'fab' 
-            }]
+            links: []
           },
           children: [],
         },
       ],
     },
   ];
+
+  export const standardRootSkill = {
+    title: 'Hello World',
+    description: 'This node is the top most level, and will be unlocked, and ready to be clicked.',
+    order: 0,
+    links: [],
+    childCount: 2
+  } 
+  
+  export const standardChildSkills = [
+    {
+      title: 'Hello Sun',
+      description:
+          'This is a child of the top node, and will be locked while the parent isn’t in a selected state.',
+      links: [{
+            id: 0,
+            reference: 'https://youtube.com', 
+            title: 'Link to YouYube', 
+            icon: 'youtube'
+        }],
+      order: 0,
+      childCount: 0
+    },
+    {
+      title: 'Hello Stars',
+      description:
+          'This is the child of ‘Hello World and the sibling of ‘Hello Sun’. Notice how the app takes care of the layout automatically?',
+      links: [],
+      order: 1,
+      childCount: 0
+    }
+  ];
+
+  export const linkIcons = {
+    'youtube': 
+      {
+        icon: 'youtube-square',
+        iconLibrary: 'fab'
+      },
+    'link': {
+        icon: 'link',
+        iconLibrary: 'fas'
+    },
+    'file': {
+        icon: 'file',
+        iconLibrary: 'fas'
+    }
+  }
 
   export const standardSkilltree = {
     collapsible: true,

@@ -71,7 +71,7 @@ export class CompositionItem extends Component {
                     You are about to delete skill tree page {title}. Do you want to delete?
                 </section>
                 <footer className="modal-card-foot">
-                    <button className="button is-danger" onClick={this.props.delComposition.bind(this, id)}>Delete</button>
+                    <button className="button is-danger" onClick={this.props.delComposition.bind(this, this.props.composition)}>Delete</button>
                     <button className="button" onClick={this.toggleIsActive}>Cancel</button>
                 </footer>
                 </div>

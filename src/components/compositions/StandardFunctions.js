@@ -9,30 +9,40 @@ export const skillTreeToSkillArray = (skills) => {
     return skillArray;
 }
 
-export const skillArrayToSkillTree = (skills, saveToDb) => {
+const filterChildren = (skill, skills) => {
+    const children = [];
+    let rawChildren = skills.filter(s => s.parent.length === skill.parent.length + 2 && s.parent.includes(skill.id));
+    rawChildren.forEach(rawChild => {
+        let childSkill = {
+            tooltip: {
+                content: <SkillContent description={rawChild.description} links={rawChild.links ? rawChild.links : []}/>,
+                direction: rawChild.direction ? rawChild.direction : 'top'
+            },
+            children: filterChildren(rawChild, skills),
+            links: rawChild.links? rawChild.links : [],
+            ...rawChild
+        };
+        children.push(childSkill);
+    });
+    return children
+}
+
+export const skillArrayToSkillTree = (skills) => {
     //first, extract all the root skills
     let skilltree = [];
     skills.forEach((skill, index) => {
-        if(skill.parent.length===1){
+        if(skill.parent.length===6){
+            let rootSkill = {
+                tooltip: {
+                    content: <SkillContent description={skill.description} links={skill.links ? skill.links : []}/>,
+                    direction: skill.direction ? skill.direction : 'top'
+                },
+                children: filterChildren(skill, skills),
+                ...skill
+            };
+
             //this is a root skill
-            skilltree.push(skill);
-        } else {
-            let parentSkill;
-            skill.parent.forEach((p, i, arr) => {
-                if(i===0){
-                    parentSkill = skilltree[p.childIndex];
-                } else if(parentSkill.id === p.parentId && i === arr.length - 1){
-                    //remove the calculated parent and tooltip content properties
-                    delete skill.parent;
-                    if(typeof saveToDb !== 'undefined' && saveToDb){
-                        delete skill.tooltip.content;
-                    }
-                    //now add the skill to the children of this parent
-                    parentSkill.children.push(skill);
-                } else {
-                    parentSkill = parentSkill.children[p.childIndex];
-                }
-            })
+            skilltree.push(rootSkill);
         }
     })
     return(skilltree);
@@ -49,7 +59,8 @@ const addToSkillArray = (arr, child, parent) => {
             links: child.tooltip.links,
         },
         parent: parent,
-        children: []
+        children: [],
+        countChildren: child.children.length
     };
     if(child.icon){
         flatSkill.icon = child.icon

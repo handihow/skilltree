@@ -6,6 +6,8 @@ import { db } from '../firebase/firebase';
 import uuid from 'uuid';
 import { connect } from "react-redux";
 import {toast} from 'react-toastify';
+import { standardChildSkills, standardRootSkill } from "./compositions/StandardData";
+import { functions } from '../firebase/firebase';
 
 class Home extends Component {
   
@@ -37,7 +39,6 @@ class Home extends Component {
       const newSkilltree = {
         id: uuid.v4(),
         title,
-        data,
         description: 'More information about my skill tree',
         collapsible: true,
         order: 0
@@ -48,42 +49,55 @@ class Home extends Component {
       .doc(newSkilltree.id)
       .set(newSkilltree)
       .then( _ => {
-        this.setState({compositions: [...this.state.compositions, newComposition]});
+        const newRootSkill = {id: uuid.v4(), skilltree: newSkilltree.id, composition: newComposition.id, ...standardRootSkill};
+        db.collection('compositions').doc(newComposition.id)
+        .collection('skilltrees').doc(newSkilltree.id)
+        .collection('skills').doc(newRootSkill.id).set(newRootSkill)
+        .then( _ => {
+          const batch = db.batch();
+          standardChildSkills.forEach((child) => {
+            const childId = uuid.v4();
+            const dbRef = db.collection('compositions').doc(newComposition.id)
+            .collection('skilltrees').doc(newSkilltree.id)
+            .collection('skills').doc(newRootSkill.id).collection('skills').doc(childId);
+            batch.set(dbRef, {id: childId, skilltree: newSkilltree.id, composition: newComposition.id, ...child});
+          })
+          batch.commit()
+          .then(_ => this.setState({compositions: [...this.state.compositions, newComposition]}))
+          .catch(error => {
+            toast.error(error.message);
+          });
+        })
+        .catch(error => {
+          toast.error(error.message);
+        })
+      })
+      .catch(error => {
+        toast.error(error.message);
       })
     })
-    .catch(err => {
-        toast(err.message);
+    .catch(error => {
+        toast(error.message);
     })
   }
 
-  delComposition = async (id) => {
-    const batch = db.batch();
-    const paymentSnapshot = await db.collection('compositions').doc(id).collection('payments').get();
-    if(!paymentSnapshot.empty){
-      paymentSnapshot.docs.forEach(doc => {
-        const paymentRef = db.collection('compositions').doc(id).collection('payments').doc(doc.id);
-        batch.delete(paymentRef);
-      })
-    }
-    const skilltreeSnapshot = await db.collection('compositions').doc(id).collection('skilltrees').get()
-    if(!skilltreeSnapshot.empty){
-      skilltreeSnapshot.docs.forEach(doc => {
-        const skilltreeRef = db.collection('compositions').doc(id).collection('skilltrees').doc(doc.id);
-        batch.delete(skilltreeRef);
-      });
-    }
-    const compositionRef = db.collection('compositions').doc(id);
-    batch.delete(compositionRef);
-    batch.commit()
-    .then(_ => {
-        toast.info('Skill tree deleted successfully');
-        this.setState({
-          compositions: [...this.state.compositions.filter((composition) => composition.id !== id)]
-        })
-    })
-    .catch(err => {
-      toast.error(err.message)
-    })
+  delComposition = (composition) => {
+    const id = composition.id;
+    let currentComponent = this;
+    const deleteComposition = functions.httpsCallable('deleteComposition');
+    deleteComposition({
+            composition
+    }).then(function(result) {
+            if(result.data.error){
+                return toast.error(result.data.error);
+            }
+            toast.info('Skill tree deleted successfully');
+            currentComponent.setState({
+              compositions: [...currentComponent.state.compositions.filter((composition) => composition.id !== id)]
+            })
+          }).catch(function(error) {
+            toast.error(error.message);
+          });;
   }
 
   render() {
