@@ -3,7 +3,7 @@ import { db, storage } from '../../firebase/firebase';
 import CompositionDisplay from '../layout/CompositionDisplay';
 import CompositionMenu from '../layout/CompositionMenu';
 import Loading from '../layout/Loading';
-import {skillArrayToSkillTree, skillTreeToSkillArray} from './StandardFunctions';
+import {skillArrayToSkillTree} from './StandardFunctions';
 
 export class Composition extends Component {
     

@@ -16,6 +16,7 @@ export class  SkillForm extends Component {
     };
 
     componentDidMount(){
+        console.log('mounting skill form');
         this.setState({
             title: this.props.isEditing ? this.props.skill.title : '',
             description: this.props.isEditing ? this.props.skill.description : '',
@@ -87,153 +88,142 @@ export class  SkillForm extends Component {
 
     render(){
         return (
-            <div className="modal is-active">
-            <div className="modal-background"></div>
-            <div className="modal-card" style={{overflow: 'auto'}}>
-                <header className="modal-card-head">
-                <p className="modal-card-title">{this.props.isEditing ? 'Edit skill' : 'Add skill'}</p>
-                <button className="delete" aria-label="close" onClick={this.props.closeModal}></button>
-                </header>
-                <form onSubmit={this.onSubmit}>
-                <section className="modal-card-body">
-                    <div className="field">
-                        <label className="label" htmlFor="title">Title</label>
+            <form className="box" onSubmit={this.onSubmit}>
+                <div className="field">
+                    <label className="label" htmlFor="title">Title</label>
+                    <div className="control">
+                        <input className="input" 
+                        name="title" type="text" placeholder="title" required 
+                        onChange={this.handleChange}
+                        value={this.state.title} />
+                    </div>
+                </div>
+                <div className="field-group">
+                <div className="field is-inline-block-desktop">
+                    <div className="field is-narrow">
+                        <label className="label">
+                            Optional skill
+                        </label>
                         <div className="control">
-                            <input className="input" 
-                            name="title" type="text" placeholder="title" required 
-                            onChange={this.handleChange}
-                            value={this.state.title} />
+                        <label className="radio">
+                            <input type="radio" name="optional" value={false}
+                                checked={!this.state.optional}
+                                onChange={this.handleOptionalChange} />
+                            <span style={{marginLeft: "5px"}}>Not optional</span>
+                        </label>
+                        <label className="radio">
+                            <input type="radio" name="optional" value={true}
+                                checked={this.state.optional}
+                                onChange={this.handleOptionalChange} />
+                            <span style={{marginLeft: "5px"}}>Optional</span>
+                        </label>
                         </div>
                     </div>
-                    <div className="field-group">
-                    <div className="field is-inline-block-desktop">
-                        <div className="field is-narrow">
-                            <label className="label">
-                                Optional skill
-                            </label>
-                            <div className="control">
-                            <label className="radio">
-                                <input type="radio" name="optional" value={false}
-                                    checked={!this.state.optional}
-                                    onChange={this.handleOptionalChange} />
-                                <span style={{marginLeft: "5px"}}>Not optional</span>
-                            </label>
-                            <label className="radio">
-                                <input type="radio" name="optional" value={true}
-                                    checked={this.state.optional}
-                                    onChange={this.handleOptionalChange} />
-                                <span style={{marginLeft: "5px"}}>Optional</span>
-                            </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="field is-inline-block-desktop" style={{marginLeft: "20px"}}>
-                        <div className="field is-narrow">
-                            <label className="label">
-                                Tooltip direction
-                            </label>
-                            <div className="control">
-                            {['top', 'left', 'right', 'bottom'].map((direction) => (
-                                <label className="radio" key={direction}>
-                                    <input type="radio" name="direction" value={direction}
-                                        checked={this.state.direction === direction}
-                                        onChange={this.handleChange} />
-                                    <span style={{marginLeft: "5px"}}>{direction}</span>
-                                </label>
-                            ))}
-                            </div>
-                        </div>
-                    </div>
-                    </div>
-                    <div className="field">
-                        <label className="label" htmlFor="description">Description</label>
+                </div>
+                <div className="field is-inline-block-desktop" style={{marginLeft: "20px"}}>
+                    <div className="field is-narrow">
+                        <label className="label">
+                            Tooltip direction
+                        </label>
                         <div className="control">
-                            <textarea className="textarea" 
-                            name="description" type="text" placeholder="description" required 
-                            onChange={this.handleChange}
-                            value={this.state.description} />
+                        {['top', 'left', 'right', 'bottom'].map((direction) => (
+                            <label className="radio" key={direction}>
+                                <input type="radio" name="direction" value={direction}
+                                    checked={this.state.direction === direction}
+                                    onChange={this.handleChange} />
+                                <span style={{marginLeft: "5px"}}>{direction}</span>
+                            </label>
+                        ))}
                         </div>
                     </div>
-                    {this.state.links.length > 0 && this.state.links.map((link, index)=> (
-                        <React.Fragment key={link.id}>
-                        <div className="field is-horizontal">
-                            <div className="field-label">
-                            <label className="label">Link type?</label>
-                            </div>
-                            <div className="field-body">
-                            <div className="field is-narrow">
-                                <div className="control">
-                                <label className="radio">
-                                    <input type="radio" name={`icon/${index}`} value='youtube' 
-                                        checked={this.state.links[index].icon === 'youtube'}
-                                        onChange={this.changeLink} />
-                                    <span style={{marginLeft: "5px"}}>YouTube</span>
-                                </label>
-                                <label className="radio">
-                                    <input type="radio" name={`icon/${index}`} value='file'
-                                    checked={this.state.links[index].icon === 'file'}
-                                    onChange={this.changeLink}/>
-                                    <span style={{marginLeft: "5px"}}>File</span>
-                                </label>
-                                <label className="radio">
-                                    <input type="radio" name={`icon/${index}`} value='link'
-                                    checked={this.state.links[index].icon === 'link'}
-                                    onChange={this.changeLink}/>
-                                    <span style={{marginLeft: "5px"}}>URL</span>
-                                </label>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-                        <div className="field is-horizontal">
-                            <div className="field-label">
-                            <label className="label">Link</label>
-                            </div>
-                            <div className="field-body">
-                                <div className="field is-inline-block">
-                                    <div className="control">
-                                        <input className="input" type="text" placeholder="title will display on the link"
-                                            name={`title/${index}`} value={this.state.links[index].title}
-                                            onChange={this.changeLink}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="field is-inline-block">
-                                    <div className="control">
-                                        <input className="input" type="text" placeholder="url to the video or file or link"
-                                            name={`reference/${index}`} value={this.state.links[index].reference}
-                                            onChange={this.changeLink}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="field is-horizontal">
+                </div>
+                </div>
+                <div className="field">
+                    <label className="label" htmlFor="description">Description</label>
+                    <div className="control">
+                        <textarea className="textarea" 
+                        name="description" type="text" placeholder="description" required 
+                        onChange={this.handleChange}
+                        value={this.state.description} />
+                    </div>
+                </div>
+                {this.state.links.length > 0 && this.state.links.map((link, index)=> (
+                    <React.Fragment key={link.id}>
+                    <div className="field is-horizontal">
                         <div className="field-label">
+                        <label className="label">Link type?</label>
                         </div>
                         <div className="field-body">
-                            <div className="field">
+                        <div className="field is-narrow">
                             <div className="control">
-                                <button type="button" className="button is-danger is-small"
-                                    onClick={() => this.removeLink(index)}>
-                                Remove link
-                                </button>
-                            </div>
+                            <label className="radio">
+                                <input type="radio" name={`icon/${index}`} value='youtube' 
+                                    checked={this.state.links[index].icon === 'youtube'}
+                                    onChange={this.changeLink} />
+                                <span style={{marginLeft: "5px"}}>YouTube</span>
+                            </label>
+                            <label className="radio">
+                                <input type="radio" name={`icon/${index}`} value='file'
+                                checked={this.state.links[index].icon === 'file'}
+                                onChange={this.changeLink}/>
+                                <span style={{marginLeft: "5px"}}>File</span>
+                            </label>
+                            <label className="radio">
+                                <input type="radio" name={`icon/${index}`} value='link'
+                                checked={this.state.links[index].icon === 'link'}
+                                onChange={this.changeLink}/>
+                                <span style={{marginLeft: "5px"}}>URL</span>
+                            </label>
                             </div>
                         </div>
                         </div>
-                        </React.Fragment>
-                    ))}
-                </section>
-                <footer className="modal-card-foot">
+                    </div>
+                    <div className="field is-horizontal">
+                        <div className="field-label">
+                        <label className="label">Link</label>
+                        </div>
+                        <div className="field-body">
+                            <div className="field is-inline-block">
+                                <div className="control">
+                                    <input className="input" type="text" placeholder="title will display on the link"
+                                        name={`title/${index}`} value={this.state.links[index].title}
+                                        onChange={this.changeLink}
+                                    />
+                                </div>
+                            </div>
+                            <div className="field is-inline-block">
+                                <div className="control">
+                                    <input className="input" type="text" placeholder="url to the video or file or link"
+                                        name={`reference/${index}`} value={this.state.links[index].reference}
+                                        onChange={this.changeLink}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="field is-horizontal">
+                    <div className="field-label">
+                    </div>
+                    <div className="field-body">
+                        <div className="field">
+                        <div className="control">
+                            <button type="button" className="button is-danger is-small"
+                                onClick={() => this.removeLink(index)}>
+                            Remove link
+                            </button>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                    </React.Fragment>
+                ))}
+                <div className="buttons">
                 <button className="button is-info" type="button" onClick={this.addLink}>Add Link</button>
                 <button className="button is-success">Save changes</button>
                 <button className="button" type="button" onClick={this.props.closeModal}>Cancel</button>
-                </footer>
-                </form>
-            </div>
-            </div>
+                </div>
+            </form>
         )
     }
 }

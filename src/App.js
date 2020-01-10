@@ -17,9 +17,8 @@ import CompositionSkills from './components/compositions/CompositionSkills';
 import Payments from './components/payments/Payments';
 import PaymentConfirmation from './components/payments/PaymentConfirmation';
 
-import CloseButton from './components/layout/CloseButton';
 import './App.sass';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Call it once in your app. At the root of your app is the best place
@@ -86,12 +85,6 @@ function App(props) {
       <Route path="/register" component={Register} />
       <Route path="/about" component={About} />
     </Switch>
-    <ToastContainer
-      className='toast-container'
-      toastClassName="notification"
-      progressClassName='progress'
-      closeButton={<CloseButton />}
-    />
     </React.Fragment>
   );
 }

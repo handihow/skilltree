@@ -313,3 +313,81 @@ export const gradients = [{value: "linear-gradient(to right, #59c173, #a17fe0, #
         {value: "linear-gradient(to right, #283048, #859398)", title: "Titanium"},
         {value: "linear-gradient(to right, #232526, #414345)", title: "Midnight City"},
         {value: "linear-gradient(to right, #ff512f, #dd2476)", title: "Bloody Mary"}];
+
+export const treebeardTheme =  {
+  tree: {
+      base: {
+          listStyle: 'none',
+          backgroundColor: '#eff0eb',
+          margin: 0,
+          padding: 0,
+          color: '0xFF',
+          fontFamily: 'nunito, lucida grande ,tahoma,verdana,arial,sans-serif',
+          fontSize: '16px'
+      },
+      node: {
+          base: {
+              position: 'relative'
+          },
+          link: {
+              cursor: 'pointer',
+              position: 'relative',
+              padding: '0px 5px',
+              display: 'block'
+          },
+          activeLink: {
+              background: '#eff0eb'
+          },
+          toggle: {
+              base: {
+                  position: 'relative',
+                  display: 'inline-block',
+                  verticalAlign: 'top',
+                  marginLeft: '-5px',
+                  height: '24px',
+                  width: '24px'
+              },
+              wrapper: {
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  margin: '-7px 0 0 -7px',
+                  height: '14px'
+              },
+              height: 14,
+              width: 14,
+              arrow: {
+                  fill: '#fa7c91',
+                  strokeWidth: 0
+              }
+          },
+          header: {
+              base: {
+                  display: 'inline-block',
+                  verticalAlign: 'top',
+                  color: '#363a3d'
+              },
+              connector: {
+                  width: '2px',
+                  height: '12px',
+                  borderLeft: 'solid 2px black',
+                  borderBottom: 'solid 2px black',
+                  position: 'absolute',
+                  top: '0px',
+                  left: '-21px'
+              },
+              title: {
+                  lineHeight: '24px',
+                  verticalAlign: 'middle'
+              }
+          },
+          subtree: {
+              listStyle: 'none',
+              paddingLeft: '19px'
+          },
+          loading: {
+              color: '#E2C089'
+          }
+      }
+  }
+};
