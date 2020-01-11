@@ -11,7 +11,7 @@ export default function SkillContent(props) {
                     <li key={link.id}>
                         <a href={link.reference} target="_blank" rel="noopener noreferrer">
                         <span style={{marginRight: '10px'}}>
-                        <FontAwesomeIcon icon={[linkIcons[link.icon].iconLibrary, linkIcons[link.icon].icon]} />
+                        <FontAwesomeIcon icon={[link.iconPrefix, link.iconName]} />
                         </span>
                         {link.title}
                         </a>

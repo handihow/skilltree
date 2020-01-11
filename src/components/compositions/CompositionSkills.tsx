@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { Redirect, Link } from 'react-router-dom';
 import { db } from '../../firebase/firebase';
 
@@ -6,88 +6,71 @@ import SkillForm from '../layout/SkillForm';
 import CompositionMenu from '../layout/CompositionMenu';
 import {toast} from 'react-toastify';
 import features from '../payments/Features';
-import {Treebeard} from 'react-treebeard';
 import {skillArrayToSkillTree} from './StandardFunctions';
-import {treebeardTheme} from './StandardData';
+import TreeView from '../layout/TreeView';
+import ISkill from '../../models/skill.model';
+import ISkilltree from '../../models/skilltree.model';
+import { RouteComponentProps } from 'react-router-dom';
+import { standardEmptySkill } from './StandardData';
 
-const decorators = {
-    Loading: (props) => {
-        return (
-            <div style={props.style}>
-                loading...
-            </div>
-        );
-    },
-    Toggle: (props) => {
-        return (
-            <div style={props.style}>
-                <svg height={props.height} width={props.width}>
-                    // Vector Toggle Here
-                </svg>
-            </div>
-        );
-    },
-    Header: (props) => {
-        return (
-            <div style={props.style}>
-                {props.node.name}
+interface ICompositionSkillsState{
+    hasUnlockedUnlimitedSkills: boolean;
+    toEditor: boolean;
+    showEditor: boolean;
+    isEditing: boolean;
+    skilltrees: ISkilltree[];
+    skills: ISkill[];
+    currentSkill?: ISkill;
+    featureId: string;
+    unsubscribe?: any;
+}
 
-            </div>
-        );
-    },
-    Container: (props) => {
-        return (
-            <div onClick={this.props.onClick}>
-                // Hide Toggle When Terminal Here
-                <this.props.decorators.Toggle/>
-                <this.props.decorators.Header/>
-            </div>
-        );
-    }
-};
 
-export class CompositionSkills extends PureComponent {
-    constructor(props){
+export class CompositionSkills extends Component<RouteComponentProps, ICompositionSkillsState> {
+    constructor(props: RouteComponentProps){
         super(props);
         this.state = {
-            compositionId: this.props.match.params.compositionId,
             hasUnlockedUnlimitedSkills: false,
             toEditor: false,
             showEditor: false,
             isEditing: false,
             skilltrees: [],
             skills: [],
-            currentSkill: null,
-            cursor: null,
             featureId: 'unlimited-skills'
         };
-        this.onToggle = this.onToggle.bind(this);
     }
+
 
     componentDidMount() {
         const currentComponent = this;
-        const compositionId = currentComponent.state.compositionId;
+        const compositionId = this.props.match.params.compositionId;
         db.collection("compositions").doc(compositionId)
         .collection("skilltrees")
         .orderBy('order').get()
         .then(async querySnapshot => {
-            const skilltrees = querySnapshot.docs.map(doc => doc.data());
+            const skilltrees = querySnapshot.docs.map(doc => doc.data() as ISkilltree);
             db.collectionGroup('skills').where('composition', '==', compositionId).orderBy('order').get()
             .then((querySnapshot) => {
-                const skills = [];
+                const skills : ISkill[] = [];
                 querySnapshot.docs.forEach((doc) => {
-                    const skill = {
+                    const skill : ISkill = {
                         parent: doc.ref.path.split('/'),
                         path: doc.ref.path,
                         name: doc.data().title,
                         isSkill: true,
-                        ...doc.data()
+                        decorators: {
+                            editSkill: () => this.editSkill(skill),
+                            closeModal: () => this.closeModal()
+                        },
+                        toggled: true,
+                        ...doc.data() as ISkill
                     }
                     skills.push(skill);
                 });
                 skilltrees.forEach((skilltree) => {
                     skilltree.name = skilltree.title;
                     skilltree.isSkill = false;
+                    skilltree.toggled = true;
                     skilltree.children = skillArrayToSkillTree(skills.filter(s => s.skilltree===skilltree.id));
                 });
                 this.setState({
@@ -100,13 +83,13 @@ export class CompositionSkills extends PureComponent {
             toast.error('Could not load skilltrees. Error ' + error.message);
         })
         const unsubscribe = db.collection('compositions')
-            .doc(currentComponent.state.compositionId)
+            .doc(compositionId)
             .collection('payments')
-            .doc(currentComponent.state.featureId)
+            .doc(this.state.featureId)
             .onSnapshot(function(doc) {
                 if(doc.exists){
-                    const paymentRecord = doc.data();
-                    if(paymentRecord.success){
+                    const paymentRecord = doc.data() || false;
+                    if(paymentRecord && paymentRecord.success){
                         currentComponent.setState({
                             hasUnlockedUnlimitedSkills: true
                         })
@@ -124,8 +107,8 @@ export class CompositionSkills extends PureComponent {
 
     addSkill = () => {
         //maximum number of skills is 10 unless the unlimited feature is paid
-        if(this.state.filteredSkills.length === 10 && !this.state.hasUnlockedUnlimitedSkills){
-            toast.error('You cannot have more than 10 skills per skill tree. You can pay $1,- to unlock unlimited skills feature.');
+        if(this.state.skills.length === 10 && !this.state.hasUnlockedUnlimitedSkills){
+            toast.error('You cannot have more than 10 skills. You can pay $1,- to unlock unlimited skills feature.');
         } else {
             this.setState({
                 showEditor: true
@@ -144,17 +127,10 @@ export class CompositionSkills extends PureComponent {
     updateSkill = (updatedSkill) => {
         console.log(updatedSkill);
         if(this.state.isEditing){
-            db.doc(updatedSkill.path).set({
-                description: updatedSkill.description,
-                title: updatedSkill.title,
-                links: updatedSkill.links,
-                optional: updatedSkill.optional,
-                direction: updatedSkill.direction
-            }, {merge: true})
+            db.doc(updatedSkill.path).set(updatedSkill, {merge: true})
             .then( _ => {
                 this.setState({
                     showEditor: false,
-                    currentSkill: null,
                     isEditing: false
                 });
             })
@@ -175,79 +151,49 @@ export class CompositionSkills extends PureComponent {
     }
 
     closeModal = () => {
-        console.log('closed modal')
         this.setState({
             showEditor : false,
-            currentSkilltree: null
         })
-    }
-
-    onToggle(node, toggled){
-        this.closeModal();
-        const {cursor, data} = this.state;
-        if (cursor) {
-            this.setState(() => ({cursor, active: false}));
-        }
-        node.active = true;
-        if (node.children) { 
-            node.toggled = toggled; 
-        }
-        this.setState(() => ({
-            cursor: node, 
-            data: Object.assign({}, data)
-        }));
-        console.log(node);
-        if(node.isSkill){
-            this.setState({
-                showEditor: true,
-                isEditing: true,
-                currentSkill: node
-            });
-        }
     }
     
     render() {
         const {skilltrees} = this.state;
-        console.log(this.state.showEditor)
         return (
             this.state.toEditor ?
-                <Redirect to={`/compositions/${this.state.compositionId}`} /> :
+                <Redirect to={`/compositions/${this.props.match.params.compositionId}`} /> :
                 <React.Fragment>
                 <div className="columns" >
                     <div className="column is-2">
-                        <CompositionMenu id={this.state.compositionId} />
+                        <CompositionMenu id={this.props.match.params.compositionId} />
                     </div>
                     <div className="column" style={{ marginTop: "10px" }}>
                         <div className="title">Skills</div>
                         <div className="buttons">
                         {!this.state.hasUnlockedUnlimitedSkills && 
-                        <Link to={`/compositions/${this.state.compositionId}/unlock/${this.state.featureId}`} 
+                        <Link to={`/compositions/${this.props.match.params.compositionId}/unlock/${this.state.featureId}`} 
                         className="button">Unlimited skills ${features[this.state.featureId].amount}</Link>}
                         </div>
                         <hr></hr>
                         <div className="container">
                         {skilltrees && skilltrees.map(tree => (
-                            <Treebeard
+                            <TreeView
                                 key={tree.id}
                                 data={tree}
-                                onToggle={this.onToggle}
-                                style={treebeardTheme}
+                                editSkill={this.editSkill}
                             />
-                        ))
-                        }
+                        ))}
                         </div>
                     </div>
                     <div className="column is-6">
                     {this.state.showEditor && <SkillForm 
                     isEditing={this.state.isEditing} 
-                    skill={this.state.currentSkill} 
+                    skill={this.state.currentSkill ? this.state.currentSkill : standardEmptySkill} 
                     skills={this.state.skills}
                     updateSkill={this.updateSkill}
                     closeModal={this.closeModal}
                     />}
                     </div>
                 </div>
-                
                 </React.Fragment>
                 
         )

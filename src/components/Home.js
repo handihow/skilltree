@@ -83,20 +83,33 @@ class Home extends Component {
 
   delComposition = (composition) => {
     const id = composition.id;
+    const toastId = uuid.v4();
     let currentComponent = this;
+    toast.info('Deleting skill tree page and all related data is in progress... please wait', {
+      toastId: toastId
+    })
     const deleteComposition = functions.httpsCallable('deleteComposition');
     deleteComposition({
             composition
     }).then(function(result) {
             if(result.data.error){
-                return toast.error(result.data.error);
+                toast.update(toastId, {
+                  render: result.data.error,
+                  
+                });
+            } else {
+              toast.update(toastId, {
+                render: 'Skill tree deleted successfully'
+              });
+              currentComponent.setState({
+                compositions: [...currentComponent.state.compositions.filter((composition) => composition.id !== id)]
+              })
             }
-            toast.info('Skill tree deleted successfully');
-            currentComponent.setState({
-              compositions: [...currentComponent.state.compositions.filter((composition) => composition.id !== id)]
-            })
           }).catch(function(error) {
-            toast.error(error.message);
+            toast.update(toastId, {
+              render: error.message,
+              type: toast.TYPE.ERROR
+            });
           });;
   }
 

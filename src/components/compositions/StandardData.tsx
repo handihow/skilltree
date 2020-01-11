@@ -1,3 +1,6 @@
+import ISkill from '../../models/skill.model';
+import uuid from 'uuid';
+
 export const standardTheme  = {
     backgroundColor: 'transparent',
     border: '2px solid white',
@@ -65,11 +68,11 @@ export const standardData = [
             description:
               'This is a child of the top node, and will be locked while the parent isn’t in a selected state.',
             links: [{
-                id: '1',
+                id: 0,
                 reference: 'https://youtube.com', 
                 title: 'Link to YouYube', 
-                icon: 'youtube-square',
-                iconLibrary: 'fab'
+                iconName: 'youtube-square',
+                iconPrefix: 'fab'
             }]
           },
           children: [],
@@ -88,35 +91,52 @@ export const standardData = [
     },
   ];
 
-  export const standardRootSkill = {
+  export const standardEmptySkill : ISkill = {
+    title: '',
+    description: '',
+    order: 0,
+    links: [],
+    id: uuid.v4(),
+    optional: false,
+    direction: 'top'
+  } 
+
+  export const standardRootSkill : ISkill = {
     title: 'Hello World',
     description: 'This node is the top most level, and will be unlocked, and ready to be clicked.',
     order: 0,
     links: [],
-    childCount: 2
+    id: uuid.v4(),
+    optional: false,
+    direction: 'top'
   } 
   
-  export const standardChildSkills = [
+  export const standardChildSkills: ISkill[] = [
     {
+      id: uuid.v4(),
       title: 'Hello Sun',
       description:
           'This is a child of the top node, and will be locked while the parent isn’t in a selected state.',
       links: [{
-            id: 0,
+            id: uuid.v4(),
             reference: 'https://youtube.com', 
             title: 'Link to YouYube', 
-            icon: 'youtube'
+            iconName: 'youtube-square',
+            iconPrefix: 'fab'
         }],
       order: 0,
-      childCount: 0
+      optional: false,
+      direction: 'top'
     },
     {
+      id: uuid.v4(),
       title: 'Hello Stars',
       description:
           'This is the child of ‘Hello World and the sibling of ‘Hello Sun’. Notice how the app takes care of the layout automatically?',
       links: [],
       order: 1,
-      childCount: 0
+      optional: false,
+      direction: 'top'
     }
   ];
 
@@ -295,7 +315,7 @@ export const standardData = [
     "Yellow",
     "YellowGreen",
   ]
-const colors = []; 
+const colors : any[] = []; 
 cssColors.forEach(color => {
     colors.push({value: color.toLocaleLowerCase(), title: color})
 });

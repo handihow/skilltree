@@ -66,7 +66,7 @@ export class Composition extends Component {
             this.state.skilltrees.length===0 ? 
             <Loading /> :
             <div className="columns" style={{marginBottom: '0rem'}}>
-                <div className="column is-2">
+                <div className="column is-2 has-background-white">
                     <CompositionMenu id={this.state.id}/>
                 </div>
                 <div className="column" style={this.state.hasBackgroundImage ? 

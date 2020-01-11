@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 export default function CompositionMenu(props) {
   return (
-      <aside className="menu" style={{margin: "10px"}}>
+      <aside className="menu has-background-white" style={{padding: '10px', height: "calc(100vh - 3.5rem)"}}>
         <ul className="menu-list">
         <p className="menu-label">
           Appearance
