@@ -110,7 +110,7 @@ class Home extends Component {
               render: error.message,
               type: toast.TYPE.ERROR
             });
-          });;
+          });
   }
 
   render() {

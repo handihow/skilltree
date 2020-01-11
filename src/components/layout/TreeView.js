@@ -19,8 +19,8 @@ class CustomContainer extends decorators.Container {
         setTimeout(() => node.decorators.editSkill(node), 100);
     }
 
-    closeModal = (node) => {
-        node.decorators.closeModal();
+    deleteSkill = (node) => {
+        node.decorators.deleteSkill(node);
     }
 
     render() {
@@ -48,7 +48,7 @@ class CustomContainer extends decorators.Container {
             <div className="level-item has-text-info" onClick={() => this.editSkill(node)} style={{cursor: 'pointer'}}>
              <FontAwesomeIcon icon='edit' />
           </div>
-          <div className="level-item has-text-danger" onClick={() => this.closeModal(node)} style={{cursor: 'pointer'}} >
+          <div className="level-item has-text-danger" onClick={() => this.deleteSkill(node)} style={{cursor: 'pointer'}} >
             <FontAwesomeIcon icon='trash' />
           </div>
         </div>}
@@ -94,7 +94,8 @@ export class TreeView extends Component {
 
 TreeView.propTypes = {
     data: PropTypes.object.isRequired,
-    editSkill: PropTypes.func.isRequired
+    editSkill: PropTypes.func.isRequired,
+    deleteSkill: PropTypes.func.isRequired
 };
 
 export default TreeView

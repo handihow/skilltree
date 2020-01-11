@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { Redirect, Link } from 'react-router-dom';
-import { db } from '../../firebase/firebase';
+import { db, functions } from '../../firebase/firebase';
 
+import uuid from 'uuid';
 import SkillForm from '../layout/SkillForm';
 import CompositionMenu from '../layout/CompositionMenu';
 import {toast} from 'react-toastify';
@@ -22,12 +23,14 @@ interface ICompositionSkillsState{
     skills: ISkill[];
     currentSkill?: ISkill;
     featureId: string;
-    unsubscribe?: any;
+    unsubscribeSkills?: any;
+    unsubscribePaymentFeature?: any;
 }
 
+type TParams =  { compositionId: string };
 
-export class CompositionSkills extends Component<RouteComponentProps, ICompositionSkillsState> {
-    constructor(props: RouteComponentProps){
+export class CompositionSkills extends Component<RouteComponentProps<TParams>, ICompositionSkillsState> {
+    constructor(props: RouteComponentProps<TParams>){
         super(props);
         this.state = {
             hasUnlockedUnlimitedSkills: false,
@@ -49,8 +52,8 @@ export class CompositionSkills extends Component<RouteComponentProps, ICompositi
         .orderBy('order').get()
         .then(async querySnapshot => {
             const skilltrees = querySnapshot.docs.map(doc => doc.data() as ISkilltree);
-            db.collectionGroup('skills').where('composition', '==', compositionId).orderBy('order').get()
-            .then((querySnapshot) => {
+            const unsubscribeSkills = db.collectionGroup('skills').where('composition', '==', compositionId).orderBy('order')
+            .onSnapshot((querySnapshot) => {
                 const skills : ISkill[] = [];
                 querySnapshot.docs.forEach((doc) => {
                     const skill : ISkill = {
@@ -60,7 +63,8 @@ export class CompositionSkills extends Component<RouteComponentProps, ICompositi
                         isSkill: true,
                         decorators: {
                             editSkill: () => this.editSkill(skill),
-                            closeModal: () => this.closeModal()
+                            closeModal: () => this.closeModal(),
+                            deleteSkill: () => this.deleteSkill(skill)
                         },
                         toggled: true,
                         ...doc.data() as ISkill
@@ -75,14 +79,15 @@ export class CompositionSkills extends Component<RouteComponentProps, ICompositi
                 });
                 this.setState({
                     skilltrees: skilltrees,
-                    skills: skills
+                    skills: skills,
+                    unsubscribeSkills: unsubscribeSkills
                 });
             })
         })
         .catch(error => {
             toast.error('Could not load skilltrees. Error ' + error.message);
         })
-        const unsubscribe = db.collection('compositions')
+        const unsubscribePaymentFeature = db.collection('compositions')
             .doc(compositionId)
             .collection('payments')
             .doc(this.state.featureId)
@@ -97,12 +102,13 @@ export class CompositionSkills extends Component<RouteComponentProps, ICompositi
                 }
             });
         currentComponent.setState({
-            unsubscribe: unsubscribe
+            unsubscribePaymentFeature: unsubscribePaymentFeature
         });
     }
 
     componentWillUnmount(){
-        this.state.unsubscribe();
+        this.state.unsubscribeSkills();
+        this.state.unsubscribePaymentFeature();
     }
 
     addSkill = () => {
@@ -124,11 +130,20 @@ export class CompositionSkills extends Component<RouteComponentProps, ICompositi
         })
     }
 
-    updateSkill = (updatedSkill) => {
-        console.log(updatedSkill);
-        if(this.state.isEditing){
-            db.doc(updatedSkill.path).set(updatedSkill, {merge: true})
+    updateSkill = (updatedSkill: ISkill) => {
+        if(this.state.isEditing && updatedSkill.path){
+            const skill : ISkill = {
+                id: updatedSkill.id,
+                title: updatedSkill.title,
+                description: updatedSkill.description,
+                direction: updatedSkill.direction,
+                links: updatedSkill.links,
+                order: updatedSkill.order,
+                optional: updatedSkill.optional
+            }
+            db.doc(updatedSkill.path).set(skill, {merge: true})
             .then( _ => {
+                toast.info(`${skill.title} updated successfully`);
                 this.setState({
                     showEditor: false,
                     isEditing: false
@@ -140,14 +155,32 @@ export class CompositionSkills extends Component<RouteComponentProps, ICompositi
         }
     }  
 
-    deleteSkill = (skill) => {
-        db.doc(skill.path).delete()
-        .then(_ => {
-            toast.info('Skill successfully deleted');
+    deleteSkill = (skill: ISkill) => {
+        const toastId = uuid.v4();
+        let currentComponent = this;
+        toast.info('Deleting skill all related child skills is in progress... please wait', {
+          toastId: toastId
         })
-        .catch(error => {
-            toast.error('Something went wrong...' + error.message);
-        });
+        const skillPath = skill.path;
+        const deleteSkill = functions.httpsCallable('deleteSkill');
+        deleteSkill({
+            skillPath
+        }).then(function(result) {
+                if(result.data.error){
+                    toast.update(toastId, {
+                      render: result.data.error,
+                    });
+                } else {
+                  toast.update(toastId, {
+                    render: 'Skill and related child skills deleted successfully'
+                  });
+                }
+              }).catch(function(error) {
+                toast.update(toastId, {
+                  render: error.message,
+                  type: toast.TYPE.ERROR
+                });
+              });
     }
 
     closeModal = () => {
@@ -180,6 +213,7 @@ export class CompositionSkills extends Component<RouteComponentProps, ICompositi
                                 key={tree.id}
                                 data={tree}
                                 editSkill={this.editSkill}
+                                deleteSkill={this.deleteSkill}
                             />
                         ))}
                         </div>

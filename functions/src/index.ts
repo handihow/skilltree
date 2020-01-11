@@ -100,5 +100,33 @@ exports.secret = functions.https.onCall((data, context) => {
           });
   });
 
+  exports.deleteSkill = functions.https.onCall((data, context) => {
+
+    if(!context.auth || !context.auth.uid){
+        return {
+            error: "Request denied. You are not authorized to delete this skill."
+        }
+    }
+    
+    const skillPath = data.skillPath;
+
+    return client.firestore
+          .delete(skillPath, {
+            project: process.env.GCLOUD_PROJECT,
+            recursive: true,
+            yes: true
+          })
+          .then(() => {
+            return {
+              result: 'Skill deleted successfully' 
+            };
+          })
+          .catch((error: any) => {
+              return {
+                  error: "Problem deleting skill " + error
+              }
+          });
+  });
+
   
 
