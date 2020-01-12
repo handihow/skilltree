@@ -71,62 +71,32 @@ exports.secret = functions.https.onCall((data, context) => {
     });
   });
 
-  exports.deleteComposition = functions.https.onCall((data, context) => {
-    const composition = data.composition;
+  exports.deleteFirestorePathRecursively = functions.https.onCall((data, context) => {
 
-    if(!context.auth || !context.auth.uid || context.auth.uid !== composition.user){
+    const collection : string = data.collection;
+
+    if(!context.auth || !context.auth.uid ){
         return {
-            error: "Request denied. You are not authorized to delete this composition."
+            error: `Request denied. You are not authorized to delete this ${collection.toLowerCase()}.`
         }
     }
     
-    const compositionPath = `compositions/${composition.id}`;
+    const path : string = data.path;
 
     return client.firestore
-          .delete(compositionPath, {
+          .delete(path, {
             project: process.env.GCLOUD_PROJECT,
             recursive: true,
             yes: true
           })
           .then(() => {
             return {
-              result: 'Skilltree page deleted successfully' 
+              result: `${collection} deleted successfully` 
             };
           })
           .catch((error: any) => {
               return {
-                  error: "Problem deleting skill tree page " + error
+                  error: `Problem deleting ${collection.toLowerCase()}: ${error} ` 
               }
           });
   });
-
-  exports.deleteSkill = functions.https.onCall((data, context) => {
-
-    if(!context.auth || !context.auth.uid){
-        return {
-            error: "Request denied. You are not authorized to delete this skill."
-        }
-    }
-    
-    const skillPath = data.skillPath;
-
-    return client.firestore
-          .delete(skillPath, {
-            project: process.env.GCLOUD_PROJECT,
-            recursive: true,
-            yes: true
-          })
-          .then(() => {
-            return {
-              result: 'Skill deleted successfully' 
-            };
-          })
-          .catch((error: any) => {
-              return {
-                  error: "Problem deleting skill " + error
-              }
-          });
-  });
-
-  
-

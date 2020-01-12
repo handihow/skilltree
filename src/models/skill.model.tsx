@@ -3,13 +3,14 @@ import ILink from './link.model';
 export default interface ISkill {
     composition?: string;        //references the composition ID
     skilltree?: string;          //references the skilltree ID
-    id: string;
+    id?: string;
     title: string;
     description: string;        
     links: ILink[];
-    order: number;
+    order?: number;
     optional: boolean;
     direction: string;
+    countChildren: number;
     //properties to track the parent and path
     parent?: string[];
     path?: string;

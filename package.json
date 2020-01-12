@@ -32,7 +32,8 @@
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "uuid": "^3.3.3",
-    "validator": "^12.1.0"
+    "validator": "^12.1.0",
+    "youtube-search": "^1.1.4"
   },
   "scripts": {
     "start": "react-scripts start",

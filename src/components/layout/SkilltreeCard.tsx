@@ -1,11 +1,23 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types';
 
-export class SkilltreeCard extends Component {
+interface ISkilltreeCardProps {
+    skilltree: any;
+    editSkilltree: Function;
+    deleteSkilltree: Function;
+}
 
-    state = {
-        isActive: false
-    };
+interface ISkilltreeCardState {
+    isActive: boolean;
+}
+
+export class SkilltreeCard extends Component<ISkilltreeCardProps, ISkilltreeCardState>  {
+
+    constructor(props: ISkilltreeCardProps){
+        super(props);
+        this.state = {
+            isActive: false
+        };
+    }
 
     editSkilltree = () => {
         this.props.editSkilltree(this.props.skilltree);
@@ -50,7 +62,7 @@ export class SkilltreeCard extends Component {
                     <button className="delete" aria-label="close" onClick={this.toggleIsActive}></button>
                 </header>
                 <section className="modal-card-body">
-                    You are about to delete skill tree {this.props.skilltree.title}. Do you want to delete?
+                    You are about to delete skill tree {this.props.skilltree.title} and all related skills. Do you want to delete?
                 </section>
                 <footer className="modal-card-foot">
                     <button className="button is-danger" onClick={this.deleteSkilltree}>Delete</button>
@@ -62,11 +74,5 @@ export class SkilltreeCard extends Component {
         )
     }
 }
-
-SkilltreeCard.propTypes = {
-    skilltree: PropTypes.object.isRequired,
-    editSkilltree: PropTypes.func.isRequired,
-    deleteSkilltree: PropTypes.func.isRequired
-};
 
 export default SkilltreeCard

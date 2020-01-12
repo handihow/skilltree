@@ -5,7 +5,7 @@ import Header from './layout/Header';
 import { db } from '../firebase/firebase';
 import uuid from 'uuid';
 import { connect } from "react-redux";
-import {toast} from 'react-toastify';
+import { toast } from 'react-toastify';
 import { standardChildSkills, standardRootSkill } from "./compositions/StandardData";
 import { functions } from '../firebase/firebase';
 
@@ -47,20 +47,29 @@ class Home extends Component {
       .doc(newComposition.id)
       .collection('skilltrees')
       .doc(newSkilltree.id)
-      .set(newSkilltree)
+      .set({composition: newComposition.id, ...newSkilltree})
       .then( _ => {
-        const newRootSkill = {id: uuid.v4(), skilltree: newSkilltree.id, composition: newComposition.id, ...standardRootSkill};
+        const newRootSkill = {
+          skilltree: newSkilltree.id, 
+          composition: newComposition.id, 
+          id: uuid.v4(),
+          ...standardRootSkill
+        };
         db.collection('compositions').doc(newComposition.id)
         .collection('skilltrees').doc(newSkilltree.id)
         .collection('skills').doc(newRootSkill.id).set(newRootSkill)
         .then( _ => {
           const batch = db.batch();
           standardChildSkills.forEach((child) => {
-            const childId = uuid.v4();
             const dbRef = db.collection('compositions').doc(newComposition.id)
             .collection('skilltrees').doc(newSkilltree.id)
-            .collection('skills').doc(newRootSkill.id).collection('skills').doc(childId);
-            batch.set(dbRef, {id: childId, skilltree: newSkilltree.id, composition: newComposition.id, ...child});
+            .collection('skills').doc(newRootSkill.id).collection('skills').doc(child.id);
+            batch.set(dbRef, {
+              skilltree: newSkilltree.id, 
+              composition: newComposition.id, 
+              id: uuid.v4(),
+              ...child
+            });
           })
           batch.commit()
           .then(_ => this.setState({compositions: [...this.state.compositions, newComposition]}))
@@ -87,10 +96,12 @@ class Home extends Component {
     let currentComponent = this;
     toast.info('Deleting skill tree page and all related data is in progress... please wait', {
       toastId: toastId
-    })
-    const deleteComposition = functions.httpsCallable('deleteComposition');
-    deleteComposition({
-            composition
+    });
+    const path = `compositions/${composition.id}`;
+    const deleteFirestorePathRecursively = functions.httpsCallable('deleteFirestorePathRecursively');
+    deleteFirestorePathRecursively({
+        collection: 'Skilltree page',
+        path: path
     }).then(function(result) {
             if(result.data.error){
                 toast.update(toastId, {
@@ -99,7 +110,7 @@ class Home extends Component {
                 });
             } else {
               toast.update(toastId, {
-                render: 'Skill tree deleted successfully'
+                render: 'Skill tree page deleted successfully'
               });
               currentComponent.setState({
                 compositions: [...currentComponent.state.compositions.filter((composition) => composition.id !== id)]

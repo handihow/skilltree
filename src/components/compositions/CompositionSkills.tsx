@@ -22,6 +22,9 @@ interface ICompositionSkillsState{
     skilltrees: ISkilltree[];
     skills: ISkill[];
     currentSkill?: ISkill;
+    parentSkill?: ISkill;
+    parentSkilltree?: ISkilltree;
+    isAddingRootSkill?: boolean;
     featureId: string;
     unsubscribeSkills?: any;
     unsubscribePaymentFeature?: any;
@@ -51,7 +54,7 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
         .collection("skilltrees")
         .orderBy('order').get()
         .then(async querySnapshot => {
-            const skilltrees = querySnapshot.docs.map(doc => doc.data() as ISkilltree);
+            const skilltrees = querySnapshot.docs.map(doc => { return {path: doc.ref.path,...doc.data() as ISkilltree}});
             const unsubscribeSkills = db.collectionGroup('skills').where('composition', '==', compositionId).orderBy('order')
             .onSnapshot((querySnapshot) => {
                 const skills : ISkill[] = [];
@@ -62,6 +65,7 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
                         name: doc.data().title,
                         isSkill: true,
                         decorators: {
+                            addSkill: () => this.addSkill(skill),
                             editSkill: () => this.editSkill(skill),
                             closeModal: () => this.closeModal(),
                             deleteSkill: () => this.deleteSkill(skill)
@@ -72,10 +76,15 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
                     skills.push(skill);
                 });
                 skilltrees.forEach((skilltree) => {
+                    const filteredSkills = skills.filter(s => s.skilltree===skilltree.id);
                     skilltree.name = skilltree.title;
                     skilltree.isSkill = false;
                     skilltree.toggled = true;
-                    skilltree.children = skillArrayToSkillTree(skills.filter(s => s.skilltree===skilltree.id));
+                    skilltree.children = skillArrayToSkillTree(filteredSkills);
+                    skilltree.decorators = {
+                        addSkill: () => this.addSkill(undefined,skilltree)
+                    };
+                    skilltree.countChildren = filteredSkills.length;
                 });
                 this.setState({
                     skilltrees: skilltrees,
@@ -111,13 +120,19 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
         this.state.unsubscribePaymentFeature();
     }
 
-    addSkill = () => {
+    addSkill = (skill?: ISkill, skilltree?: ISkilltree) => {
         //maximum number of skills is 10 unless the unlimited feature is paid
-        if(this.state.skills.length === 10 && !this.state.hasUnlockedUnlimitedSkills){
-            toast.error('You cannot have more than 10 skills. You can pay $1,- to unlock unlimited skills feature.');
+        if(this.state.skills.length === 20 && !this.state.hasUnlockedUnlimitedSkills){
+            toast.error('You cannot have more than 20 skills. You can pay $1,- to unlock unlimited skills feature.');
         } else {
+            //add a child to an existing skill
             this.setState({
-                showEditor: true
+                showEditor: true,
+                currentSkill: {id: uuid.v4(),...standardEmptySkill},
+                isEditing: false,
+                parentSkill: skill,
+                parentSkilltree: skilltree,
+                isAddingRootSkill: typeof skill == 'undefined' ? true : false
             });
         }
     }
@@ -131,40 +146,74 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
     }
 
     updateSkill = (updatedSkill: ISkill) => {
+        let path = '';
         if(this.state.isEditing && updatedSkill.path){
-            const skill : ISkill = {
-                id: updatedSkill.id,
-                title: updatedSkill.title,
-                description: updatedSkill.description,
-                direction: updatedSkill.direction,
-                links: updatedSkill.links,
-                order: updatedSkill.order,
-                optional: updatedSkill.optional
-            }
-            db.doc(updatedSkill.path).set(skill, {merge: true})
+            path = updatedSkill.path;
+        } else if(!this.state.isEditing 
+                    && !this.state.isAddingRootSkill) {
+            path = `${this.state.parentSkill?.path}/skills/${updatedSkill.id}`
+        } else if(!this.state.isEditing 
+                    && this.state.isAddingRootSkill) {
+            path = `${this.state.parentSkilltree?.path}/skills/${updatedSkill.id}`
+        }
+        let skill : ISkill = {
+            id: updatedSkill.id,
+            title: updatedSkill.title,
+            description: updatedSkill.description,
+            direction: updatedSkill.direction,
+            links: updatedSkill.links,
+            optional: updatedSkill.optional,
+            countChildren: updatedSkill.countChildren
+        }
+        if(!this.state.isEditing && !this.state.isAddingRootSkill){
+            skill.composition = this.state.parentSkill?.composition;
+            skill.skilltree = this.state.parentSkill?.skilltree;
+            skill.order = this.state.parentSkill?.countChildren;
+        } else if(!this.state.isEditing && this.state.isAddingRootSkill){
+            skill.composition = this.state.parentSkilltree?.composition;
+            skill.skilltree = this.state.parentSkilltree?.id;
+            skill.order = this.state.parentSkilltree?.countChildren;
+        }
+        if(path !== ''){
+            db.doc(path).set(skill, {merge: true})
             .then( _ => {
-                toast.info(`${skill.title} updated successfully`);
-                this.setState({
-                    showEditor: false,
-                    isEditing: false
-                });
+                if(this.state.isEditing || (!this.state.isEditing && this.state.isAddingRootSkill)){
+                    this.onSuccessfullUpdate(skill);
+                } else if(!this.state.isEditing && this.state.parentSkill && this.state.parentSkill.path) {
+                    db.doc(this.state.parentSkill.path).set({
+                        countChildren: this.state.parentSkill?.countChildren + 1
+                    }, {merge: true})
+                    .then( _ => {
+                        this.onSuccessfullUpdate(skill);
+                    })
+                }
             })
             .catch(err => {
                 toast.error(err.message);
             });
+        } else {
+            toast.error('Could not construct the path to updated skill')
         }
     }  
 
+    onSuccessfullUpdate(skill: ISkill){
+        toast.info(`${skill.title} updated successfully`);
+        this.setState({
+            showEditor: false,
+            isEditing: false
+        });
+    }
+
     deleteSkill = (skill: ISkill) => {
         const toastId = uuid.v4();
-        let currentComponent = this;
         toast.info('Deleting skill all related child skills is in progress... please wait', {
           toastId: toastId
         })
         const skillPath = skill.path;
-        const deleteSkill = functions.httpsCallable('deleteSkill');
-        deleteSkill({
-            skillPath
+        const deleteFirestorePathRecursively = functions.httpsCallable('deleteFirestorePathRecursively');
+        deleteFirestorePathRecursively({
+            collection: 'Skill',
+            path: skillPath
         }).then(function(result) {
                 if(result.data.error){
                     toast.update(toastId, {
@@ -221,10 +270,10 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
                     <div className="column is-6">
                     {this.state.showEditor && <SkillForm 
                     isEditing={this.state.isEditing} 
-                    skill={this.state.currentSkill ? this.state.currentSkill : standardEmptySkill} 
-                    skills={this.state.skills}
+                    skill={this.state.currentSkill ? this.state.currentSkill : {id: uuid.v4(), ...standardEmptySkill}} 
                     updateSkill={this.updateSkill}
                     closeModal={this.closeModal}
+                    parentName={this.state.parentSkill ? this.state.parentSkill.title : ''}
                     />}
                     </div>
                 </div>

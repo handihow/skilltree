@@ -7,10 +7,10 @@ import ISkill from '../../models/skill.model';
 
 interface ISkillFormProps {
     skill: ISkill;
-    skills: ISkill[];
     isEditing: boolean;
     updateSkill: Function;
     closeModal: Function;
+    parentName: string;
 }
 
 interface ISkillFormState{
@@ -29,11 +29,9 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
 
 
     componentDidMount(){
-        if(this.props.isEditing){
-            this.setState({
-                skill: this.props.skill
-            });
-        }
+        this.setState({
+            skill: this.props.skill,
+        })
     }
 
     addLink = () => {
@@ -117,7 +115,8 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                     <div className="level-left">
                         <div className="level-item">
                             <h6 className="title is-6">
-                                {this.state.skill ?  'Editing ' + this.state.skill.title : 'Add skill' }
+                                {this.props.isEditing ?  'Editing ' + (this.state.skill ? this.state.skill.title : '') 
+                                    : 'Add skill to ' + this.props.parentName }
                             </h6>
                         </div>
                     </div>
@@ -151,7 +150,7 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                         </label>
                         <label className="radio">
                             <input type="radio" name="optional"
-                                checked={this.state.skill && this.state.skill.optional}
+                                checked={this.state.skill && this.state.skill.optional ? true : false}
                                 onChange={() => this.handleOptionalChange('true')} />
                             <span style={{marginLeft: "5px"}}>Optional</span>
                         </label>
@@ -167,7 +166,7 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                         {['top', 'left', 'right', 'bottom'].map((direction) => (
                             <label className="radio" key={direction}>
                                 <input type="radio" name="direction" value={direction}
-                                    checked={this.state.skill && this.state.skill.direction === direction}
+                                    checked={this.state.skill && this.state.skill.direction === direction ? true : false}
                                     onChange={this.handleChange} />
                                 <span style={{marginLeft: "5px"}}>{direction}</span>
                             </label>

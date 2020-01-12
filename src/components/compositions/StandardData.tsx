@@ -96,9 +96,9 @@ export const standardData = [
     description: '',
     order: 0,
     links: [],
-    id: uuid.v4(),
     optional: false,
-    direction: 'top'
+    direction: 'top',
+    countChildren: 0
   } 
 
   export const standardRootSkill : ISkill = {
@@ -106,14 +106,13 @@ export const standardData = [
     description: 'This node is the top most level, and will be unlocked, and ready to be clicked.',
     order: 0,
     links: [],
-    id: uuid.v4(),
     optional: false,
-    direction: 'top'
+    direction: 'top',
+    countChildren: 2
   } 
   
   export const standardChildSkills: ISkill[] = [
     {
-      id: uuid.v4(),
       title: 'Hello Sun',
       description:
           'This is a child of the top node, and will be locked while the parent isn’t in a selected state.',
@@ -126,17 +125,18 @@ export const standardData = [
         }],
       order: 0,
       optional: false,
-      direction: 'top'
+      direction: 'top',
+      countChildren: 0
     },
     {
-      id: uuid.v4(),
       title: 'Hello Stars',
       description:
           'This is the child of ‘Hello World and the sibling of ‘Hello Sun’. Notice how the app takes care of the layout automatically?',
       links: [],
       order: 1,
       optional: false,
-      direction: 'top'
+      direction: 'top',
+      countChildren: 0
     }
   ];
 

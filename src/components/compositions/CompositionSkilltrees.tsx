@@ -1,46 +1,66 @@
 import React, { Component } from 'react'
 import { Redirect, Link } from 'react-router-dom';
-import { db } from '../../firebase/firebase';
+import { db, functions } from '../../firebase/firebase';
+import { RouteComponentProps } from 'react-router-dom';
+import uuid from 'uuid';
 
 import SkilltreeForm from '../layout/SkilltreeForm';
 import CompositionMenu from '../layout/CompositionMenu';
 import SkilltreeCard from '../layout/SkilltreeCard';
 import {toast} from 'react-toastify';
 import features from '../payments/Features';
+import ISkilltree from '../../models/skilltree.model';
 
-export class CompositionSkilltrees extends Component {
+interface ICompositionSkilltreesState{
+    hasUnlockedUnlimitedSkilltrees: boolean;
+    toEditor: boolean;
+    showEditor: boolean;
+    isEditing: boolean;
+    skilltrees: ISkilltree[];
+    featureId: string;
+    currentSkilltree?: ISkilltree;
+    unsubscribeSkilltrees?: any;
+    unsubscribePaymentFeature?: any;
+}
 
-    state = {
-        compositionId: this.props.match.params.compositionId,
-        hasUnlockedUnlimitedSkilltrees: false,
-        toEditor: false,
-        showEditor: false,
-        isEditing: false,
-        skilltrees: [],
-        currentSkilltree: null,
-        featureId: 'unlimited-skilltrees'
+type TParams =  { compositionId: string };
+
+export class CompositionSkilltrees extends Component<RouteComponentProps<TParams>, ICompositionSkilltreesState> {
+    constructor(props: RouteComponentProps<TParams>){
+        super(props);
+        this.state = {
+            hasUnlockedUnlimitedSkilltrees: false,
+            toEditor: false,
+            showEditor: false,
+            isEditing: false,
+            skilltrees: [],
+            featureId: 'unlimited-skilltrees'
+        };
     }
 
     componentDidMount() {
         const currentComponent = this;
-        db.collection("compositions").doc(currentComponent.state.compositionId)
+        const compositionId = this.props.match.params.compositionId;
+        const unsubscribeSkilltrees = db.collection("compositions").doc(compositionId)
         .collection("skilltrees")
-        .orderBy('order').get()
-        .then(querySnapshot => {
-            const data = querySnapshot.docs.map(doc => doc.data());
-            currentComponent.setState({skilltrees: data });
-        })
-        .catch(error => {
+        .orderBy('order')
+        .onSnapshot(querySnapshot => {
+            const data = querySnapshot.docs.map(doc => doc.data() as ISkilltree);
+            currentComponent.setState({
+                skilltrees: data,
+                unsubscribeSkilltrees: unsubscribeSkilltrees
+            });
+        }, (error) => {
             toast.error('Could not load skilltrees. Error ' + error.message);
         })
-        const unsubscribe = db.collection('compositions')
-            .doc(currentComponent.state.compositionId)
+        const unsubscribePaymentFeature = db.collection('compositions')
+            .doc(compositionId)
             .collection('payments')
             .doc(currentComponent.state.featureId)
             .onSnapshot(function(doc) {
                 if(doc.exists){
                     const paymentRecord = doc.data();
-                    if(paymentRecord.success){
+                    if(paymentRecord && paymentRecord.success){
                         currentComponent.setState({
                             hasUnlockedUnlimitedSkilltrees: true
                         })
@@ -48,12 +68,13 @@ export class CompositionSkilltrees extends Component {
                 }
             });
         currentComponent.setState({
-            unsubscribe: unsubscribe
+            unsubscribePaymentFeature: unsubscribePaymentFeature
         });
     }
 
     componentWillUnmount(){
-        this.state.unsubscribe();
+        this.state.unsubscribeSkilltrees();
+        this.state.unsubscribePaymentFeature();
     }
 
     addSkilltree = () => {
@@ -62,7 +83,8 @@ export class CompositionSkilltrees extends Component {
             return toast.error('You cannot have more than 2 skilltrees. You can pay $1,- to unlock unlimited skill trees feature.');
         }
         this.setState({
-            showEditor: true
+            showEditor: true,
+            isEditing: false
         });
     }
 
@@ -74,30 +96,19 @@ export class CompositionSkilltrees extends Component {
         })
     }
 
-    updateSkilltree = (skilltree) => {
+    updateSkilltree = (skilltree: ISkilltree) => {
+        if(!this.state.isEditing){
+            skilltree.composition = this.props.match.params.compositionId;
+        }
         db.collection('compositions')
-        .doc(this.state.compositionId)
+        .doc(this.props.match.params.compositionId)
         .collection('skilltrees')
         .doc(skilltree.id).set(skilltree, {merge: true})
         .then(_=> {
-            if(this.state.isEditing){
-                const index = this.state.skilltrees.findIndex(st => st.id === skilltree.id);
-                this.setState({
-                    skilltrees: this.state.skilltrees.map((st) => {
-                        if(st.id === skilltree.id){
-                            st = skilltree
-                        }
-                        return st;
-                    }),
-                    showEditor: false,
-                    currentSkilltree: null
-                });
-            } else {
-                this.setState({
-                    skilltrees: [...this.state.skilltrees, skilltree],
-                    showEditor: false,
-                })
-            }
+            toast.info("Skilltree successfully updated");
+            this.setState({
+                showEditor: false
+            });
         })
         .catch(error => {
             toast.error('Something went wrong...' + error.message);
@@ -105,45 +116,54 @@ export class CompositionSkilltrees extends Component {
     }  
 
     deleteSkilltree = (skilltree) => {
-        //check if at least one skilltree would remain
-        if(this.state.skilltrees.length === 1){
-            return toast.error('You need to have at least one skilltree');
-        }
-        db.collection('compositions').doc(this.state.compositionId)
-        .collection('skilltrees').doc(skilltree.id)
-        .delete()
-        .then(_ => {
-            this.setState({
-                skilltrees: [...this.state.skilltrees.filter((st) => st.id !== skilltree.id)]
-            })
+        const toastId = uuid.v4();
+        toast.info('Deleting skill all related child skills is in progress... please wait', {
+          toastId: toastId
         })
-        .catch(error => {
-            toast.error('Something went wrong...' + error.message);
-        });
+        const skilltreePath = `compositions/${this.props.match.params.compositionId}/skilltrees/${skilltree.id}`;
+        const deleteFirestorePathRecursively = functions.httpsCallable('deleteFirestorePathRecursively');
+        deleteFirestorePathRecursively({
+            collection: 'Skilltree',
+            path: skilltreePath
+        }).then(function(result) {
+                if(result.data.error){
+                    toast.update(toastId, {
+                      render: result.data.error,
+                    });
+                } else {
+                  toast.update(toastId, {
+                    render: 'Skilltree and related child skills deleted successfully'
+                  });
+                }
+              }).catch(function(error) {
+                toast.update(toastId, {
+                  render: error.message,
+                  type: toast.TYPE.ERROR
+                });
+              });
     }
 
     closeModal = () => {
         this.setState({
             showEditor : false,
-            currentSkilltree: null
         })
     }
     
     render() {
         return (
             this.state.toEditor ?
-                <Redirect to={`/compositions/${this.state.compositionId}`} /> :
+                <Redirect to={`/compositions/${this.props.match.params.compositionId}`} /> :
                 <React.Fragment>
                 <div className="columns" >
                     <div className="column is-2">
-                        <CompositionMenu id={this.state.compositionId} />
+                        <CompositionMenu id={this.props.match.params.compositionId} />
                     </div>
                     <div className="column" style={{ marginTop: "10px" }}>
                         <div className="title">Skilltrees</div>
                         <div className="buttons">
                         <button className="button" onClick={this.addSkilltree}>Add skilltree</button>
                         {!this.state.hasUnlockedUnlimitedSkilltrees && 
-                                <Link to={`/compositions/${this.state.compositionId}/unlock/${this.state.featureId}`} 
+                                <Link to={`/compositions/${this.props.match.params.compositionId}/unlock/${this.state.featureId}`} 
                         className="button">Unlimited skilltrees ${features[this.state.featureId].amount}</Link>}
                         </div>
                         <hr></hr>

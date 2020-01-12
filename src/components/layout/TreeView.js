@@ -23,6 +23,15 @@ class CustomContainer extends decorators.Container {
         node.decorators.deleteSkill(node);
     }
 
+    addSkill = (node) => {
+      node.decorators.closeModal();
+      setTimeout(() => node.decorators.addSkill(node), 100);
+    }
+
+    addRootSkill = (node) => {
+      setTimeout(() => node.decorators.addSkill(undefined, node), 100);
+    }
+
     render() {
       const { style, decorators, terminal, onClick, node } = this.props;
       return (
@@ -41,17 +50,23 @@ class CustomContainer extends decorators.Container {
             </div>
           
         </div>
-        {node.isSkill && <div className="level-right">
-            <div className="level-item has-text-success" style={{cursor: 'pointer'}}>
+        <div className="level-right">
+          
+          
+          {node.isSkill ? <React.Fragment>
+          <div className="level-item has-text-success" onClick={() => this.addSkill(node)} style={{cursor: 'pointer'}}>
             <FontAwesomeIcon icon='plus' />
           </div>
-            <div className="level-item has-text-info" onClick={() => this.editSkill(node)} style={{cursor: 'pointer'}}>
+          <div className="level-item has-text-info" onClick={() => this.editSkill(node)} style={{cursor: 'pointer'}}>
              <FontAwesomeIcon icon='edit' />
           </div>
           <div className="level-item has-text-danger" onClick={() => this.deleteSkill(node)} style={{cursor: 'pointer'}} >
             <FontAwesomeIcon icon='trash' />
-          </div>
-        </div>}
+          </div></React.Fragment> :
+          <div className="level-item has-text-success" onClick={() => this.addRootSkill(node)} style={{cursor: 'pointer'}}>
+            <FontAwesomeIcon icon='plus' />
+          </div>}
+        </div>
         </div>
       );
     }
