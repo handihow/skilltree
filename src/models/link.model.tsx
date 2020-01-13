@@ -6,4 +6,7 @@ export default interface ILink {
     iconPrefix: IconPrefix;
     reference: string;
     title: string;
+    description?: string;
+    imageUrl?: string;
+    filename?: string;
 }

@@ -4,7 +4,9 @@ import ILink from '../../models/link.model';
 
 interface ILinkProps {
     link: ILink;
-    deleteLink: Function;
+    deleteLink?: Function;
+    selectLink?: Function;
+    isSelected?: boolean;
 }
 
 interface ILinkState{
@@ -19,26 +21,38 @@ export class LinkCard extends Component<ILinkProps, ILinkState> {
             isActive: false
         };
     }
-
-    deleteSkill = () => {
-        this.props.deleteLink(this.props.link);
-    }
     
     render() {
         const {link} = this.props;
         return (
-            <li key={link.id}>
-                <a href={link.reference} target="_blank" rel="noopener noreferrer">
-                <span style={{marginRight: '10px'}}>
-                    <FontAwesomeIcon icon={[link.iconPrefix, link.iconName]} />
-                </span>
-                {link.title}
-                </a>
-                <span style={{float: 'right'}}>
-                    <button className="delete" onClick={() => this.props.deleteLink(link.id)}></button>
-                </span>
-                
-            </li>
+            <article className="media">
+                <figure className="media-left">
+                <p className="image is-64x64">
+                    <img src={link.imageUrl? link.imageUrl: "https://bulma.io/images/placeholders/128x128.png"} alt='' />
+                </p>
+                </figure>
+                <div className="media-content">
+                <div className="content">
+                    <p>
+                    <a href={link.reference} target="_blank" rel="noopener noreferrer">
+                    <span style={{marginRight: '10px'}}>
+                        <FontAwesomeIcon icon={[link.iconPrefix, link.iconName]} />
+                    </span>
+                    {link.title}
+                    </a>
+                    {link.description && <React.Fragment>
+                    <br></br>{link.description}</React.Fragment>}
+                    </p>
+                </div>
+                </div>
+                <div className="media-right">
+                {typeof this.props.deleteLink !=='undefined' ?
+                <button className="delete" onClick={() => this.props.deleteLink!(link.id)}></button> : null}
+                {typeof this.props.selectLink !=='undefined' ?
+                <button className={`button ${this.props.isSelected ? "is-success" : ""}`} 
+                onClick={() => this.props.selectLink!(link)}>Select</button> : null}
+                </div>
+            </article>
         )
     }
 }

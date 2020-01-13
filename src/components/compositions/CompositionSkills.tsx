@@ -18,6 +18,7 @@ interface ICompositionSkillsState{
     hasUnlockedUnlimitedSkills: boolean;
     toEditor: boolean;
     showEditor: boolean;
+    showWarning: boolean;
     isEditing: boolean;
     skilltrees: ISkilltree[];
     skills: ISkill[];
@@ -39,6 +40,7 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
             hasUnlockedUnlimitedSkills: false,
             toEditor: false,
             showEditor: false,
+            showWarning: false,
             isEditing: false,
             skilltrees: [],
             skills: [],
@@ -205,11 +207,19 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
     }
 
     deleteSkill = (skill: ISkill) => {
+        this.setState({
+            currentSkill: skill,
+            showWarning: true
+        })
+    }
+
+    confirmDeleteSkill = () => {
+        const currentComponent = this;
         const toastId = uuid.v4();
         toast.info('Deleting skill all related child skills is in progress... please wait', {
           toastId: toastId
         })
-        const skillPath = skill.path;
+        const skillPath = this.state.currentSkill?.path;
         const deleteFirestorePathRecursively = functions.httpsCallable('deleteFirestorePathRecursively');
         deleteFirestorePathRecursively({
             collection: 'Skill',
@@ -224,12 +234,21 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
                     render: 'Skill and related child skills deleted successfully'
                   });
                 }
+                currentComponent.closeWarning()
               }).catch(function(error) {
                 toast.update(toastId, {
                   render: error.message,
                   type: toast.TYPE.ERROR
                 });
+                currentComponent.closeWarning()
               });
+    }
+
+    closeWarning = () => {
+        this.setState({
+            currentSkill: undefined,
+            showWarning: false
+        })
     }
 
     closeModal = () => {
@@ -248,7 +267,7 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
                     <div className="column is-2">
                         <CompositionMenu id={this.props.match.params.compositionId} />
                     </div>
-                    <div className="column" style={{ marginTop: "10px" }}>
+                    <div className="column" style={{ marginTop: "10px", height:"calc(100vh - 3.5rem)", overflow: 'auto' }}>
                         <div className="title">Skills</div>
                         <div className="buttons">
                         {!this.state.hasUnlockedUnlimitedSkills && 
@@ -275,6 +294,22 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
                     closeModal={this.closeModal}
                     parentName={this.state.parentSkill ? this.state.parentSkill.title : ''}
                     />}
+                    </div>
+                </div>
+                <div className={`modal ${this.state.showWarning ? "is-active" : ""}`}>
+                    <div className="modal-background"></div>
+                    <div className="modal-card">
+                    <header className="modal-card-head">
+                        <p className="modal-card-title">Are you sure?</p>
+                        <button className="delete" aria-label="close" onClick={this.closeWarning}></button>
+                    </header>
+                    <section className="modal-card-body">
+                        You are about to delete skill '{this.state.currentSkill?.title}' and related child skills. Do you want to delete?
+                    </section>
+                    <footer className="modal-card-foot">
+                        <button className="button is-danger" onClick={this.confirmDeleteSkill}>Delete</button>
+                        <button className="button" onClick={this.closeWarning}>Cancel</button>
+                    </footer>
                     </div>
                 </div>
                 </React.Fragment>

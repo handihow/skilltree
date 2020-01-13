@@ -40,30 +40,29 @@ class CustomContainer extends decorators.Container {
           onClick={onClick}
           ref={ref => (this.clickableRef = ref)}
           style={{cursor: 'pointer'}}
-          className="level-left"
-        >
+          className="level-left">
             <div className="level-item">
                 {!terminal ? this.renderToggle() : null}
             </div>
             <div className="level-item">
                 <decorators.Header node={node} style={style.header} />
             </div>
-          
         </div>
         <div className="level-right">
-          
-          
           {node.isSkill ? <React.Fragment>
-          <div className="level-item has-text-success" onClick={() => this.addSkill(node)} style={{cursor: 'pointer'}}>
+          <div className="level-item has-text-success" data-tooltip="Add child skill" 
+              onClick={() => this.addSkill(node)} style={{cursor: 'pointer'}}>
             <FontAwesomeIcon icon='plus' />
           </div>
-          <div className="level-item has-text-info" onClick={() => this.editSkill(node)} style={{cursor: 'pointer'}}>
+          <div className="level-item has-text-info" data-tooltip="Edit skill" 
+              onClick={() => this.editSkill(node)} style={{cursor: 'pointer'}}>
              <FontAwesomeIcon icon='edit' />
           </div>
-          <div className="level-item has-text-danger" onClick={() => this.deleteSkill(node)} style={{cursor: 'pointer'}} >
+          <div className="level-item has-text-danger has-tooltip-left" data-tooltip="Delete skill" 
+              onClick={() => this.deleteSkill(node)} style={{cursor: 'pointer'}} >
             <FontAwesomeIcon icon='trash' />
           </div></React.Fragment> :
-          <div className="level-item has-text-success" onClick={() => this.addRootSkill(node)} style={{cursor: 'pointer'}}>
+          <div className="level-item has-text-success has-tooltip-left" data-tooltip="Add root skill" onClick={() => this.addRootSkill(node)} style={{cursor: 'pointer'}}>
             <FontAwesomeIcon icon='plus' />
           </div>}
         </div>
@@ -82,7 +81,9 @@ export class TreeView extends Component {
 
     onToggle(node, toggled) {
         if (this.state.cursor) {
-          this.state.cursor.active = false;
+          this.setState({
+            cursor: {...this.state.cursor, active: false}
+          })
         }
         node.active = true;
         if (node.children) {

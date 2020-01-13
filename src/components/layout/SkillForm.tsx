@@ -4,6 +4,11 @@ import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import LinkCard from './LinkCard';
 import ISkill from '../../models/skill.model';
+import YouTubeForm from './YouTubeForm';
+import LinkFileUploader from './LinkFileUploader';
+import LinkForm from './LinkForm';
+import ILink from '../../models/link.model';
+import { db } from '../../firebase/firebase';
 
 interface ISkillFormProps {
     skill: ISkill;
@@ -15,18 +20,19 @@ interface ISkillFormProps {
 
 interface ISkillFormState{
     skill?: ISkill,
-    openLinkModal?: boolean;
-    openYouTubeModal?: boolean;
-    openFileModal?: boolean;
+    isShowFileModal?: boolean;
+    isShowYouTubeModal?: boolean;
+    isShowLinkModal?: boolean;
 }
 
 export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
 
     constructor(props: ISkillFormProps){
         super(props);
-        this.state = {};
+        this.state = {
+            isShowYouTubeModal: false
+        };
     }
-
 
     componentDidMount(){
         this.setState({
@@ -34,21 +40,21 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
         })
     }
 
-    addLink = () => {
+    toggleLinkModal = () => {
         this.setState({
-            openLinkModal: true
+            isShowLinkModal: !this.state.isShowLinkModal
         })
     }
 
-    addYouTube = () => {
+    toggleYouTubeModal = () => {
         this.setState({
-            openYouTubeModal: true
+            isShowYouTubeModal: !this.state.isShowYouTubeModal
         })
     }
 
-    addFile = () => {
+    toggleFileModal = () => {
         this.setState({
-            openFileModal: true
+            isShowFileModal: !this.state.isShowFileModal
         })
     }
 
@@ -96,6 +102,25 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
         }
     }
 
+    addLink = (link: ILink) => {
+        if(this.state.skill?.path){
+            db.doc(this.state.skill.path).update({links: [...this.state.skill.links, link] })
+            .then( _ => {
+                if(this.state.skill){
+                    this.setState({
+                        skill: {...this.state.skill, links: [...this.state.skill.links, link]}
+                    })
+                }
+            })
+            .catch(e => toast.error(e))
+        } else if(this.state.skill){
+            //this is a new skill
+            this.setState({
+                skill: {...this.state.skill, links: [...this.state.skill.links, link]}
+            })
+        }
+    }
+
     deleteLink = (id: string) => {
         if(this.state.skill && this.state.skill.links.length > 0){
             this.setState({
@@ -104,8 +129,10 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
         }
     }
 
+
     render(){
         return (
+            <React.Fragment>
             <div className="has-background-white" style={{
                     height: "calc(100vh - 3.5rem)",
                     padding: "20px",
@@ -121,7 +148,8 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                         </div>
                     </div>
                     <div className="level-right">
-                        <button className="delete" style={{float: 'right'}} onClick={() => this.props.closeModal()}></button>
+                        <button className="delete"
+                            style={{float: 'right'}} onClick={() => this.props.closeModal()}></button>
                     </div>
                 </div>
 
@@ -157,7 +185,7 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                         </div>
                     </div>
                 </div>
-                <div className="field is-inline-block-desktop" style={{marginLeft: "20px"}}>
+                {/* <div className="field is-inline-block-desktop" style={{marginLeft: "20px"}}>
                     <div className="field is-narrow">
                         <label className="label">
                             Tooltip direction
@@ -173,7 +201,7 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                         ))}
                         </div>
                     </div>
-                </div>
+                </div> */}
                 </div>
                 <div className="field">
                     <label className="label" htmlFor="description">Description</label>
@@ -185,17 +213,20 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                     </div>
                 </div>
                 <div className="buttons">
-                    <button className="button" onClick={this.addYouTube} type="button">
+                    <button className="button has-tooltip-right" data-tooltip="Add YouTube video" 
+                        onClick={this.toggleYouTubeModal} type="button">
                         <span className="icon is-small" >
                             <FontAwesomeIcon icon={['fab', 'youtube-square']} />
                         </span>
                     </button>
-                    <button className="button" onClick={this.addFile} type="button">
+                    <button className="button" data-tooltip="Add file"
+                        onClick={this.toggleFileModal} type="button">
                         <span className="icon is-small">
                             <FontAwesomeIcon icon={'file'} />
                         </span>
                     </button>
-                    <button className="button" onClick={this.addLink} type="button">
+                    <button className="button" data-tooltip="Add link"
+                        onClick={this.toggleLinkModal} type="button">
                         <span className="icon is-small">
                             <FontAwesomeIcon icon={'link'} />
                         </span>
@@ -214,7 +245,16 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                 </ul>
             }
             </div>
-                        
+            <YouTubeForm toggleYouTubeModal={this.toggleYouTubeModal} 
+                isShowYouTubeModal={this.state.isShowYouTubeModal ? this.state.isShowYouTubeModal : false}
+                addLink={this.addLink}/>
+            <LinkFileUploader isShowFileModal={this.state.isShowFileModal ? this.state.isShowFileModal : false}
+                toggleFileModal={this.toggleFileModal}
+                addLink={this.addLink} />
+            <LinkForm isShowLinkModal={this.state.isShowLinkModal ? this.state.isShowLinkModal : false}
+                toggleLinkModal={this.toggleLinkModal}
+                addLink={this.addLink} />
+            </React.Fragment>        
         )
     }
 }
