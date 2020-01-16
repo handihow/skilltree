@@ -12,7 +12,6 @@ import features from '../payments/Features';
 export class CompositionTheme extends Component {
 
     state = {
-        compositionId: this.props.match.params.compositionId,
         toEditor: false,
         hasUnlockedAllCustomThemeOptions: false,
         fontFamilies: [],
@@ -41,7 +40,7 @@ export class CompositionTheme extends Component {
     }
 
     saveChanges = () => {
-        db.collection('compositions').doc(this.state.compositionId).set({
+        db.collection('compositions').doc(this.props.match.params.compositionId).set({
                 theme: this.state.theme
         }, {merge: true})
         .then(_ => {
@@ -69,7 +68,7 @@ export class CompositionTheme extends Component {
             console.error(e);
         })
 
-        db.collection('compositions').doc(currentComponent.state.compositionId).get()
+        db.collection('compositions').doc(currentComponent.props.match.params.compositionId).get()
             .then(doc => {
                 const data = doc.data();
                 currentComponent.setState({
@@ -80,7 +79,7 @@ export class CompositionTheme extends Component {
                 console.error(e)
             })
         const unsubscribe = db.collection('compositions')
-            .doc(currentComponent.state.compositionId)
+            .doc(currentComponent.props.match.params.compositionId)
             .collection('payments')
             .doc(currentComponent.state.featureId)
             .onSnapshot(function(doc) {
@@ -203,16 +202,16 @@ export class CompositionTheme extends Component {
         
         return (
             this.state.toEditor ?
-                <Redirect to={`/compositions/${this.state.compositionId}`} /> :
+                <Redirect to={`/compositions/${this.props.match.params.compositionId}`} /> :
                 <div className="columns">
                     <div className="column is-2">
-                        <CompositionMenu id={this.state.compositionId} />
+                        <CompositionMenu id={this.props.match.params.compositionId} />
                     </div>
                     <div className="column" style={{ marginTop: "10px" }}>
                         <div className="title">Customize Appearance</div>
                         <button className="button" onClick={this.saveChanges}>Save Changes</button>
                         {!this.state.hasUnlockedAllCustomThemeOptions && 
-                        <Link to={`/compositions/${this.state.compositionId}/unlock/custom-theme-options`} 
+                        <Link to={`/compositions/${this.props.match.params.compositionId}/unlock/custom-theme-options`} 
                         className="button">Unlock all options ${features[this.state.featureId].amount}</Link>}
                         <hr></hr>
                         <div className="columns">
@@ -251,7 +250,7 @@ export class CompositionTheme extends Component {
                             </div>
                             </div>
                             <div className="column is-narrow">
-                                {this.state.theme && <CompositionDisplay theme={this.state.theme} skilltrees={[standardSkilltree]} />} 
+                                {this.state.theme && <CompositionDisplay compositionId={this.props.match.params.compositionId} theme={this.state.theme} skilltrees={[standardSkilltree]} />} 
                             </div>
                         </div>
                         

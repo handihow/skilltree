@@ -8,7 +8,6 @@ import {skillArrayToSkillTree} from './StandardFunctions';
 export class Composition extends Component {
     
     state = {
-        id: '',
         composition: {},
         hasBackgroundImage: false,
         backgroundImage: null,
@@ -45,7 +44,6 @@ export class Composition extends Component {
                         imageRef.getDownloadURL()
                         .then(url => {
                             this.setState({
-                                id: compositionId, 
                                 composition, 
                                 hasBackgroundImage: true, 
                                 backgroundImage: url, 
@@ -53,7 +51,7 @@ export class Composition extends Component {
                             });
                         });
                     } else {
-                        this.setState({id: compositionId, composition, skilltrees: skilltrees });
+                        this.setState({composition, skilltrees: skilltrees });
                     }
                 })
                 
@@ -67,7 +65,7 @@ export class Composition extends Component {
             <Loading /> :
             <div className="columns" style={{marginBottom: '0rem'}}>
                 <div className="column is-2 has-background-white">
-                    <CompositionMenu id={this.state.id}/>
+                    <CompositionMenu id={this.props.match.params.compositionId}/>
                 </div>
                 <div className="column" style={this.state.hasBackgroundImage ? 
                                                 {
@@ -82,7 +80,8 @@ export class Composition extends Component {
                     <div style={{maxHeight:'100%',overflow:'auto'}}>
                     <CompositionDisplay
                     theme={this.state.composition.theme} 
-                    skilltrees={this.state.skilltrees} /></div>
+                    skilltrees={this.state.skilltrees}
+                    compositionId={this.props.match.params.compositionId} /></div>
                 </div>
             </div>
         )

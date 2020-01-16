@@ -5,6 +5,8 @@ export default interface ISkilltree {
     collapsible: boolean;
     order: number;
     composition?: string; //references the parent composition ID
+    //make it compatible with skilltree
+    data?: any;
     //make it compatible with treebeard
     name?: string;
     isSkill?: boolean;
