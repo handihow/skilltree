@@ -5,17 +5,30 @@ import CompositionMenu from '../layout/CompositionMenu';
 import { Redirect, Link } from 'react-router-dom';
 import ImageUploader from '../layout/ImageUploader';
 import features from '../payments/Features';
+import { RouteComponentProps } from 'react-router-dom';
+import BackgroundImage from '../../models/backgroundimage.model';
 
-export class CompositionBackground extends Component {
-    
-    state = {
-        compositionId: this.props.match.params.compositionId,
-        toEditor: false,
-        images: [],
-        hasUnlockedCustomImageUpload: false,
-        featureId: 'custom-image-upload',
-        unsubscribe: null
+type TParams =  { compositionId: string };
+
+interface ICompositionBackgroundState {
+    toEditor: boolean;
+    images: BackgroundImage[];
+    hasUnlockedCustomImageUpload: boolean;
+    unsubscribe?: any;
+}
+
+const featureId = 'custom-image-upload';
+
+export class CompositionBackground extends Component<RouteComponentProps<TParams>, ICompositionBackgroundState> {
+    constructor(props: RouteComponentProps<TParams>){
+        super(props);
+        this.state = {
+            toEditor: false,
+            images: [],
+            hasUnlockedCustomImageUpload: false
+        }
     }
+    
     
     componentDidMount(){
         const currentComponent = this;
@@ -23,27 +36,20 @@ export class CompositionBackground extends Component {
         .orderBy('title')
         .get()
         .then(snapshots => {
-            const imageData = [];
-            snapshots.forEach(snap => imageData.push(snap.data()));
+            const imageData : BackgroundImage[]= [];
+            snapshots.forEach(snap => imageData.push(snap.data() as BackgroundImage));
             currentComponent.setState({
                 images: imageData
             })
         })
-        db.collection('compositions').doc(currentComponent.state.compositionId).get()
-        .then(snap => {
-            const composition = snap.data();
-            currentComponent.setState({
-                hasUnlockedCustomImageUpload: composition.hasUnlockedCustomImageUpload ? true : false
-            })
-        })
         const unsubscribe = db.collection('compositions')
-        .doc(currentComponent.state.compositionId)
+        .doc(currentComponent.props.match.params.compositionId)
         .collection('payments')
-        .doc(currentComponent.state.featureId)
+        .doc(featureId)
         .onSnapshot(function(doc) {
             if(doc.exists){
                 const paymentRecord = doc.data();
-                if(paymentRecord.success){
+                if(paymentRecord?.success){
                     currentComponent.setState({
                         hasUnlockedCustomImageUpload: true,
                     })
@@ -60,7 +66,7 @@ export class CompositionBackground extends Component {
     }
 
     removeBackground = () => {
-        db.collection('compositions').doc(this.state.compositionId).set({
+        db.collection('compositions').doc(this.props.match.params.compositionId).set({
             hasBackgroundImage: false
         }, {merge: true})
         .then( _=> {
@@ -71,24 +77,25 @@ export class CompositionBackground extends Component {
     }
 
     render() {
+        const compositionId = this.props.match.params.compositionId;
         return (
             this.state.toEditor ? 
-            <Redirect to={`/compositions/${this.state.compositionId}`}/> :
+            <Redirect to={`/compositions/${compositionId}`}/> :
             <div className="columns" style={{height:"95vh"}}>
                 <div className="column is-2">
-                    <CompositionMenu id={this.state.compositionId} />
+                    <CompositionMenu id={compositionId} />
                 </div>
                 <div className="column" style={{marginTop: "10px"}}>
                         <div className="title">Customize Background</div>
                         <button className="button" onClick={this.removeBackground}>Remove background</button>
                         {this.state.hasUnlockedCustomImageUpload ? 
-                        <ImageUploader compositionId={this.state.compositionId} /> :
-                        <Link to={`/compositions/${this.state.compositionId}/unlock/custom-image-upload`} className="button">
-                            Unlock upload ${features[this.state.featureId].amount}</Link>}
+                        <ImageUploader compositionId={compositionId} /> :
+                        <Link to={`/compositions/${compositionId}/unlock/custom-image-upload`} className="button">
+                            Unlock upload ${features[featureId].amount}</Link>}
                         <hr></hr>
                         <div className="columns is-multiline is-mobile">
                             {this.state.images.map((image) => (
-                                <ImageThumb1 key={image.id} image={image} compositionId={this.state.compositionId}/>
+                                <ImageThumb1 key={image.id} image={image} compositionId={compositionId}/>
                             ))}
                         </div>
                 </div>

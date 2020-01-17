@@ -2,23 +2,38 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { db, googleFontAPIKey } from '../../firebase/firebase';
 import CompositionMenu from '../layout/CompositionMenu';
-import { Redirect, Link } from 'react-router-dom';
+import { Redirect, Link, RouteComponentProps } from 'react-router-dom';
 import { SketchPicker } from 'react-color';
 import SelectFieldWithColumn from '../layout/SelectFieldWithColumn';
 import CompositionDisplay from '../layout/CompositionDisplay';
 import {standardSkilltree, allColors, gradients} from './StandardData';
 import features from '../payments/Features';
+import { toast } from 'react-toastify';
 
-export class CompositionTheme extends Component {
+type TParams =  { compositionId: string };
 
-    state = {
-        toEditor: false,
-        hasUnlockedAllCustomThemeOptions: false,
-        fontFamilies: [],
-        theme: null,
-        featureId: 'custom-theme-options',
-        unsubscribe: null
+interface ICompositionThemeState {
+    toEditor: boolean;
+    doneLoading: boolean;
+    hasUnlockedAllCustomThemeOptions: boolean;
+    fontFamilies?: any[];
+    theme?: any;
+    unsubscribe?: any;
+}
+
+const featureId = 'custom-theme-options';
+
+export class CompositionTheme extends Component<RouteComponentProps<TParams>, ICompositionThemeState> {
+
+    constructor(props: RouteComponentProps<TParams>){
+        super(props);
+        this.state = {
+            toEditor: false,
+            doneLoading: false,
+            hasUnlockedAllCustomThemeOptions: false
+        }
     }
+    
 
     handleChange = ({ target }) => {
         this.setState({
@@ -61,31 +76,32 @@ export class CompositionTheme extends Component {
                 return {value: i.family, title: i.family}
             }).slice(0,50);
             currentComponent.setState({
-                fontFamilies: fontFamilyResponse
+                fontFamilies: fontFamilyResponse,
+                doneLoading: true
             })
         })
         .catch(e => {
-            console.error(e);
+            toast.error('Could not load Google fonts');
         })
 
         db.collection('compositions').doc(currentComponent.props.match.params.compositionId).get()
             .then(doc => {
                 const data = doc.data();
                 currentComponent.setState({
-                    theme: data.theme
+                    theme: data?.theme
                 });
             })
             .catch(e => {
-                console.error(e)
+                toast.error(e.message);
             })
         const unsubscribe = db.collection('compositions')
             .doc(currentComponent.props.match.params.compositionId)
             .collection('payments')
-            .doc(currentComponent.state.featureId)
+            .doc(featureId)
             .onSnapshot(function(doc) {
                 if(doc.exists){
                     const paymentRecord = doc.data();
-                    if(paymentRecord.success){
+                    if(paymentRecord?.success){
                         currentComponent.setState({
                             hasUnlockedAllCustomThemeOptions: true
                         })
@@ -203,7 +219,7 @@ export class CompositionTheme extends Component {
         return (
             this.state.toEditor ?
                 <Redirect to={`/compositions/${this.props.match.params.compositionId}`} /> :
-                <div className="columns">
+                this.state.doneLoading && <div className="columns">
                     <div className="column is-2">
                         <CompositionMenu id={this.props.match.params.compositionId} />
                     </div>
@@ -212,7 +228,7 @@ export class CompositionTheme extends Component {
                         <button className="button" onClick={this.saveChanges}>Save Changes</button>
                         {!this.state.hasUnlockedAllCustomThemeOptions && 
                         <Link to={`/compositions/${this.props.match.params.compositionId}/unlock/custom-theme-options`} 
-                        className="button">Unlock all options ${features[this.state.featureId].amount}</Link>}
+                        className="button">Unlock all options ${features[featureId].amount}</Link>}
                         <hr></hr>
                         <div className="columns">
                             <div className="column">
@@ -224,7 +240,7 @@ export class CompositionTheme extends Component {
                                     name={selectOption.name}
                                     value={selectOption.value}
                                     onChange={this.handleChange}
-                                    options={selectOption.options}/>
+                                    options={selectOption.options || []}/>
                                 ))}
                                 {this.state.hasUnlockedAllCustomThemeOptions && 
                                 additionalSelectOptions.map((selectOption) => (
@@ -234,7 +250,7 @@ export class CompositionTheme extends Component {
                                     name={selectOption.name}
                                     value={selectOption.value}
                                     onChange={this.handleChange}
-                                    options={selectOption.options}/>
+                                    options={selectOption.options || []}/>
                                 ))}
                                 <div className="column">
                                     <div className="field">
@@ -260,7 +276,5 @@ export class CompositionTheme extends Component {
         )
     }
 }
-
-
 
 export default CompositionTheme
