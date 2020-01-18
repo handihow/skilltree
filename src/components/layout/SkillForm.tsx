@@ -89,7 +89,7 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
         if(!this.state.skill || isEmpty(this.state.skill.title) || isEmpty(this.state.skill.description) ){
             toast.error('Title and description cannot be empty');
             hasError = true;
-        } else if(this.state.skill.links.length > 0){
+        } else if(this.state.skill && this.state.skill.links && this.state.skill.links.length > 0){
             this.state.skill.links.forEach((link, index) => {
                 if(isEmpty(link.title) || isEmpty(link.iconName) || !isURL(link.reference)){
                     toast.error('Link number ' + (index + 1) + ' does not have title or icon, or does not contain a valid URL');
@@ -104,11 +104,11 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
 
     addLink = (link: ILink) => {
         if(this.state.skill?.path){
-            db.doc(this.state.skill.path).update({links: [...this.state.skill.links, link] })
+            db.doc(this.state.skill.path).update({links: [...this.state.skill.links || [], link] })
             .then( _ => {
                 if(this.state.skill){
                     this.setState({
-                        skill: {...this.state.skill, links: [...this.state.skill.links, link]}
+                        skill: {...this.state.skill, links: [...this.state.skill.links || [], link]}
                     })
                 }
             })
@@ -116,13 +116,13 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
         } else if(this.state.skill){
             //this is a new skill
             this.setState({
-                skill: {...this.state.skill, links: [...this.state.skill.links, link]}
+                skill: {...this.state.skill, links: [...this.state.skill.links || [], link]}
             })
         }
     }
 
     deleteLink = (id: string) => {
-        if(this.state.skill && this.state.skill.links.length > 0){
+        if(this.state.skill && this.state.skill.links && this.state.skill.links.length > 0){
             this.setState({
                 skill: { ...this.state.skill, links:[...this.state.skill.links.filter(l => l.id !== id)] } 
             })
@@ -237,7 +237,7 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                 </div>
             </form>
             <hr></hr>
-            {this.state.skill && this.state.skill.links.length > 0 && 
+            {this.state.skill && this.state.skill.links && this.state.skill.links.length > 0 && 
                 <ul style={{listStyleType: 'none', marginTop: '10px'}}>
                     {this.state.skill.links.map((link, index)=> (
                         <LinkCard link={link} key={index} deleteLink={this.deleteLink}/>

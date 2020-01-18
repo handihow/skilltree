@@ -94,13 +94,13 @@ class Home extends Component {
     const id = composition.id;
     const toastId = uuid.v4();
     let currentComponent = this;
-    toast.info('Deleting skill tree page and all related data is in progress... please wait', {
+    toast.info('Deleting skill tree and all related data is in progress... please wait', {
       toastId: toastId
     });
     const path = `compositions/${composition.id}`;
     const deleteFirestorePathRecursively = functions.httpsCallable('deleteFirestorePathRecursively');
     deleteFirestorePathRecursively({
-        collection: 'Skilltree page',
+        collection: 'Skilltree',
         path: path
     }).then(function(result) {
             if(result.data.error){
@@ -110,7 +110,7 @@ class Home extends Component {
                 });
             } else {
               toast.update(toastId, {
-                render: 'Skill tree page deleted successfully'
+                render: 'Skill tree deleted successfully'
               });
               currentComponent.setState({
                 compositions: [...currentComponent.state.compositions.filter((composition) => composition.id !== id)]
@@ -125,7 +125,7 @@ class Home extends Component {
   }
 
   render() {
-    const header = "Skill tree pages"
+    const header = "Skilltrees"
 
     return (
       <section className="section">
@@ -138,7 +138,8 @@ class Home extends Component {
           <AddComposition addComposition={this.addComposition} />  
           </div>
         </div>
-        <Compositions compositions={this.state.compositions} delComposition={this.delComposition} />
+        {this.state.compositions && 
+        <Compositions compositions={this.state.compositions} delComposition={this.delComposition} />}
       </div>
       </section>    
     );

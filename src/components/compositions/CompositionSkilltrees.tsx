@@ -51,7 +51,7 @@ export class CompositionSkilltrees extends Component<RouteComponentProps<TParams
                 unsubscribeSkilltrees: unsubscribeSkilltrees
             });
         }, (error) => {
-            toast.error('Could not load skilltrees. Error ' + error.message);
+            toast.error('Could not load branches. Error ' + error.message);
         })
         const unsubscribePaymentFeature = db.collection('compositions')
             .doc(compositionId)
@@ -80,7 +80,7 @@ export class CompositionSkilltrees extends Component<RouteComponentProps<TParams
     addSkilltree = () => {
         //maximum number of skill trees is 2 unless the unlimited feature is paid
         if(this.state.skilltrees.length === 2 && !this.state.hasUnlockedUnlimitedSkilltrees){
-            return toast.error('You cannot have more than 2 skilltrees. You can pay $1,- to unlock unlimited skill trees feature.');
+            return toast.error('You cannot have more than 2 branches. You can pay $1,- to unlock unlimited branches feature.');
         }
         this.setState({
             showEditor: true,
@@ -105,7 +105,7 @@ export class CompositionSkilltrees extends Component<RouteComponentProps<TParams
         .collection('skilltrees')
         .doc(skilltree.id).set(skilltree, {merge: true})
         .then(_=> {
-            toast.info("Skilltree successfully updated");
+            toast.info("Branch successfully updated");
             this.setState({
                 showEditor: false
             });
@@ -117,7 +117,7 @@ export class CompositionSkilltrees extends Component<RouteComponentProps<TParams
 
     deleteSkilltree = (skilltree) => {
         const toastId = uuid.v4();
-        toast.info('Deleting skill all related child skills is in progress... please wait', {
+        toast.info('Deleting branch all related child skills is in progress... please wait', {
           toastId: toastId
         })
         const skilltreePath = `compositions/${this.props.match.params.compositionId}/skilltrees/${skilltree.id}`;
@@ -132,7 +132,7 @@ export class CompositionSkilltrees extends Component<RouteComponentProps<TParams
                     });
                 } else {
                   toast.update(toastId, {
-                    render: 'Skilltree and related child skills deleted successfully'
+                    render: 'Branch and related child skills deleted successfully'
                   });
                 }
               }).catch(function(error) {
@@ -159,12 +159,12 @@ export class CompositionSkilltrees extends Component<RouteComponentProps<TParams
                         <CompositionMenu id={this.props.match.params.compositionId} />
                     </div>
                     <div className="column" style={{ marginTop: "10px" }}>
-                        <div className="title">Skilltrees</div>
+                        <div className="title">Branches</div>
                         <div className="buttons">
-                        <button className="button" onClick={this.addSkilltree}>Add skilltree</button>
+                        <button className="button" onClick={this.addSkilltree}>Add branch</button>
                         {!this.state.hasUnlockedUnlimitedSkilltrees && 
                                 <Link to={`/compositions/${this.props.match.params.compositionId}/unlock/${this.state.featureId}`} 
-                        className="button">Unlimited skilltrees ${features[this.state.featureId].amount}</Link>}
+                        className="button">Unlimited branches ${features[this.state.featureId].amount}</Link>}
                         </div>
                         <hr></hr>
                         <div className="columns is-multiline">

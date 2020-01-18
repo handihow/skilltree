@@ -10,10 +10,12 @@ import Register from './components/Register';
 import About from "./components/pages/About";
 import NavBar from './components/layout/Navbar';
 import Composition from './components/compositions/Composition';
+import CompositionViewer from './components/compositions/CompositionViewer';
 import CompositionBackground from './components/compositions/CompositionBackground';
 import CompositionTheme from './components/compositions/CompositionTheme';
 import CompositionSkilltrees from './components/compositions/CompositionSkilltrees';
 import CompositionSkills from './components/compositions/CompositionSkills';
+import PublishComposition from './components/compositions/PublishComposition';
 import Payments from './components/payments/Payments';
 import PaymentConfirmation from './components/payments/PaymentConfirmation';
 
@@ -70,6 +72,12 @@ function App(props) {
         isVerifying={isVerifying}
       />
       <ProtectedRoute 
+        path="/compositions/:compositionId/publish"
+        component={PublishComposition}
+        isAuthenticated={isAuthenticated}
+        isVerifying={isVerifying}
+      />
+      <ProtectedRoute 
         path="/compositions/:compositionId/unlock/:featureId"
         component={Payments}
         isAuthenticated={isAuthenticated}
@@ -81,6 +89,7 @@ function App(props) {
         isAuthenticated={isAuthenticated}
         isVerifying={isVerifying}
       />
+      <Route path="/compositions/:compositionId/viewer" component={CompositionViewer} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/about" component={About} />

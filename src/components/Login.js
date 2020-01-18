@@ -61,10 +61,10 @@ class Login extends Component {
                         <div className="hero-body">
                             <div className="container has-text-centered">
                                 <h1 className="title">
-                                    Skill tree
+                                    Skilltree
                                 </h1>
                                 <h2 className="subtitle">
-                                    Sign in to create awesome skill trees
+                                    Sign in to create awesome skilltrees
                                 </h2>
                             </div>
                         </div>

@@ -1,8 +1,11 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom';
-import PropTypes from 'prop-types';
 
-export default function CompositionMenu(props) {
+interface ICompositionMenuProps {
+  id: string;
+}
+
+export default function CompositionMenu(props: ICompositionMenuProps) {
   return (
       <aside className="menu has-background-white" style={{padding: '10px', height: "calc(100vh - 3.5rem)"}}>
         <ul className="menu-list">
@@ -15,7 +18,7 @@ export default function CompositionMenu(props) {
         <p className="menu-label">
           Content
         </p>
-          <li><NavLink to={"/compositions/"+props.id +"/skilltrees"} activeClassName='is-active'>Skilltrees</NavLink></li>
+          <li><NavLink to={"/compositions/"+props.id +"/skilltrees"} activeClassName='is-active'>Branches</NavLink></li>
           <li><NavLink to={"/compositions/"+props.id +"/skills"} activeClassName='is-active'>Skills</NavLink></li>
         <p className="menu-label">
           Share
@@ -28,7 +31,3 @@ export default function CompositionMenu(props) {
   )
 }
 
-// Proptypes
-CompositionMenu.propTypes = {
-  id: PropTypes.string.isRequired
-}

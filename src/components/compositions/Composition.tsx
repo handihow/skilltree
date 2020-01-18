@@ -4,40 +4,52 @@ import CompositionDisplay from '../layout/CompositionDisplay';
 import CompositionMenu from '../layout/CompositionMenu';
 import Loading from '../layout/Loading';
 import {skillArrayToSkillTree} from './StandardFunctions';
+import { RouteComponentProps } from 'react-router-dom';
+import ISkilltree from '../../models/skilltree.model';
+import IComposition from '../../models/composition.model';
+import ISkill from '../../models/skill.model';
 
-export class Composition extends Component {
-    
-    state = {
-        composition: {},
-        hasBackgroundImage: false,
-        backgroundImage: null,
-        skilltrees: []
+type TParams =  { compositionId: string };
+
+interface ICompositionState {
+    composition?: IComposition;
+    hasBackgroundImage: boolean;
+    backgroundImage?: string;
+    skilltrees?: ISkilltree[];
+}
+
+export class Composition extends Component<RouteComponentProps<TParams>,ICompositionState> {
+    constructor(props: RouteComponentProps<TParams>){
+        super(props);
+        this.state = {
+            hasBackgroundImage: false,
+        }
     }
 
     componentDidMount() {
         const compositionId = this.props.match.params.compositionId;
         db.collection("compositions").doc(compositionId).get()
         .then(doc => {
-            const composition = doc.data();
+            const composition = doc.data() as IComposition;
             db.collection("compositions").doc(compositionId)
             .collection("skilltrees").orderBy('order').get()
             .then(async querySnapshot => {
-                const skilltrees = querySnapshot.docs.map(doc => doc.data());
+                const skilltrees = querySnapshot.docs.map(doc => doc.data() as ISkilltree);
                 db.collectionGroup('skills').where('composition', '==', compositionId).orderBy('order').get()
                 .then((querySnapshot) => {
-                    const skills = [];
+                    const skills : ISkill[] = [];
                     querySnapshot.docs.forEach((doc) => {
-                        const skill = {
+                        const skill : ISkill = {
                             parent: doc.ref.path.split('/'),
                             path: doc.ref.path,
-                            ...doc.data()
+                            ...doc.data() as ISkill
                         }
                         skills.push(skill);
                     });
                     skilltrees.forEach((skilltree) => {
-                        skilltree.data = skillArrayToSkillTree(skills.filter(s => s.skilltree===skilltree.id));
+                        skilltree.data = skillArrayToSkillTree(skills.filter((s:ISkill) => s.skilltree===skilltree.id));
                     });
-                    if(composition.hasBackgroundImage){
+                    if(composition?.hasBackgroundImage){
                         //fetch the background image
                         const storageRef = storage.ref();
                         const imageRef = storageRef.child(composition.backgroundImage);
@@ -61,7 +73,7 @@ export class Composition extends Component {
 
     render() {
         return (
-            this.state.skilltrees.length===0 ? 
+            this.state.skilltrees && this.state.skilltrees.length===0 ? 
             <Loading /> :
             <div className="columns" style={{marginBottom: '0rem'}}>
                 <div className="column is-2 has-background-white">
@@ -76,12 +88,15 @@ export class Composition extends Component {
                                                     padding: '0px',
                                                     marginTop: '0.75rem'
                                                 }
-                                                : null}>
+                                                : undefined}>
                     <div style={{maxHeight:'100%',overflow:'auto'}}>
-                    <CompositionDisplay
-                    theme={this.state.composition.theme} 
-                    skilltrees={this.state.skilltrees}
-                    compositionId={this.props.match.params.compositionId} /></div>
+                    {this.state.skilltrees && this.state.skilltrees.length > 0 && <CompositionDisplay
+                    showCounter={true}
+                    showFilter={true}
+                    theme={this.state.composition?.theme} 
+                    skilltrees={this.state.skilltrees || []}
+                    compositionId={this.props.match.params.compositionId}
+                    title={this.state.composition?.title || ''} />}</div>
                 </div>
             </div>
         )

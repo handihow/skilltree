@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import {standardData} from '../compositions/StandardData';
 import uuid from 'uuid';
 import ISkilltree from '../../models/skilltree.model';
 
@@ -66,7 +65,7 @@ export class SkilltreeForm extends Component<ISkilltreeFormProps,ISkilltreeFormS
             <div className="modal-background"></div>
             <div className="modal-card">
                 <header className="modal-card-head">
-                <p className="modal-card-title">{this.props.isEditing ? 'Edit skilltree' : 'Add skilltree'}</p>
+                <p className="modal-card-title">{this.props.isEditing ? 'Edit branch' : 'Add branch'}</p>
                 <button className="delete" aria-label="close" onClick={() =>this.props.closeModal()}></button>
                 </header>
                 <form onSubmit={this.onSubmit}>

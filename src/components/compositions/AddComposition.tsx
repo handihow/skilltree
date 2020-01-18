@@ -1,12 +1,23 @@
 import React, { Component } from 'react'
 import {standardData, standardTheme} from './StandardData';
 
-export class AddComposition extends Component {
+interface IAddCompositionProps {
+    addComposition: Function;
+}
 
-    state = {
-        title: ''
+interface IAddCompositionState {
+    title: string;
+}
+
+export class AddComposition extends Component<IAddCompositionProps, IAddCompositionState> {
+
+    constructor(props: IAddCompositionProps){
+        super(props);
+        this.state = {
+            title: ''
+        }
     }
-
+    
     onChange = (e) => this.setState({title: e.target.value});
 
     onSubmit = (e) => {
@@ -23,7 +34,7 @@ export class AddComposition extends Component {
                 <input 
                     className="input" 
                     type="text" 
-                    placeholder="Title of skill tree page..."
+                    placeholder="Title of skilltree..."
                     value={this.state.title}
                     onChange={this.onChange} />
                 </div>

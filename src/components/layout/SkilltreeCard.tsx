@@ -35,8 +35,8 @@ export class SkilltreeCard extends Component<ISkilltreeCardProps, ISkilltreeCard
 
     render() {
         return (
-            <div className="column is-one-third-desktop is-one-half-tablet">
-            <div className="card">
+            <div className="column is-one-third-desktop is-half-tablet">
+            <div className="card" style={{margin: "10px"}}>
                 <header className="card-header">
                 <p className="card-header-title">
                     {this.props.skilltree.title}
@@ -50,8 +50,8 @@ export class SkilltreeCard extends Component<ISkilltreeCardProps, ISkilltreeCard
                 </div>
                 </div>
                 <footer className="card-footer">
-                <a className="card-footer-item" onClick={this.editSkilltree}>Edit</a>
-                <a className="card-footer-item" onClick={this.toggleIsActive}>Delete</a>
+                <a className="card-footer-item" onClick={this.editSkilltree} href="# ">Edit</a>
+                <a className="card-footer-item" onClick={this.toggleIsActive} href="# ">Delete</a>
                 </footer>
             </div>
             <div className={`modal ${this.state.isActive ? "is-active" : ""}`}>

@@ -16,11 +16,11 @@ const features = {
         'redirect': 'theme'
     },
     'unlimited-skilltrees': {
-        'title': 'Unlock unlimited skill trees',
-        'description': 'After payment, you can have unlimited skill trees on your page. Payment is valid only for the current skill tree page.',
+        'title': 'Unlock unlimited branches',
+        'description': 'After payment, you can have unlimited branches in your skill tree. Payment is valid only for the current skill tree.',
         'amount': 1,
         'currency': 'usd',
-        'success': 'Unlimited skill trees feature is now unlocked!',
+        'success': 'Unlimited branches feature is now unlocked!',
         'redirect': 'skilltrees'
     },
     'unlimited-skills': {

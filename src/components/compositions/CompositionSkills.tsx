@@ -286,7 +286,7 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
                         ))}
                         </div>
                     </div>
-                    <div className="column is-6">
+                    <div className={this.state.showEditor ? "column is-6" : "column is-1"}>
                     {this.state.showEditor && <SkillForm 
                     isEditing={this.state.isEditing} 
                     skill={this.state.currentSkill ? this.state.currentSkill : {id: uuid.v4(), ...standardEmptySkill}} 

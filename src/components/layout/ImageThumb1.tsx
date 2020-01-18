@@ -2,12 +2,26 @@ import React, { Component } from 'react'
 import {storage} from '../../firebase/firebase';
 import { db } from '../../firebase/firebase';
 import { Redirect } from 'react-router-dom';
+import IBackgroundImage from '../../models/backgroundimage.model';
 
-export class ImageThumb1 extends Component {
+interface IImageThumb1Props {
+    image: IBackgroundImage;
+    compositionId: string;
+}
+
+interface IImageThumb1State {
+    reference: string;
+    toEditor: boolean;
+}
+
+export class ImageThumb1 extends Component<IImageThumb1Props, IImageThumb1State> {
     
-    state = {
-        reference: 'https://via.placeholder.com/300x200.png?text=Skilltree',
-        toEditor: false
+    constructor(props: IImageThumb1Props){
+        super(props);
+        this.state = {
+            reference: 'https://via.placeholder.com/300x200.png?text=Skilltree',
+            toEditor: false
+        };
     }
 
     componentDidMount(){
@@ -42,7 +56,8 @@ export class ImageThumb1 extends Component {
                         </figure>
                     </div>
                     <footer className="card-footer">
-                        <a className="card-footer-item" onClick={this.selectBackground}>{this.props.image.title}</a>
+                        <a className="card-footer-item" href="# "
+                        onClick={this.selectBackground}>{this.props.image.title}</a>
                     </footer>
                 </div>
             </div>

@@ -3,9 +3,14 @@ import { Link } from 'react-router-dom';
 import { logoutUser } from "../../actions";
 import { connect } from "react-redux";
 
+interface INavbarProps {
+    isLoggingOut: any;
+    logoutError: any;
+    isAuthenticated: boolean;
+    dispatch: any;
+}
 
-
-class Navbar extends Component {
+class Navbar extends Component<INavbarProps> {
     handleLogout = () => {
         const { dispatch } = this.props;
         dispatch(logoutUser());
@@ -19,14 +24,14 @@ class Navbar extends Component {
                 <div className="navbar-brand">
                     <Link to="/" className="navbar-item">
                         <img 
-                        alt="Skill tree logo"
+                        alt="Skilltree logo"
                         src="https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/SkillTree_logo.png?alt=media&token=0cbc6c2a-58c2-46e7-bfec-47eafb6ddb01" ></img>
                     </Link>
                 </div>
                 <div className="navbar-end">
                 {isAuthenticated ?
                     <Link to="/" className="navbar-item">
-                        Skill trees
+                        Skilltrees
                     </Link> :
                     <Link to="/about" className="navbar-item">
                         About

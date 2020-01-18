@@ -1,5 +1,6 @@
 import React from 'react'
 import SkillContent from '../layout/SkillContent';
+import ISkill from '../../models/skill.model';
 
 export const skillTreeToSkillArray = (skills) => {
     const skillArray = [];
@@ -10,7 +11,7 @@ export const skillTreeToSkillArray = (skills) => {
 }
 
 const filterChildren = (skill, skills) => {
-    const children = [];
+    const children : any[] = [];
     let rawChildren = skills.filter(s => s.parent.length === skill.parent.length + 2 && s.parent.includes(skill.id));
     rawChildren.forEach(rawChild => {
         let childSkill = {
@@ -29,7 +30,7 @@ const filterChildren = (skill, skills) => {
 
 export const skillArrayToSkillTree = (skills) => {
     //first, extract all the root skills
-    let skilltree = [];
+    let skilltree : any[] = [];
     skills.forEach((skill, index) => {
         if(skill.parent.length===6){
             let rootSkill = {
@@ -49,7 +50,7 @@ export const skillArrayToSkillTree = (skills) => {
 }
 
 const addToSkillArray = (arr, child, parent) => {
-    let flatSkill = {
+    let flatSkill : ISkill = {
         id: child.id,
         title: child.title,
         optional: child.optional ? true : false,
@@ -71,7 +72,7 @@ const addToSkillArray = (arr, child, parent) => {
     arr.push(flatSkill);
     if(child.children.length>0){
         child.children.forEach((nestedChild, index) => {
-            addToSkillArray(arr, nestedChild, [...flatSkill.parent, {parentId: flatSkill.id, childIndex: index}]);
+            addToSkillArray(arr, nestedChild, [...flatSkill.parent || [], {parentId: flatSkill.id, childIndex: index}]);
         })
     }
 }

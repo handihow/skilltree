@@ -1,16 +1,29 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {storage} from '../../firebase/firebase';
+import IComposition from '../../models/composition.model';
 
-export class CompositionItem extends Component {
+interface ICompositionItemProps {
+    composition: IComposition;
+    delComposition: Function;
+}
 
-    state = {
-        isActive: false,
-        thumbnail: 'https://via.placeholder.com/128x128.png?text=Skilltree'
-    };
+interface ICompositionItemState {
+    isActive: boolean;
+    thumbnail: string;
+}
 
+export class CompositionItem extends Component<ICompositionItemProps, ICompositionItemState> {
+
+    constructor(props: ICompositionItemProps){
+        super(props);
+        this.state = {
+            isActive: false,
+            thumbnail: 'https://via.placeholder.com/128x128.png?text=Skilltree'
+        };
+    }
+    
     componentDidMount(){
         if(this.props.composition.hasBackgroundImage){
             const storageRef = storage.ref();
@@ -50,7 +63,7 @@ export class CompositionItem extends Component {
                     <Link to={"/compositions/"+id} className="level-item">
                     <span className="icon is-small"><FontAwesomeIcon icon='edit' /></span>
                     </Link>
-                    <Link to={"/compositions/"+id+"/view"} className="level-item">
+                    <Link to={"/compositions/"+id+"/viewer"} className="level-item">
                     <span className="icon is-small"><FontAwesomeIcon icon='eye' /></span>
                     </Link>
                 </div>
@@ -79,12 +92,6 @@ export class CompositionItem extends Component {
             </div>
         )
     }
-}
-
-// Proptypes
-CompositionItem.propTypes = {
-    composition: PropTypes.object.isRequired,
-    delComposition: PropTypes.func.isRequired
 }
 
 export default CompositionItem

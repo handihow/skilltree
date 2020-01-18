@@ -3,14 +3,28 @@ import FileUploader from "react-firebase-file-uploader";
 import { db, storage } from '../../firebase/firebase';
 import { Redirect } from 'react-router-dom';
 
-export class ImageUploader extends Component {
+interface IImageUploaderProps {
+    compositionId: string;
+}
 
-    state = {
-        toEditor: false,
-        isUploading: false,
-        progress: 0,
-        uploadedBackgroundFile: '',
-        uploadedBackgroundUrl: ''
+interface IImageUploaderState {
+    toEditor: boolean;
+    isUploading: boolean;
+    progress: number;
+    uploadedBackgroundFile: string;
+    uploadedBackgroundUrl: string;
+}
+
+export class ImageUploader extends Component<IImageUploaderProps, IImageUploaderState> {
+    constructor(props: IImageUploaderProps){
+        super(props);
+        this.state = {
+            toEditor: false,
+            isUploading: false,
+            progress: 0,
+            uploadedBackgroundFile: '',
+            uploadedBackgroundUrl: ''
+        };
     }
 
     handleUploadStart = () => this.setState({ isUploading: true, progress: 0 });

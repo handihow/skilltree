@@ -4,7 +4,6 @@ import {treebeardTheme} from '../compositions/StandardData';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types';
 
-
 const CustomHeader = ({ node, style, prefix }) =>
   <div style={style.base}>
     <div style={{ ...style.title, display: "flex" }}>
