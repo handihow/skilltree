@@ -7,6 +7,10 @@ export default interface ICompostion {
     username?: string; //refers to user email
     theme?: SkillThemeType;
     hasBackgroundImage?: boolean;
-    backgroundImage: string;
-    thumbnailImage: string;
+    backgroundImage?: string;
+    thumbnailImage?: string;
+    skillcount?: number;
+    loggedInUsersOnly?: boolean;
+    loggedInUsersCanEdit?: boolean;
+    sharedUsers?: string[];
 }

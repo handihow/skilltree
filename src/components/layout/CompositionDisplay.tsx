@@ -12,14 +12,14 @@ import { ContextStorage } from 'beautiful-skill-tree/dist/models';
 import { db } from '../../firebase/firebase';
 import { connect } from "react-redux";
 import firebase from "firebase/app";
+import { toast } from 'react-toastify';
 
 interface ICompositionDisplayProps {
     theme: any;
     compositionId: string;
     skilltrees: ISkilltree[];
     user: any;
-    showCounter: boolean;
-    showFilter: boolean;
+    showController: boolean;
     title: string;
 }
 
@@ -31,6 +31,7 @@ interface ICompositionDisplayState {
 }
 
 class CompositionDisplay extends Component<ICompositionDisplayProps, ICompositionDisplayState> {
+    progress: React.RefObject<HTMLSpanElement>;
     // the state of the skill tree, as per my custom implementation
     
     constructor(props: ICompositionDisplayProps){
@@ -39,6 +40,7 @@ class CompositionDisplay extends Component<ICompositionDisplayProps, ICompositio
             doneLoading: false
         };
         this.handleSave = this.handleSave.bind(this);
+        this.progress = React.createRef()
     }
 
     componentDidMount(){
@@ -61,11 +63,16 @@ class CompositionDisplay extends Component<ICompositionDisplayProps, ICompositio
                         data: data,
                         doneLoading: true
                     });
+                } else {
+                    //no data yet
+                    this.setState({
+                        data: [],
+                        doneLoading: true
+                    })
                 }
                 
             });
         } else {
-            console.log('not logged in')
             //no user is logged in
             this.setState({
                 data: [],
@@ -90,24 +97,38 @@ class CompositionDisplay extends Component<ICompositionDisplayProps, ICompositio
     handleSave(
         storage: ContextStorage,
         treeId: string,
-        skills: SavedDataType
+        skills: SavedDataType,
+        progress?: number
     ) {
+        
         if(this.props.user && this.props.user.uid && treeId && this.state.doneLoading){
-            db.collection('results').doc(this.props.user.uid).set({
-                user: this.props.user.uid,
-                email: this.props.user.email,
-                skilltrees: firebase.firestore.FieldValue.arrayUnion(treeId)
-            }, {merge: true})
+            db.collection('results')
+            .doc(this.props.user.uid)
+            .collection('skilltrees')
+            .doc(treeId)
+            .set({
+                skills, 
+                id: treeId,
+                compositionId: this.props.compositionId
+            })
             .then( _ => {
-                db.collection('results')
-                .doc(this.props.user.uid)
-                .collection('skilltrees')
-                .doc(treeId)
-                .set({
-                    skills, 
-                    id: treeId,
-                    compositionId: this.props.compositionId
+                db.collection('results').doc(this.props.user.uid).set({
+                    user: this.props.user.uid,
+                    email: this.props.user.email,
+                    displayName: this.props.user.displayName,
+                    compositions: firebase.firestore.FieldValue.arrayUnion(this.props.compositionId),
+                    skilltrees: firebase.firestore.FieldValue.arrayUnion(treeId),
+                    progress: {
+                        [this.props.compositionId]: 
+                        parseInt(this.progress.current?.textContent ? this.progress.current?.textContent : '0') 
+                    }
+                }, {merge: true})
+                .catch(err => {
+                    toast.error(err.message);
                 });
+            })
+            .catch(err => {
+                toast.error(err.message);
             })
         } else if (this.state.doneLoading){
             //not logged in
@@ -122,14 +143,17 @@ class CompositionDisplay extends Component<ICompositionDisplayProps, ICompositio
                 <SkillTreeGroup theme={this.props.theme}>
                 {(treeData: SkillGroupDataType) => (
                     <React.Fragment>
-                      {this.props.showCounter && this.state.doneLoading && 
+                      {this.props.showController && this.state.doneLoading && 
                       <div className="message is-primary" style={{marginTop: "15px"}}>
                       <div className="message-header">{this.props.title}</div>
                           <div className="message-body">
                               <div className="level">
                                   <div className="level-left">
-                                    <h6 className="title is-6">Completed skills: {treeData.selectedSkillCount.required + treeData.selectedSkillCount.optional} 
-                                        /{treeData.skillCount.required + treeData.skillCount.optional}</h6>
+                                    <h6 className="title is-6">Completed skills: 
+                                    <span style={{marginLeft: "5px"}} ref={this.progress}>
+                                        {treeData.selectedSkillCount.required + treeData.selectedSkillCount.optional}
+                                    </span>
+                                    /{treeData.skillCount.required + treeData.skillCount.optional}</h6>
                                   </div>
                                   <div className="level-right">
                                     <button className="button" onClick={treeData.resetSkills}>Reset</button>

@@ -1,8 +1,12 @@
 import React, { Component } from 'react'
 import {standardData, standardTheme} from './StandardData';
+import ICompostion from '../../models/composition.model';
 
 interface IAddCompositionProps {
     addComposition: Function;
+    isEditingTitle: boolean;
+    composition?: ICompostion;
+    updateCompositionTitle: Function;
 }
 
 interface IAddCompositionState {
@@ -17,12 +21,24 @@ export class AddComposition extends Component<IAddCompositionProps, IAddComposit
             title: ''
         }
     }
+
+    componentDidUpdate(prevProps) {
+        if (!prevProps.isEditingTitle && this.props.isEditingTitle) {
+            this.setState({
+                title: this.props.composition?.title || '',
+            })
+        }
+    }
     
     onChange = (e) => this.setState({title: e.target.value});
 
     onSubmit = (e) => {
         e.preventDefault();
-        this.props.addComposition(this.state.title, standardTheme, standardData);
+        if(this.props.isEditingTitle) {
+            this.props.updateCompositionTitle(this.state.title);
+        } else {
+            this.props.addComposition(this.state.title, standardTheme, standardData);
+        }
         this.setState({title: ''});
     }
 

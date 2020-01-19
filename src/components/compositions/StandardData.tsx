@@ -1,4 +1,5 @@
 import ISkill from '../../models/skill.model';
+import ISkilltree from '../../models/skilltree.model';
 import uuid from 'uuid';
 
 export const standardTheme  = {
@@ -156,13 +157,13 @@ export const standardData = [
     }
   }
 
-  export const standardSkilltree = {
+  export const standardSkilltree : ISkilltree = {
     collapsible: true,
     data: standardData,
     description: "More information about my skill tree",
-    id: '1',
+    id: 'default-skilltree',
     title: 'Example',
-    order: 0
+    order: 0,
   }
 
   const cssColors = [

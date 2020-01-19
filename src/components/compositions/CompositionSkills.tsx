@@ -204,6 +204,9 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
             showEditor: false,
             isEditing: false
         });
+        db.collection('compositions').doc(this.props.match.params.compositionId).update({
+            skillcount: this.state.skills.length
+        });
     }
 
     deleteSkill = (skill: ISkill) => {
@@ -233,6 +236,7 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
                   toast.update(toastId, {
                     render: 'Skill and related child skills deleted successfully'
                   });
+
                 }
                 currentComponent.closeWarning()
               }).catch(function(error) {
@@ -248,7 +252,10 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
         this.setState({
             currentSkill: undefined,
             showWarning: false
-        })
+        });
+        db.collection('compositions').doc(this.props.match.params.compositionId).update({
+            skillcount: this.state.skills.length
+        });
     }
 
     closeModal = () => {

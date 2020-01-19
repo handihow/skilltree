@@ -52,9 +52,10 @@ export class Composition extends Component<RouteComponentProps<TParams>,IComposi
                     if(composition?.hasBackgroundImage){
                         //fetch the background image
                         const storageRef = storage.ref();
-                        const imageRef = storageRef.child(composition.backgroundImage);
+                        const imageRef = storageRef.child(composition.backgroundImage ||'');
                         imageRef.getDownloadURL()
                         .then(url => {
+                            console.log(skilltrees);
                             this.setState({
                                 composition, 
                                 hasBackgroundImage: true, 
@@ -91,8 +92,7 @@ export class Composition extends Component<RouteComponentProps<TParams>,IComposi
                                                 : undefined}>
                     <div style={{maxHeight:'100%',overflow:'auto'}}>
                     {this.state.skilltrees && this.state.skilltrees.length > 0 && <CompositionDisplay
-                    showCounter={true}
-                    showFilter={true}
+                    showController={true}
                     theme={this.state.composition?.theme} 
                     skilltrees={this.state.skilltrees || []}
                     compositionId={this.props.match.params.compositionId}

@@ -267,8 +267,7 @@ export class CompositionTheme extends Component<RouteComponentProps<TParams>, IC
                             </div>
                             <div className="column is-narrow">
                                 {this.state.theme && <CompositionDisplay
-                                showCounter={false}
-                                showFilter={false}
+                                showController={false}
                                 compositionId={this.props.match.params.compositionId} 
                                 theme={this.state.theme} 
                                 skilltrees={[standardSkilltree]}
