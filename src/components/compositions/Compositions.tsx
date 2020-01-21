@@ -4,9 +4,7 @@ import IComposition from '../../models/composition.model';
 
 interface ICompositionsProps {
     compositions: IComposition[];
-    delComposition: Function;
     editCompositionTitle: Function;
-    copyComposition: Function;
 }
 
 export default function Compositions(props: ICompositionsProps) {
@@ -16,8 +14,8 @@ export default function Compositions(props: ICompositionsProps) {
         <React.Fragment>
         {props.compositions?.map((composition) => (
             <CompositionItem key={composition.id} composition={composition} 
-            delComposition={props.delComposition} editCompositionTitle={props.editCompositionTitle}
-            copyComposition={props.copyComposition} />
+            editCompositionTitle={props.editCompositionTitle}
+             />
         ))}
         </React.Fragment>
     )

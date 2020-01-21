@@ -7,22 +7,46 @@ import { RouteComponentProps } from 'react-router-dom';
 import ISkilltree from '../../models/skilltree.model';
 import IComposition from '../../models/composition.model';
 import ISkill from '../../models/skill.model';
+import { connect } from "react-redux";
+import Login from '../Login';
+import firebase from "firebase/app";
 
 type TParams =  { compositionId: string };
 
-interface ICompositionState {
+interface ICompositionViewerProps extends RouteComponentProps<TParams>{
+    user: any;
+    isAuthenticated: boolean;
+}
+
+interface ICompositionViewerState {
     composition?: IComposition;
     hasBackgroundImage: boolean;
     backgroundImage?: string;
     skilltrees?: ISkilltree[];
 }
 
-export class CompositionViewer extends Component<RouteComponentProps<TParams>,ICompositionState> {
-    constructor(props: RouteComponentProps<TParams>){
+export class CompositionViewer extends Component<ICompositionViewerProps,ICompositionViewerState> {
+    constructor(props: ICompositionViewerProps){
         super(props);
         this.state = {
             hasBackgroundImage: false,
         }
+    }
+
+    componentDidUpdate(prevProps){
+        if(!prevProps.isAuthenticated && this.props.isAuthenticated){
+            this.addSharedUser();
+        }
+        
+    }
+
+    addSharedUser = () => {
+        if(this.props.isAuthenticated && this.state.composition && !this.state.composition.sharedUsers?.includes(this.props.user.uid)){
+            db.collection("compositions").doc(this.state.composition?.id).update({
+                sharedUsers: firebase.firestore.FieldValue.arrayUnion(this.props.user.uid)
+            })
+        }
+        
     }
 
     componentDidMount() {
@@ -30,6 +54,9 @@ export class CompositionViewer extends Component<RouteComponentProps<TParams>,IC
         db.collection("compositions").doc(compositionId).get()
         .then(doc => {
             const composition = doc.data() as IComposition;
+            this.setState({
+                composition: composition
+            })
             db.collection("compositions").doc(compositionId)
             .collection("skilltrees").orderBy('order').get()
             .then(async querySnapshot => {
@@ -74,6 +101,8 @@ export class CompositionViewer extends Component<RouteComponentProps<TParams>,IC
         return (
             this.state.skilltrees && this.state.skilltrees.length===0 ? 
             <Loading /> :
+                this.state.composition?.loggedInUsersOnly && !this.props.isAuthenticated ? 
+                <Login onCompositionPage={true} /> :
                 <div style={this.state.hasBackgroundImage ? 
                                                 {
                                                     backgroundImage: `url(${this.state.backgroundImage})`,
@@ -95,4 +124,11 @@ export class CompositionViewer extends Component<RouteComponentProps<TParams>,IC
     }
 }
 
-export default CompositionViewer
+function mapStateToProps(state) {
+    return {
+      isAuthenticated: state.auth.isAuthenticated,
+      user: state.auth.user
+    };
+  }
+
+export default connect(mapStateToProps)(CompositionViewer)

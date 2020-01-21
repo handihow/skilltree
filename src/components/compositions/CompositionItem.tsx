@@ -1,16 +1,16 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {storage, db} from '../../firebase/firebase';
+import {storage, db, functions} from '../../firebase/firebase';
 import IComposition from '../../models/composition.model';
 import { connect } from "react-redux";
 import IResult from '../../models/result.model';
+import uuid from 'uuid';
+import { toast } from 'react-toastify';
 
 interface ICompositionItemProps {
     composition: IComposition;
     editCompositionTitle: Function;
-    delComposition: Function;
-    copyComposition: Function;
     isAuthenticated: boolean;
     user: any
 }
@@ -32,6 +32,104 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
         };
     }
     
+    copyComposition = async (composition) => {
+        const toastId = uuid.v4();
+        toast.info('Copying skilltree and all related data is in progress... please wait', {
+            toastId: toastId,
+            autoClose: 5000
+        });
+        const batch = db.batch();
+        //first create a new composition and set it to the batch
+        const newComposition = {...composition, user: this.props.user.uid, id: uuid.v4(), sharedUsers: [], title: 'Copy of ' + composition.title};
+        const newCompositionRef = db.collection('compositions').doc(newComposition.id);
+        batch.set(newCompositionRef, newComposition);
+        
+        //then copy all the skilltrees
+        const skilltreeSnapshot = await db.collection('compositions').doc(composition.id).collection('skilltrees').get();
+        const skilltrees = skilltreeSnapshot.docs.map(snap => snap.data());
+        for(let i = 0; i < skilltrees.length; i++){
+          const newSkilltree = {...skilltrees[i], id: uuid.v4(), composition: newComposition.id};
+          const newSkilltreeRef = db.collection('compositions').doc(newComposition.id)
+                                    .collection('skilltrees').doc(newSkilltree.id);
+          batch.set(newSkilltreeRef, newSkilltree);
+          
+          //get the root skills and start copying
+          const rootSkillSnapshot = await db.collection('compositions').doc(composition.id)
+                                            .collection('skilltrees').doc(skilltrees[i].id)
+                                            .collection('skills').get();
+          const rootSkills = rootSkillSnapshot.empty ? [] : rootSkillSnapshot.docs.map(snap => snap.data());
+          const rootSkillPaths = rootSkillSnapshot.empty ? [] : rootSkillSnapshot.docs.map(snap => snap.ref.path)
+          for(let j = 0; j < rootSkills.length; j ++){
+    
+            const newRootSkill = {...rootSkills[j], composition: newComposition.id, skilltree: newSkilltree.id, id: uuid.v4()};
+            const newRootSkillRef = db.collection('compositions').doc(newComposition.id)
+                                      .collection('skilltrees').doc(newSkilltree.id)
+                                      .collection('skills').doc(newRootSkill.id);
+            batch.set(newRootSkillRef, newRootSkill);
+            await this.copyChildSkills(rootSkills[j], rootSkillPaths[j], batch, newComposition.id, newSkilltree.id, newRootSkillRef);
+          }
+        }
+        return batch.commit()
+        .then(() => {
+            toast.update(toastId, {
+                render: `Successfully copied skilltree '${composition.title}'`
+              });
+        })
+        .catch((error: any) => {
+            toast.update(toastId, {
+                render: toast.error(`Problem copying: ${error.message} `),
+                type: toast.TYPE.ERROR
+              });
+        });
+      };
+    
+      copyChildSkills = async (skill: any, path: string, batch: any, newCompositionId: string, newSkilltreeId: string, newSkillRef: any) => {
+        const childSkillSnapshot = await db.doc(path).collection('skills').get();
+        if(childSkillSnapshot.empty){
+          return;
+        } else {
+          const childSkills = childSkillSnapshot.docs.map(snap => snap.data());
+          const childSkillPaths = childSkillSnapshot.docs.map(snap => snap.ref);
+          for (let index = 0; index < childSkills.length; index++) {
+            const newChildSkill = {...childSkills[index], composition: newCompositionId, skilltree: newSkilltreeId, id: uuid.v4()};
+            const newChildSkillRef = newSkillRef.collection('skills').doc(newChildSkill.id);
+            batch.set(newChildSkillRef, newChildSkill);
+            await this.copyChildSkills(childSkills[index], childSkillPaths[index].path, batch, newCompositionId, newSkilltreeId, newChildSkillRef);
+          }
+        }
+      }
+
+      delComposition = (composition) => {
+        const toastId = uuid.v4();
+        toast.info('Deleting skilltree and all related data is in progress... please wait', {
+          toastId: toastId,
+          autoClose: 5000
+        });
+        const path = `compositions/${composition.id}`;
+        const deleteFirestorePathRecursively = functions.httpsCallable('deleteFirestorePathRecursively');
+        deleteFirestorePathRecursively({
+            collection: 'Skilltree',
+            path: path
+        })
+        .then(function(result) {
+          if(result.data.error){
+              toast.update(toastId, {
+                render: result.data.error
+              });
+          } else {
+            toast.update(toastId, {
+              render: 'Skill tree deleted successfully'
+            });
+          }
+        })
+        .catch(function(error) {
+          toast.update(toastId, {
+            render: error.message,
+            type: toast.TYPE.ERROR
+          });
+        });
+      }
+
     componentDidMount(){
         if(this.props.composition.hasBackgroundImage){
             const storageRef = storage.ref();
@@ -88,7 +186,7 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
                             <FontAwesomeIcon icon='pen' /></a>
                     </div>}
                     <div className="level-item" data-tooltip="Copy skilltree">
-                        <a href="# " onClick={this.props.copyComposition.bind(this, this.props.composition)}>
+                        <a href="# " onClick={() => this.copyComposition(this.props.composition)}>
                             <FontAwesomeIcon icon='copy' /></a>
                     </div>
                     {this.props.user.uid === this.props.composition.user &&
@@ -127,7 +225,8 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
                     You are about to delete skill tree page {title}. Do you want to delete?
                 </section>
                 <footer className="modal-card-foot">
-                    <button className="button is-danger" onClick={this.props.delComposition.bind(this, this.props.composition)}>Delete</button>
+                    <button className="button is-danger" onClick={() => this.delComposition(this.props.composition)}>
+                        Delete</button>
                     <button className="button" onClick={this.toggleIsActive}>Cancel</button>
                 </footer>
                 </div>

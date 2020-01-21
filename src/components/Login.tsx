@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Redirect, Link } from "react-router-dom";
+import { Redirect, Link, RouteComponentProps } from "react-router-dom";
 import { loginUser, loginWithGoogle, loginWithMicrosoft } from "../actions";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
@@ -12,8 +12,24 @@ const hrStyle =  {
     width: '100px'
 }
 
-class Login extends Component {
-    state = { email: "", password: "" };
+interface ILoginProps  {
+    isLoggingIn: boolean;
+    isAuthenticated: boolean;
+    dispatch: any;
+    onCompositionPage?: boolean;
+}
+
+interface ILoginState {
+    email: string;
+    password: string;
+}
+
+class Login extends Component<ILoginProps, ILoginState> {
+    
+    constructor(props: ILoginProps){
+        super(props);
+        this.state = { email: "", password: "" };
+    }
 
     handleEmailChange = ({ target }) => {
         this.setState({ email: target.value });
@@ -64,7 +80,8 @@ class Login extends Component {
                                     Skilltree
                                 </h1>
                                 <h2 className="subtitle">
-                                    Sign in to create awesome skilltrees
+                                    {this.props.onCompositionPage ? 'You need to sign in to view this skilltree'
+                                    : 'Sign in to create awesome skilltrees'}
                                 </h2>
                             </div>
                         </div>

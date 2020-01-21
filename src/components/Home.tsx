@@ -159,36 +159,6 @@ class Home extends Component<IHomeProps, IHomeState> {
     });
   }
 
-  delComposition = (composition) => {
-    const toastId = uuid.v4();
-    toast.info('Deleting skilltree and all related data is in progress... please wait', {
-      toastId: toastId
-    });
-    const path = `compositions/${composition.id}`;
-    const deleteFirestorePathRecursively = functions.httpsCallable('deleteFirestorePathRecursively');
-    deleteFirestorePathRecursively({
-        collection: 'Skilltree',
-        path: path
-    })
-    .then(function(result) {
-      if(result.data.error){
-          toast.update(toastId, {
-            render: result.data.error
-          });
-      } else {
-        toast.update(toastId, {
-          render: 'Skill tree deleted successfully'
-        });
-      }
-    })
-    .catch(function(error) {
-      toast.update(toastId, {
-        render: error.message,
-        type: toast.TYPE.ERROR
-      });
-    });
-  }
-
   render() {
     const header = "Skilltrees"
     return (
@@ -204,8 +174,8 @@ class Home extends Component<IHomeProps, IHomeState> {
           </div>
         </div>
         {this.state.compositions && 
-          <Compositions compositions={this.state.compositions} delComposition={this.delComposition}
-            editCompositionTitle={this.editCompositionTitle} copyComposition={this.copyComposition} />
+          <Compositions compositions={this.state.compositions} 
+            editCompositionTitle={this.editCompositionTitle} />
         }
       </div>
       </section>    
