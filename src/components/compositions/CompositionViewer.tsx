@@ -10,6 +10,7 @@ import ISkill from '../../models/skill.model';
 import { connect } from "react-redux";
 import Login from '../Login';
 import firebase from "firebase/app";
+import { toast } from 'react-toastify';
 
 type TParams =  { compositionId: string };
 
@@ -35,18 +36,28 @@ export class CompositionViewer extends Component<ICompositionViewerProps,ICompos
 
     componentDidUpdate(prevProps){
         if(!prevProps.isAuthenticated && this.props.isAuthenticated){
+            console.log('adding skilltree to shared')
             this.addSharedUser();
         }
         
     }
 
     addSharedUser = () => {
-        if(this.props.isAuthenticated && this.state.composition && !this.state.composition.sharedUsers?.includes(this.props.user.uid)){
+        if(this.props.isAuthenticated 
+            && this.state.composition
+            && !this.state.composition.sharedUsers?.includes(this.props.user.uid)
+            && this.state.composition.user !== this.props.user.uid ){
+                console.log('adding skilltree to shared')
             db.collection("compositions").doc(this.state.composition?.id).update({
                 sharedUsers: firebase.firestore.FieldValue.arrayUnion(this.props.user.uid)
             })
+            .then( _ => {
+                toast.info('Skilltree was added to your list of shared skilltrees')
+            })
+            .catch(e => {
+                toast.error(e.message);
+            })
         }
-        
     }
 
     componentDidMount() {
@@ -87,9 +98,11 @@ export class CompositionViewer extends Component<ICompositionViewerProps,ICompos
                                 backgroundImage: url, 
                                 skilltrees: skilltrees
                             });
+                            this.addSharedUser();
                         });
                     } else {
                         this.setState({composition, skilltrees: skilltrees });
+                        this.addSharedUser();
                     }
                 })
                 

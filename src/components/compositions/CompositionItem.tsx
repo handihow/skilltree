@@ -7,6 +7,7 @@ import { connect } from "react-redux";
 import IResult from '../../models/result.model';
 import uuid from 'uuid';
 import { toast } from 'react-toastify';
+import firebase from 'firebase/app'
 
 interface ICompositionItemProps {
     composition: IComposition;
@@ -40,7 +41,14 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
         });
         const batch = db.batch();
         //first create a new composition and set it to the batch
-        const newComposition = {...composition, user: this.props.user.uid, id: uuid.v4(), sharedUsers: [], title: 'Copy of ' + composition.title};
+        const newComposition = {
+          ...composition, 
+          user: this.props.user.uid, 
+          id: uuid.v4(), 
+          sharedUsers: [], 
+          title: 'Copy of ' + composition.title,
+          lastUpdate: firebase.firestore.Timestamp.now()
+        };
         const newCompositionRef = db.collection('compositions').doc(newComposition.id);
         batch.set(newCompositionRef, newComposition);
         
@@ -129,6 +137,12 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
           });
         });
       }
+    
+    removeSharedSkilltree = (composition) => {
+      db.collection('compositions').doc(composition.id).update({
+        sharedUsers: firebase.firestore.FieldValue.arrayRemove(this.props.user.uid)
+      })
+    }
 
     componentDidMount(){
         if(this.props.composition.hasBackgroundImage){
@@ -150,8 +164,6 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
                 })
             })
         }
-        
-        
     }
 
     toggleIsActive = () =>{
@@ -198,7 +210,7 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
                     </Link>
                 </div>
                 <div className="level-right">
-                <div className="level-item">
+                <div className="level-item is-hidden-mobile">
                     <div className="tag is-primary">
                         {'Completed ' + this.state.progress + ' of ' + this.props.composition.skillcount + ' skills'}
                     </div>
@@ -210,8 +222,7 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
                         max={this.props.composition.skillcount}></progress>
             </div>
             <div className="media-right">
-            {this.props.user.uid === this.props.composition.user &&
-            <button className="delete" onClick={this.toggleIsActive}></button>}
+            <button className="delete" onClick={this.toggleIsActive}></button>
             </div>
             </div>
             <div className={`modal ${this.state.isActive ? "is-active" : ""}`}>
@@ -225,7 +236,10 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
                     You are about to delete skill tree page {title}. Do you want to delete?
                 </section>
                 <footer className="modal-card-foot">
-                    <button className="button is-danger" onClick={() => this.delComposition(this.props.composition)}>
+                    <button className="button is-danger" 
+                    onClick={this.props.user.uid === this.props.composition.user ? 
+                              () => this.delComposition(this.props.composition) : 
+                              () => this.removeSharedSkilltree(this.props.composition)}>
                         Delete</button>
                     <button className="button" onClick={this.toggleIsActive}>Cancel</button>
                 </footer>

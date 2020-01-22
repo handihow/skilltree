@@ -10,11 +10,29 @@ interface INavbarProps {
     dispatch: any;
 }
 
-class Navbar extends Component<INavbarProps> {
+interface INavbarState {
+    isActive: boolean;
+}
+
+class Navbar extends Component<INavbarProps, INavbarState> {
+
+    constructor(props: INavbarProps) {
+        super(props);
+        this.state = {
+            isActive: false
+        }
+    }
+
     handleLogout = () => {
         const { dispatch } = this.props;
         dispatch(logoutUser());
     };
+
+    toggleActive = () => {
+        this.setState({
+            isActive: !this.state.isActive
+        })
+    }
 
     render(){
         const { isLoggingOut, logoutError, isAuthenticated } = this.props;
@@ -27,7 +45,14 @@ class Navbar extends Component<INavbarProps> {
                         alt="Skilltree logo"
                         src="https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/SkillTree_logo.png?alt=media&token=0cbc6c2a-58c2-46e7-bfec-47eafb6ddb01" ></img>
                     </Link>
+                    <a role="button" className={this.state.isActive ? "navbar-burger is-active" : "navbar-burger"}
+                        aria-label="menu" aria-expanded="false" onClick={this.toggleActive} href="# ">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    </a>
                 </div>
+                <div className={this.state.isActive ? "navbar-menu is-active" : "navbar-menu"}>
                 <div className="navbar-end">
                 {isAuthenticated ?
                     <Link to="/" className="navbar-item">
@@ -43,6 +68,7 @@ class Navbar extends Component<INavbarProps> {
                             <Link to="/login" className="button is-light">Login</Link>}
                         </div>
                     </div>  
+                </div>
                 </div>
             </div>
             {isLoggingOut ? <div className="notification">Logging out...</div> : null}

@@ -9,35 +9,41 @@ import LinkFileUploader from './LinkFileUploader';
 import LinkForm from './LinkForm';
 import ILink from '../../models/link.model';
 import { db } from '../../firebase/firebase';
+import RichTextEditor from 'react-rte';
+import {toolbarConfig} from '../compositions/StandardData';
 
 interface ISkillFormProps {
-    skill: ISkill;
     isEditing: boolean;
     updateSkill: Function;
     closeModal: Function;
     parentName: string;
+    skill: ISkill;
 }
 
 interface ISkillFormState{
-    skill?: ISkill,
     isShowFileModal?: boolean;
     isShowYouTubeModal?: boolean;
     isShowLinkModal?: boolean;
+    description: any;
+    title: string;
+    optional: boolean;
+    links: ILink[];
 }
 
 export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
 
     constructor(props: ISkillFormProps){
         super(props);
+        console.log(props);
         this.state = {
-            isShowYouTubeModal: false
+            isShowYouTubeModal: false,
+            description: this.props.skill?.description ? 
+                    RichTextEditor.createValueFromString(this.props.skill.description, 'html') : 
+                    RichTextEditor.createEmptyValue(),
+            title: this.props.skill?.title ? this.props.skill.title : '',
+            optional: this.props.skill?.optional ? this.props.skill.optional : false,
+            links: this.props.skill?.links && this.props.skill.links.length > 0  ? this.props.skill.links : []
         };
-    }
-
-    componentDidMount(){
-        this.setState({
-            skill: this.props.skill,
-        })
     }
 
     toggleLinkModal = () => {
@@ -58,39 +64,38 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
         })
     }
 
-    handleChange = (e : React.FormEvent<HTMLInputElement>) => {
-        if(this.state.skill){
-            this.setState({
-                skill: {...this.state.skill, [e.currentTarget.name] : e.currentTarget.value}
-            });
-        }
+    handleTitleChange = (e : React.FormEvent<HTMLInputElement>) => {
+        this.setState({
+            title: e.currentTarget.value
+        });
     };
 
-    handleDescriptionChange = (e : React.FormEvent<HTMLTextAreaElement>) => {
-        if(this.state.skill){
-            this.setState({
-                skill: {...this.state.skill, description: e.currentTarget.value}
-            })
-        }
+    handleDescriptionChange = (value) => {
+        this.setState({
+            description: value
+        })
+        // if(this.state.skill){
+        //     this.setState({
+        //         skill: {...this.state.skill, description: e.currentTarget.value}
+        //     })
+        // }
     }
 
     handleOptionalChange = (value: string) => {
-        if(this.state.skill){
-            this.setState({
-                skill: {...this.state.skill, optional: value === 'true' ? true : false}
-            })
-        }
+        this.setState({
+            optional: value === 'true' ? true : false
+        })
     }
 
     onSubmit = (e:any) => {
         e.preventDefault();
         // form validation
         let hasError = false;
-        if(!this.state.skill || isEmpty(this.state.skill.title) || isEmpty(this.state.skill.description) ){
+        if(isEmpty(this.state.title) || isEmpty(this.state.description.toString('html')) ){
             toast.error('Title and description cannot be empty');
             hasError = true;
-        } else if(this.state.skill && this.state.skill.links && this.state.skill.links.length > 0){
-            this.state.skill.links.forEach((link, index) => {
+        } else if(this.state.links && this.state.links.length > 0){
+            this.state.links.forEach((link, index) => {
                 if(isEmpty(link.title) || isEmpty(link.iconName) || !isURL(link.reference)){
                     toast.error('Link number ' + (index + 1) + ' does not have title or icon, or does not contain a valid URL');
                     hasError = true;
@@ -98,35 +103,36 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
             })
         } 
         if(!hasError) {
-            this.props.updateSkill(this.state.skill);
+            this.props.updateSkill({
+                ...this.props.skill,
+                title: this.state.title,
+                description: this.state.description.toString('html'),
+                optional: this.state.optional
+            });
         }
     }
 
     addLink = (link: ILink) => {
-        if(this.state.skill?.path){
-            db.doc(this.state.skill.path).update({links: [...this.state.skill.links || [], link] })
+        if(this.props.skill?.path){
+            db.doc(this.props.skill.path).update({links: [...this.state.links || [], link] })
             .then( _ => {
-                if(this.state.skill){
-                    this.setState({
-                        skill: {...this.state.skill, links: [...this.state.skill.links || [], link]}
-                    })
-                }
+                this.setState({
+                    links: [...this.state.links || [], link]
+                })
             })
             .catch(e => toast.error(e))
-        } else if(this.state.skill){
+        } else if(this.props.skill){
             //this is a new skill
             this.setState({
-                skill: {...this.state.skill, links: [...this.state.skill.links || [], link]}
+                links: [...this.state.links || [], link]
             })
         }
     }
 
     deleteLink = (id: string) => {
-        if(this.state.skill && this.state.skill.links && this.state.skill.links.length > 0){
-            this.setState({
-                skill: { ...this.state.skill, links:[...this.state.skill.links.filter(l => l.id !== id)] } 
-            })
-        }
+        this.setState({
+            links:[...this.state.links.filter(l => l.id !== id)] 
+        })
     }
 
 
@@ -142,7 +148,7 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                     <div className="level-left">
                         <div className="level-item">
                             <h6 className="title is-6">
-                                {this.props.isEditing ?  'Editing ' + (this.state.skill ? this.state.skill.title : '') 
+                                {this.props.isEditing ?  'Editing ' + (this.props.skill ? this.props.skill.title : '') 
                                     : 'Add skill to ' + this.props.parentName }
                             </h6>
                         </div>
@@ -159,8 +165,8 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                     <div className="control">
                         <input className="input" 
                         name="title" type="text" placeholder="title" required 
-                        onChange={this.handleChange}
-                        value={this.state.skill ? this.state.skill.title : ''} />
+                        onChange={this.handleTitleChange}
+                        value={this.state.title} />
                     </div>
                 </div>
                 <div className="field-group">
@@ -172,13 +178,13 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                         <div className="control">
                         <label className="radio">
                             <input type="radio" name="optional"
-                                checked={!this.state.skill || !this.state.skill.optional}
+                                checked={!this.state.optional}
                                 onChange={() => this.handleOptionalChange('false')} />
                             <span style={{marginLeft: "5px"}}>Not optional</span>
                         </label>
                         <label className="radio">
                             <input type="radio" name="optional"
-                                checked={this.state.skill && this.state.skill.optional ? true : false}
+                                checked={this.state.optional}
                                 onChange={() => this.handleOptionalChange('true')} />
                             <span style={{marginLeft: "5px"}}>Optional</span>
                         </label>
@@ -206,10 +212,15 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                 <div className="field">
                     <label className="label" htmlFor="description">Description</label>
                     <div className="control">
-                        <textarea className="textarea" 
+                        {/* <textarea className="textarea" 
                         name="description" placeholder="description" required 
                         onChange={this.handleDescriptionChange}
-                        value={this.state.skill && this.state.skill.description} />
+                        value={this.state.skill && this.state.skill.description} /> */}
+                        <RichTextEditor
+                            value={this.state.description}
+                            onChange={this.handleDescriptionChange}
+                            toolbarConfig={toolbarConfig}
+                        />
                     </div>
                 </div>
                 <div className="buttons">
@@ -237,9 +248,9 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                 </div>
             </form>
             <hr></hr>
-            {this.state.skill && this.state.skill.links && this.state.skill.links.length > 0 && 
+            {this.state.links.length > 0 && 
                 <ul style={{listStyleType: 'none', marginTop: '10px'}}>
-                    {this.state.skill.links.map((link, index)=> (
+                    {this.state.links.map((link, index)=> (
                         <LinkCard link={link} key={index} deleteLink={this.deleteLink}/>
                     ))}
                 </ul>

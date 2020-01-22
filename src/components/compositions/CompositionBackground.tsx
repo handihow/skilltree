@@ -81,7 +81,7 @@ export class CompositionBackground extends Component<RouteComponentProps<TParams
         return (
             this.state.toEditor ? 
             <Redirect to={`/compositions/${compositionId}`}/> :
-            <div className="columns" style={{height:"95vh"}}>
+            <div className="columns is-mobile" style={{height:"95vh"}}>
                 <div className="column is-2">
                     <CompositionMenu id={compositionId} />
                 </div>

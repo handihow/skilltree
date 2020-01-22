@@ -16,6 +16,7 @@ import CompositionTheme from './components/compositions/CompositionTheme';
 import CompositionSkilltrees from './components/compositions/CompositionSkilltrees';
 import CompositionSkills from './components/compositions/CompositionSkills';
 import PublishComposition from './components/compositions/PublishComposition';
+import ExportComposition from './components/compositions/ExportComposition';
 import Payments from './components/payments/Payments';
 import PaymentConfirmation from './components/payments/PaymentConfirmation';
 
@@ -74,6 +75,12 @@ function App(props) {
       <ProtectedRoute 
         path="/compositions/:compositionId/publish"
         component={PublishComposition}
+        isAuthenticated={isAuthenticated}
+        isVerifying={isVerifying}
+      />
+      <ProtectedRoute 
+        path="/compositions/:compositionId/export"
+        component={ExportComposition}
         isAuthenticated={isAuthenticated}
         isVerifying={isVerifying}
       />

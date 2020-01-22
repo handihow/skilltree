@@ -1,10 +1,11 @@
-import React from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import renderHTML from 'react-render-html';
 
 export default function SkillContent(props) {
     return (
         <React.Fragment>
-            <div>{props.description}</div>
+            {renderHTML(props.description)}
             <ul style={{listStyleType: 'none', marginTop: '10px'}}>
                 {props.links.map((link) => (
                     <li key={link.id}>

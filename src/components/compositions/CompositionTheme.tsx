@@ -9,6 +9,7 @@ import CompositionDisplay from '../layout/CompositionDisplay';
 import {standardSkilltree, allColors, gradients} from './StandardData';
 import features from '../payments/Features';
 import { toast } from 'react-toastify';
+import firebase from 'firebase/app';
 
 type TParams =  { compositionId: string };
 
@@ -56,7 +57,8 @@ export class CompositionTheme extends Component<RouteComponentProps<TParams>, IC
 
     saveChanges = () => {
         db.collection('compositions').doc(this.props.match.params.compositionId).set({
-                theme: this.state.theme
+                theme: this.state.theme,
+                lastUpdate: firebase.firestore.Timestamp.now()
         }, {merge: true})
         .then(_ => {
             this.setState({
@@ -219,7 +221,7 @@ export class CompositionTheme extends Component<RouteComponentProps<TParams>, IC
         return (
             this.state.toEditor ?
                 <Redirect to={`/compositions/${this.props.match.params.compositionId}`} /> :
-                this.state.doneLoading && <div className="columns">
+                this.state.doneLoading && <div className="columns is-mobile">
                     <div className="column is-2">
                         <CompositionMenu id={this.props.match.params.compositionId} />
                     </div>

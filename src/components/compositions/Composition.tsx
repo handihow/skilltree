@@ -76,7 +76,7 @@ export class Composition extends Component<RouteComponentProps<TParams>,IComposi
         return (
             this.state.skilltrees && this.state.skilltrees.length===0 ? 
             <Loading /> :
-            <div className="columns" style={{marginBottom: '0rem'}}>
+            <div className="columns is-mobile" style={{marginBottom: '0rem'}}>
                 <div className="column is-2 has-background-white">
                     <CompositionMenu id={this.props.match.params.compositionId}/>
                 </div>

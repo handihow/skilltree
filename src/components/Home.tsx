@@ -7,8 +7,8 @@ import uuid from 'uuid';
 import { connect } from "react-redux";
 import { toast } from 'react-toastify';
 import { standardChildSkills, standardRootSkill } from "./compositions/StandardData";
-import { functions } from '../firebase/firebase';
 import IComposition from '../models/composition.model';
+import firebase from 'firebase/app';
 
 interface IHomeProps {
   isAuthenticated: boolean;
@@ -17,9 +17,12 @@ interface IHomeProps {
 
 interface IHomeState {
   compositions: IComposition[];
+  sharedCompositions: IComposition[];
   isEditingTitle: boolean;
   currentComposition?: IComposition;
-  unsubscribe?: any;
+  unsubscribeOwned?: any;
+  unsubscribeShared?: any;
+  activeTab: string;
 }
 
 class Home extends Component<IHomeProps, IHomeState> {
@@ -27,25 +30,45 @@ class Home extends Component<IHomeProps, IHomeState> {
   constructor(props: IHomeProps){
     super(props)
     this.state = {
+      activeTab: 'owned',
       compositions: [],
+      sharedCompositions: [],
       isEditingTitle: false
     }
   }
   
   componentDidMount() {
-      const unsubscribe = db.collection("compositions")
+      const unsubscribeOwned = db.collection("compositions")
         .where('user', '==', this.props.user.uid)
+        .orderBy('lastUpdate', "desc")
         .onSnapshot(querySnapshot => {
-          const data = querySnapshot.docs.map(doc => doc.data() as IComposition);
-          this.setState({ compositions: data });
+          const ownCompositions = querySnapshot.docs.map(doc => doc.data() as IComposition);
+          this.setState({ 
+            compositions: ownCompositions,
+            unsubscribeOwned: unsubscribeOwned 
+          });
         });
-      this.setState({
-        unsubscribe: unsubscribe
-      })
+      
+        const unsubscribeShared = db.collection("compositions")
+        .where('sharedUsers', 'array-contains', this.props.user.uid)
+        .orderBy('lastUpdate', "desc")
+        .onSnapshot(querySnapshot => {
+          const sharedCompositions = querySnapshot.docs.map(doc => doc.data() as IComposition);
+          this.setState({ 
+            sharedCompositions: sharedCompositions,
+            unsubscribeShared: unsubscribeShared 
+          });
+        });
+
   } 
 
   componentWillUnmount() {
-    this.state.unsubscribe();
+    if(this.state.unsubscribeOwned){
+      this.state.unsubscribeOwned();
+    }
+    if(this.state.unsubscribeShared){
+      this.state.unsubscribeShared();
+    }
   }
 
   addComposition = (title, theme, data) => {
@@ -56,7 +79,8 @@ class Home extends Component<IHomeProps, IHomeState> {
       user: this.props.user.uid,
       username: this.props.user.email,
       hasBackgroundImage: false,
-      skillcount: 3
+      skillcount: 3,
+      lastUpdate: firebase.firestore.Timestamp.now()
     };
     db.collection('compositions').doc(newComposition.id).set(newComposition)
     .then(_ => {
@@ -122,7 +146,8 @@ class Home extends Component<IHomeProps, IHomeState> {
 
   updateCompositionTitle = (updatedTitle: string) => {
     db.collection('compositions').doc(this.state.currentComposition?.id).update({
-      title: updatedTitle
+      title: updatedTitle,
+      lastUpdate: firebase.firestore.Timestamp.now()
     }).then( _ => {
       this.setState({
         isEditingTitle: false,
@@ -131,31 +156,9 @@ class Home extends Component<IHomeProps, IHomeState> {
     })
   }
 
-  copyComposition = (composition) => {
-    const toastId = uuid.v4();
-    toast.info('Copying skilltree and all related data is in progress... please wait', {
-      toastId: toastId
-    });
-    const copyComposition = functions.httpsCallable('copyComposition');
-    copyComposition({
-      composition: composition
-    })
-    .then(function(result) {
-      if(result.data.error){
-          toast.update(toastId, {
-            render: result.data.error
-          });
-      } else {
-        toast.update(toastId, {
-          render: 'Skill tree copied successfully'
-        });
-      }
-    })
-    .catch(function(error) {
-      toast.update(toastId, {
-        render: error.message,
-        type: toast.TYPE.ERROR
-      });
+  changeActiveTab = (tab: string) => {
+    this.setState({
+        activeTab: tab
     });
   }
 
@@ -173,8 +176,18 @@ class Home extends Component<IHomeProps, IHomeState> {
              composition={this.state.currentComposition} updateCompositionTitle={this.updateCompositionTitle}/>  
           </div>
         </div>
+        <div className="tabs">
+        <ul>
+            <li className={this.state.activeTab ==='owned' ? "is-active" : undefined}>
+                <a href="# " onClick={() => this.changeActiveTab('owned')}>Your skilltrees</a>
+            </li>
+            <li className={this.state.activeTab ==='shared' ? "is-active" : undefined}>
+                <a href="# " onClick={() => this.changeActiveTab('shared')}>Shared skilltrees</a>
+            </li>
+        </ul>
+        </div>
         {this.state.compositions && 
-          <Compositions compositions={this.state.compositions} 
+          <Compositions compositions={this.state.activeTab === 'owned' ? this.state.compositions : this.state.sharedCompositions} 
             editCompositionTitle={this.editCompositionTitle} />
         }
       </div>

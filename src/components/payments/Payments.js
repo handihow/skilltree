@@ -70,6 +70,13 @@ export class Payments extends Component {
                             Pay ${this.state.amount},- to unlock
                         </h2>
                         {this.state.description}
+                        <p style={{marginTop: "10px"}}>
+                            <div><span class="tag is-info" style={{marginRight: "10px"}}>Info</span>
+                            During this bèta testing phase, you can use credit card number 4242 4242 4242 4242
+                            to unlock the feature.</div>
+                            <small>This will work with any postal code and cvc number.</small>
+                        </p>
+                        
                     </div>
                 </div>
                 

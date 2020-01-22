@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Redirect, Link } from 'react-router-dom';
 import { db, functions } from '../../firebase/firebase';
+import firebase from 'firebase/app';
 
 import uuid from 'uuid';
 import SkillForm from '../layout/SkillForm';
@@ -205,7 +206,8 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
             isEditing: false
         });
         db.collection('compositions').doc(this.props.match.params.compositionId).update({
-            skillcount: this.state.skills.length
+            skillcount: this.state.skills.length,
+            lastUpdate: firebase.firestore.Timestamp.now()
         });
     }
 
@@ -270,7 +272,7 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
             this.state.toEditor ?
                 <Redirect to={`/compositions/${this.props.match.params.compositionId}`} /> :
                 <React.Fragment>
-                <div className="columns" >
+                <div className="columns is-mobile" >
                     <div className="column is-2">
                         <CompositionMenu id={this.props.match.params.compositionId} />
                     </div>

@@ -3,6 +3,7 @@ import {storage} from '../../firebase/firebase';
 import { db } from '../../firebase/firebase';
 import { Redirect } from 'react-router-dom';
 import IBackgroundImage from '../../models/backgroundimage.model';
+import firebase from 'firebase/app';
 
 interface IImageThumb1Props {
     image: IBackgroundImage;
@@ -37,7 +38,8 @@ export class ImageThumb1 extends Component<IImageThumb1Props, IImageThumb1State>
         db.collection('compositions').doc(this.props.compositionId).set({
             backgroundImage: this.props.image.reference,
             thumbnailImage: this.props.image.thumb2,
-            hasBackgroundImage: true
+            hasBackgroundImage: true,
+            lastUpdate: firebase.firestore.Timestamp.now()
         }, {merge: true})
         .then( _ => {
             this.setState({toEditor: true})

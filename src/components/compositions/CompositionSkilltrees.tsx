@@ -3,6 +3,7 @@ import { Redirect, Link } from 'react-router-dom';
 import { db, functions } from '../../firebase/firebase';
 import { RouteComponentProps } from 'react-router-dom';
 import uuid from 'uuid';
+import firebase from 'firebase/app';
 
 import SkilltreeForm from '../layout/SkilltreeForm';
 import CompositionMenu from '../layout/CompositionMenu';
@@ -86,6 +87,7 @@ export class CompositionSkilltrees extends Component<RouteComponentProps<TParams
             showEditor: true,
             isEditing: false
         });
+        this.updateCompositionTimestamp()
     }
 
     editSkilltree = (skilltree) => {
@@ -109,6 +111,7 @@ export class CompositionSkilltrees extends Component<RouteComponentProps<TParams
             this.setState({
                 showEditor: false
             });
+            this.updateCompositionTimestamp()
         })
         .catch(error => {
             toast.error('Something went wrong...' + error.message);
@@ -116,6 +119,7 @@ export class CompositionSkilltrees extends Component<RouteComponentProps<TParams
     }  
 
     deleteSkilltree = (skilltree) => {
+        const currentComponent = this;
         const toastId = uuid.v4();
         toast.info('Deleting branch all related child skills is in progress... please wait', {
           toastId: toastId
@@ -126,6 +130,7 @@ export class CompositionSkilltrees extends Component<RouteComponentProps<TParams
             collection: 'Skilltree',
             path: skilltreePath
         }).then(function(result) {
+                currentComponent.updateCompositionTimestamp()
                 if(result.data.error){
                     toast.update(toastId, {
                       render: result.data.error,
@@ -143,6 +148,12 @@ export class CompositionSkilltrees extends Component<RouteComponentProps<TParams
               });
     }
 
+    updateCompositionTimestamp = () => {
+        db.collection('compositions').doc(this.props.match.params.compositionId).update({
+            lastUpdate: firebase.firestore.Timestamp.now()
+        })
+    }
+
     closeModal = () => {
         this.setState({
             showEditor : false,
@@ -154,7 +165,7 @@ export class CompositionSkilltrees extends Component<RouteComponentProps<TParams
             this.state.toEditor ?
                 <Redirect to={`/compositions/${this.props.match.params.compositionId}`} /> :
                 <React.Fragment>
-                <div className="columns" >
+                <div className="columns is-mobile" >
                     <div className="column is-2">
                         <CompositionMenu id={this.props.match.params.compositionId} />
                     </div>

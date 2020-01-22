@@ -59,10 +59,14 @@ export class PublishComposition extends Component<RouteComponentProps<TParams>, 
         }
     }
 
+    openEmailClient = () => {
+        window.location.href = `mailto:?subject=Link%20to%20my%20skilltree&body=${this.state.url}`;
+    }
+
     render() {
         const compositionId = this.props.match.params.compositionId;
         return (
-            <div className="columns" style={{height:"95vh"}}>
+            <div className="columns is-mobile" style={{height:"95vh"}}>
                 <div className="column is-2">
                     <CompositionMenu id={compositionId} />
                 </div>
@@ -114,9 +118,9 @@ export class PublishComposition extends Component<RouteComponentProps<TParams>, 
                             <li className={this.state.activeTab ==='link' ? "is-active" : undefined}>
                                 <a href="# " onClick={() => this.changeActiveTab('link')}>Link</a>
                             </li>
-                            <li className={this.state.activeTab ==='iframe' ? "is-active" : undefined}>
+                            {/* <li className={this.state.activeTab ==='iframe' ? "is-active" : undefined}>
                                 <a href="# " onClick={() => this.changeActiveTab('iframe')}>IFrame</a>
-                            </li>
+                            </li> */}
                             <li className={this.state.activeTab ==='email' ? "is-active" : undefined}>
                                 <a href="# " onClick={() => this.changeActiveTab('email')}>Email</a>
                             </li>
@@ -142,6 +146,8 @@ export class PublishComposition extends Component<RouteComponentProps<TParams>, 
                                     </div>
                                 </div>
                             </div>}
+                        {this.state.activeTab === 'email' && 
+                            <button className="button" onClick={this.openEmailClient}>New email with link</button>}
 
                 </div>
             </div>

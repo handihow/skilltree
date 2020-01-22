@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Redirect, Link, RouteComponentProps } from "react-router-dom";
+import { Redirect, Link } from "react-router-dom";
 import { loginUser, loginWithGoogle, loginWithMicrosoft } from "../actions";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
