@@ -93,7 +93,9 @@ export class PublishComposition extends Component<RouteComponentProps<TParams>, 
                                 ))}
                                 </div>
                             </div>
-                            {this.state.composition && this.state.composition.loggedInUsersOnly && <div className="field is-narrow">
+                            {this.state.composition?.loggedInUsersOnly && 
+                            <React.Fragment>
+                            <div className="field is-narrow">
                                 <label className="label">
                                     Logged in users can edit skilltree?
                                 </label>
@@ -110,7 +112,26 @@ export class PublishComposition extends Component<RouteComponentProps<TParams>, 
                                     </label>
                                 ))}
                                 </div>
-                            </div>}
+                            </div>
+                            <div className="field is-narrow">
+                                <label className="label">
+                                    Logged in users can copy skilltree?
+                                </label>
+                                <div className="control">
+                                {["true", "false"].map((option, index) => (
+                                    <label className="radio" key={index}>
+                                        <input type="radio" name="canCopy" value={option}
+                                            checked={this.state.composition && 
+                                                this.state.composition.canCopy?.toString() ===  option ? 
+                                                true : false}
+                                            onChange={this.handleChange} />
+                                        <span style={{marginLeft: "10px"}}>{option === 'true' ? 
+                                                                'Logged in users can copy the skilltree' : 'Copying skilltree not allowed'}</span>
+                                    </label>
+                                ))}
+                                </div>
+                            </div>
+                            </React.Fragment>}
                         </div>
                         <hr></hr>
                         <div className="tabs">

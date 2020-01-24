@@ -48,7 +48,6 @@ export class LinkForm extends Component<ILinkFormProps, ILinkFormState> {
     startScraping = () => {
         if(this.state.url){
             const normalizedUrl = normalize(this.state.url, {forceHttps: true});
-            console.log(normalizedUrl);
             urlMetadata('https://cors-anywhere.herokuapp.com/' + normalizedUrl).then((metadata) => { // success handler
                 console.log(metadata);
                 const link:ILink = {
@@ -66,7 +65,20 @@ export class LinkForm extends Component<ILinkFormProps, ILinkFormState> {
                 })
             },
             (error) => { // failure handler
-                toast.error('Could not find information about the link. Check if the link is valid.')
+                toast.error('Could not find information about the link. Set title and description manually.')
+                const link:ILink = {
+                    id: uuid.v4(),
+                    iconName: 'link',
+                    iconPrefix: 'fas',
+                    reference: normalizedUrl,
+                    title: normalizedUrl,
+                    description: '',
+                    imageUrl: 'https://cdn.pixabay.com/photo/2014/04/02/14/08/mouse-306274_1280.png'
+                }
+                this.setState({
+                    link: link,
+                    doneScraping: true
+                })
             });
         }
     }

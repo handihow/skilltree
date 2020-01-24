@@ -82,7 +82,6 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
                     const filteredSkills = skills.filter(s => s.skilltree===skilltree.id);
                     skilltree.name = skilltree.title;
                     skilltree.isSkill = false;
-                    skilltree.toggled = true;
                     skilltree.children = skillArrayToSkillTree(filteredSkills);
                     skilltree.decorators = {
                         addSkill: () => this.addSkill(undefined,skilltree)

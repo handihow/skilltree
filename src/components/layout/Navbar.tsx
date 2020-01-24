@@ -7,6 +7,7 @@ interface INavbarProps {
     isLoggingOut: any;
     logoutError: any;
     isAuthenticated: boolean;
+    user: any;
     dispatch: any;
 }
 
@@ -21,6 +22,10 @@ class Navbar extends Component<INavbarProps, INavbarState> {
         this.state = {
             isActive: false
         }
+    }
+
+    componentDidUpdate(){
+        console.log(this.props.user);
     }
 
     handleLogout = () => {
@@ -61,6 +66,12 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                     <Link to="/about" className="navbar-item">
                         About
                     </Link> }
+                {this.props.isAuthenticated && <div className="navbar-item">
+                    <img alt="" 
+                    src={this.props.user?.photoURL ? 
+                        this.props.user.photoURL :
+                        `https://eu.ui-avatars.com/api/?name=${this.props.user.displayName}&rounded=true`}/>
+                </div>}
                 <div className="navbar-item">
                     <div className="buttons">
                         {isAuthenticated ? 
@@ -83,7 +94,8 @@ function mapStateToProps(state) {
     return {
       isLoggingOut: state.auth.isLoggingOut,
       logoutError: state.auth.logoutError,
-      isAuthenticated: state.auth.isAuthenticated
+      isAuthenticated: state.auth.isAuthenticated,
+      user: state.auth.user
     };
   }
 

@@ -12,6 +12,7 @@ export default interface ICompostion {
     skillcount?: number;
     loggedInUsersOnly?: boolean;
     loggedInUsersCanEdit?: boolean;
+    canCopy?: boolean;
     sharedUsers?: string[];
     lastUpdate?: any;
 }

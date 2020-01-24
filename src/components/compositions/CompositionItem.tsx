@@ -43,7 +43,8 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
         //first create a new composition and set it to the batch
         const newComposition = {
           ...composition, 
-          user: this.props.user.uid, 
+          user: this.props.user.uid,
+          username: this.props.user.email, 
           id: uuid.v4(), 
           sharedUsers: [], 
           title: 'Copy of ' + composition.title,
@@ -56,7 +57,11 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
         const skilltreeSnapshot = await db.collection('compositions').doc(composition.id).collection('skilltrees').get();
         const skilltrees = skilltreeSnapshot.docs.map(snap => snap.data());
         for(let i = 0; i < skilltrees.length; i++){
-          const newSkilltree = {...skilltrees[i], id: uuid.v4(), composition: newComposition.id};
+          const newSkilltree = {
+            ...skilltrees[i], 
+            id: uuid.v4(), 
+            composition: newComposition.id
+          };
           const newSkilltreeRef = db.collection('compositions').doc(newComposition.id)
                                     .collection('skilltrees').doc(newSkilltree.id);
           batch.set(newSkilltreeRef, newSkilltree);
@@ -99,7 +104,12 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
           const childSkills = childSkillSnapshot.docs.map(snap => snap.data());
           const childSkillPaths = childSkillSnapshot.docs.map(snap => snap.ref);
           for (let index = 0; index < childSkills.length; index++) {
-            const newChildSkill = {...childSkills[index], composition: newCompositionId, skilltree: newSkilltreeId, id: uuid.v4()};
+            const newChildSkill = {
+              ...childSkills[index], 
+              composition: newCompositionId, 
+              skilltree: newSkilltreeId, 
+              id: uuid.v4()
+            };
             const newChildSkillRef = newSkillRef.collection('skills').doc(newChildSkill.id);
             batch.set(newChildSkillRef, newChildSkill);
             await this.copyChildSkills(childSkills[index], childSkillPaths[index].path, batch, newCompositionId, newSkilltreeId, newChildSkillRef);
@@ -185,7 +195,9 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
             <div className="media-content">
                 <div className="content">
                 <p>
-                    <Link to={"/compositions/"+id} data-tooltip="To skilltree editor" style={{color: "black"}}> 
+                    <Link to={this.props.user.uid === this.props.composition.user 
+                              ? "/compositions/"+id :
+                              "compositions/"+id+"/viewer"} data-tooltip="To skilltree editor" style={{color: "black"}}> 
                     <strong>{title}</strong> 
                     </Link><small style={{marginLeft: "10px"}}>{username}</small>
                 </p>
@@ -197,10 +209,10 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
                         <a href="# " onClick={this.props.editCompositionTitle.bind(this, this.props.composition)}>
                             <FontAwesomeIcon icon='pen' /></a>
                     </div>}
-                    <div className="level-item" data-tooltip="Copy skilltree">
+                    {(this.props.composition.canCopy || this.props.user.uid === this.props.composition.user)  && <div className="level-item" data-tooltip="Copy skilltree">
                         <a href="# " onClick={() => this.copyComposition(this.props.composition)}>
                             <FontAwesomeIcon icon='copy' /></a>
-                    </div>
+                    </div>}
                     {this.props.user.uid === this.props.composition.user &&
                         <Link to={"/compositions/"+id} className="level-item" data-tooltip="Skilltree editor">
                     <span className="icon is-small"><FontAwesomeIcon icon='edit' /></span>
@@ -233,7 +245,7 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
                     <button className="delete" aria-label="close" onClick={this.toggleIsActive}></button>
                 </header>
                 <section className="modal-card-body">
-                    You are about to delete skill tree page {title}. Do you want to delete?
+                    You are about to delete skill tree page '{title}'. Do you want to delete?
                 </section>
                 <footer className="modal-card-foot">
                     <button className="button is-danger" 

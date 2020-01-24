@@ -107,7 +107,8 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                 ...this.props.skill,
                 title: this.state.title,
                 description: this.state.description.toString('html'),
-                optional: this.state.optional
+                optional: this.state.optional,
+                links: this.state.links
             });
         }
     }
@@ -212,10 +213,6 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                 <div className="field">
                     <label className="label" htmlFor="description">Description</label>
                     <div className="control">
-                        {/* <textarea className="textarea" 
-                        name="description" placeholder="description" required 
-                        onChange={this.handleDescriptionChange}
-                        value={this.state.skill && this.state.skill.description} /> */}
                         <RichTextEditor
                             value={this.state.description}
                             onChange={this.handleDescriptionChange}

@@ -30,13 +30,12 @@ export class CompositionViewer extends Component<ICompositionViewerProps,ICompos
     constructor(props: ICompositionViewerProps){
         super(props);
         this.state = {
-            hasBackgroundImage: false,
+            hasBackgroundImage: false
         }
     }
 
     componentDidUpdate(prevProps){
         if(!prevProps.isAuthenticated && this.props.isAuthenticated){
-            console.log('adding skilltree to shared')
             this.addSharedUser();
         }
         
@@ -47,7 +46,6 @@ export class CompositionViewer extends Component<ICompositionViewerProps,ICompos
             && this.state.composition
             && !this.state.composition.sharedUsers?.includes(this.props.user.uid)
             && this.state.composition.user !== this.props.user.uid ){
-                console.log('adding skilltree to shared')
             db.collection("compositions").doc(this.state.composition?.id).update({
                 sharedUsers: firebase.firestore.FieldValue.arrayUnion(this.props.user.uid)
             })
@@ -112,7 +110,7 @@ export class CompositionViewer extends Component<ICompositionViewerProps,ICompos
 
     render() {
         return (
-            this.state.skilltrees && this.state.skilltrees.length===0 ? 
+            !this.state.skilltrees || this.state.skilltrees.length===0 ? 
             <Loading /> :
                 this.state.composition?.loggedInUsersOnly && !this.props.isAuthenticated ? 
                 <Login onCompositionPage={true} /> :
