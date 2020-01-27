@@ -58,13 +58,13 @@ class Login extends Component<ILoginProps, ILoginState> {
 
     render() {
         const { isAuthenticated } = this.props;
-        const LoginButton = ({ icon, name, onClick, color }) => (
+        const LoginButton = ({ icon, iconPrefix, buttonText, onClick, color }) => (
             <div className="field">
               <p className={`control button is-medium ${color}`} style={{ width: '300px' }} onClick={onClick}>
                 <span className="icon">
-                <FontAwesomeIcon icon={['fab', icon]} />
+                <FontAwesomeIcon icon={[iconPrefix, icon]} />
                 </span>
-                <span>{`Sign in with ${name}`}</span>
+                <span>{buttonText}</span>
               </p>
             </div>
           );
@@ -88,8 +88,8 @@ class Login extends Component<ILoginProps, ILoginState> {
                     </section>
                     <section className="section">
                     <div className="has-text-centered">
-                    <LoginButton icon="google" name="Google" onClick={this.handleLoginWithGoogle} color="is-danger" />
-                    <LoginButton icon="microsoft" name="Microsoft" onClick={this.handleLoginWithMicrosoft} color="is-info" />
+                    <LoginButton icon="google" iconPrefix="fab" buttonText="Sign in with Google" onClick={this.handleLoginWithGoogle} color="is-danger" />
+                    <LoginButton icon="microsoft" iconPrefix="fab" buttonText="Sign in with Microsoft" onClick={this.handleLoginWithMicrosoft} color="is-info" />
                     </div>
 
                     <div className="has-text-centered" style={{ margin: '10px 0' }}>
@@ -113,11 +113,10 @@ class Login extends Component<ILoginProps, ILoginState> {
                             </div>
                             
                             <div className="field">
-                                <div className="control buttons is-centered">
-                                    <input className="button is-medium is-primary is-fullwidth" type="button" value="Sign In" onClick={this.handleSubmit} />
-                                </div>
+                            <LoginButton icon="sign-in-alt" iconPrefix="fas" buttonText="Sign In" onClick={this.handleSubmit} color="is-primary" />
                             </div>
-                            <Link to="/register">Click here to create an account</Link>
+                            <div><Link to="/register">Click here to create an account</Link></div>
+                            <div><Link to="/recover">Forgot password?</Link></div>
                         </div>
                         
                     </section>

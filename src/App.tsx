@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./components/Home";
 import Login from "./components/Login";
+import Recover from './components/Recover';
 import Register from './components/Register';
 import About from "./components/pages/About";
 import NavBar from './components/layout/Navbar';
@@ -129,6 +130,7 @@ function App(props) {
       />
       <Route path="/compositions/:compositionId/viewer" component={CompositionViewer} />
       <Route path="/login" component={Login} />
+      <Route path="/recover" component={Recover} />
       <Route path="/register" component={Register} />
       <Route path="/about" component={About} />
     </Switch>

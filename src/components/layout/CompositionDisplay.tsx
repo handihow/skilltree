@@ -15,6 +15,7 @@ import { connect } from "react-redux";
 import firebase from "firebase/app";
 import { toast } from 'react-toastify';
 import IComposition from '../../models/composition.model';
+import BackButton from './BackButton';
 
 interface ICompositionDisplayProps {
     theme: any;
@@ -173,7 +174,13 @@ class CompositionDisplay extends Component<ICompositionDisplayProps, ICompositio
                                     /{treeData.skillCount.required + treeData.skillCount.optional}</h6>
                                   </div>
                                   <div className="level-right">
-                                    <button className="button" onClick={treeData.resetSkills}>Reset</button>
+                                      {/* <div className="level-item">
+                                        <button className="button" onClick={treeData.resetSkills}>Reset</button>
+                                      </div> */}
+                                      <div className="level-item">
+                                        <BackButton />
+                                      </div>
+                                    
                                   </div>
                               </div>
                               <div className="field is-fullwidth has-addons">
