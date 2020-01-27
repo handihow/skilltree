@@ -24,10 +24,6 @@ class Navbar extends Component<INavbarProps, INavbarState> {
         }
     }
 
-    componentDidUpdate(){
-        console.log(this.props.user);
-    }
-
     handleLogout = () => {
         const { dispatch } = this.props;
         dispatch(logoutUser());
@@ -66,16 +62,11 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                     <Link to="/about" className="navbar-item">
                         About
                     </Link> }
-                {this.props.isAuthenticated && <div className="navbar-item">
-                    <img alt="" 
-                    src={this.props.user?.photoURL ? 
-                        this.props.user.photoURL :
-                        `https://eu.ui-avatars.com/api/?name=${this.props.user.displayName}&rounded=true`}/>
-                </div>}
                 <div className="navbar-item">
                     <div className="buttons">
+                        {isAuthenticated && <Link to="/profile" className="button is-light">Profile</Link>}
                         {isAuthenticated ? 
-                            <button className="button is-light" onClick={this.handleLogout}>Logout</button> : 
+                            <button className="button is-primary" onClick={this.handleLogout}>Logout</button> : 
                             <Link to="/login" className="button is-light">Login</Link>}
                         </div>
                     </div>  

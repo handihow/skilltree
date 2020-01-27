@@ -6,7 +6,7 @@
 .pnp.js
 
 #firebase connection
-/src/firebase/firebase.js
+/src/firebase/firebase.tsx
 
 # testing
 /coverage

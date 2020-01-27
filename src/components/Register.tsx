@@ -4,8 +4,24 @@ import { Redirect } from "react-router-dom";
 import { registerUser } from "../actions";
 import { toast } from 'react-toastify';
 
-class Register extends Component {
-    state = { displayName: "", email: "", password: "", repeatPassword: "" };
+interface IRegisterProps {
+    isAuthenticated: boolean;
+    dispatch: any;
+}
+
+interface IRegisterState {
+    displayName: string;
+    email: string;
+    password: string;
+    repeatPassword: string;
+}
+
+class Register extends Component<IRegisterProps, IRegisterState> {
+    constructor(props: IRegisterProps) {
+        super(props);
+        this.state = { displayName: "", email: "", password: "", repeatPassword: "" };
+    }
+
 
     handleDisplayNameChange = ({ target }) => {
         this.setState({ displayName: target.value });

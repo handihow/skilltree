@@ -101,4 +101,66 @@ exports.secret = functions.https.onCall((data, context) => {
           });
   });
 
+  exports.onCreateUser = functions.auth.user().onCreate((user) => {
+    return db.collection('users').doc(user.uid).set({
+      uid: user.uid,
+      displayName: user.displayName,
+      email: user.email,
+      emailVerified: user.emailVerified,
+      photoURL: user.photoURL ? user.photoURL : `https://eu.ui-avatars.com/api/?name=${user.displayName}`
+    }, {merge: true});
+  })
+
+  exports.addStudentList = functions.https.onCall(async (data,context) => {
+    if(!context.auth || !context.auth.uid ){
+        return {
+            error: 'Request denied. You are not logged in.'
+        }
+    }
+    const emailAddresses : string[] = data.emailAddresses || [];
+    const displayNames : string[] = data.displayNames || [];
+    const compositionId : string = data.compositionId || '';
+
+    if(emailAddresses.length !== displayNames.length){
+      return {
+          error: 'Number of email addresses does not match the number of full names'
+      }
+    }
+
+    const errorMessages : string[] = [];
+    for (let index = 0; index < emailAddresses.length; index++) {
+      const email = emailAddresses[index];
+      let user: admin.auth.UserRecord;
+      try{
+        user = await admin.auth().getUserByEmail(email);
+        //user record already exists
+      } catch(err){
+        //user record needs to be created
+        user = await admin.auth().createUser({
+          email: email,
+          displayName: displayNames[index]
+        });
+      }
+      try{
+        await db.collection('results').doc(user.uid).set({
+          user: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL ? user.photoURL : '',
+          compositions: admin.firestore.FieldValue.arrayUnion(compositionId),
+          progress: {
+                [compositionId]: 0 
+            }
+        }, {merge: true})
+      } catch(err){
+        errorMessages.push(err.message);
+      }
+    }
+
+    return {
+        result: errorMessages.length === 0 ? 'Student list added successfully' :
+          'Student list added with errors: ' + errorMessages.join(', ')
+    }
+
+  })
   

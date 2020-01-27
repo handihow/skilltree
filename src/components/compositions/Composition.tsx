@@ -70,7 +70,6 @@ export class Composition extends Component<ICompositionProps,ICompositionState> 
                             const imageRef = storageRef.child(composition.backgroundImage ||'');
                             imageRef.getDownloadURL()
                             .then(url => {
-                                console.log(skilltrees);
                                 this.setState({
                                     composition, 
                                     hasBackgroundImage: true, 
@@ -109,11 +108,12 @@ export class Composition extends Component<ICompositionProps,ICompositionState> 
                                                 }
                                                 : undefined}>
                     <div style={{maxHeight:'100%',overflow:'auto'}}>
-                    {this.state.skilltrees && this.state.skilltrees.length > 0 && <CompositionDisplay
+                    {this.state.skilltrees && this.state.skilltrees.length > 0 && this.state.composition && 
+                    <CompositionDisplay
                     showController={true}
-                    theme={this.state.composition?.theme} 
+                    theme={this.state.composition.theme} 
                     skilltrees={this.state.skilltrees || []}
-                    compositionId={this.props.match.params.compositionId}
+                    composition={this.state.composition}
                     title={this.state.composition?.title || ''} />}</div>
                 </div>
             </div>

@@ -220,6 +220,10 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
                     <Link to={"/compositions/"+id+"/viewer"} className="level-item" data-tooltip="View skilltree">
                     <span className="icon is-small"><FontAwesomeIcon icon='eye' /></span>
                     </Link>
+                    {this.props.user.uid === this.props.composition.user &&
+                        <Link to={"/compositions/"+id+"/monitor"} className="level-item" data-tooltip="Monitor your students">
+                    <span className="icon is-small"><FontAwesomeIcon icon='users' /></span>
+                    </Link>}
                 </div>
                 <div className="level-right">
                 <div className="level-item is-hidden-mobile">

@@ -12,7 +12,7 @@ import Login from '../Login';
 import firebase from "firebase/app";
 import { toast } from 'react-toastify';
 
-type TParams =  { compositionId: string };
+type TParams =  { compositionId: string, userId?: string };
 
 interface ICompositionViewerProps extends RouteComponentProps<TParams>{
     user: any;
@@ -124,12 +124,13 @@ export class CompositionViewer extends Component<ICompositionViewerProps,ICompos
                                                 }
                                                 : undefined}>
                     <div style={{maxHeight:'100%',overflow:'auto'}}>
-                    {this.state.skilltrees && this.state.skilltrees.length > 0 && <CompositionDisplay
+                    {this.state.skilltrees && this.state.skilltrees.length > 0 && this.state.composition && <CompositionDisplay
                     showController={true}
                     theme={this.state.composition?.theme} 
                     skilltrees={this.state.skilltrees || []}
-                    compositionId={this.props.match.params.compositionId}
-                    title={this.state.composition?.title || ''} />}</div>
+                    composition={this.state.composition}
+                    title={this.state.composition?.title || ''}
+                    monitoredUserId={this.props.match.params.userId} />}</div>
                 </div>
         )
     }

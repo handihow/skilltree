@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ISkilltree from '../../models/skilltree.model';
+import IUser from '../../models/user.model';
 import {
     SkillTreeGroup,
     SkillTree,
@@ -13,14 +14,16 @@ import { db } from '../../firebase/firebase';
 import { connect } from "react-redux";
 import firebase from "firebase/app";
 import { toast } from 'react-toastify';
+import IComposition from '../../models/composition.model';
 
 interface ICompositionDisplayProps {
     theme: any;
-    compositionId: string;
+    composition: IComposition;
     skilltrees: ISkilltree[];
     user: any;
     showController: boolean;
     title: string;
+    monitoredUserId?: string;
 }
 
 interface ICompositionDisplayState {
@@ -45,8 +48,10 @@ class CompositionDisplay extends Component<ICompositionDisplayProps, ICompositio
 
     componentDidMount(){
         if(this.props.user && this.props.user.uid){
-            const unsubscribe = db.collection('results').doc(this.props.user.uid)
-            .collection('skilltrees').where('compositionId', '==', this.props.compositionId).onSnapshot((querySnapshot) =>{
+            const monitoredUserId = typeof this.props.monitoredUserId === 'undefined' ? this.props.user.uid : 
+                this.props.monitoredUserId;
+            const unsubscribe = db.collection('results').doc(monitoredUserId)
+            .collection('skilltrees').where('compositionId', '==', this.props.composition.id).onSnapshot((querySnapshot) =>{
                 if(!querySnapshot.empty && querySnapshot.size !== 0){
                     const results = querySnapshot.docs.map(snap => snap.data());
                     const data : SavedDataType[]= [];
@@ -98,38 +103,50 @@ class CompositionDisplay extends Component<ICompositionDisplayProps, ICompositio
         storage: ContextStorage,
         treeId: string,
         skills: SavedDataType,
-        progress?: number
     ) {
-        
+        const monitoredUserId = typeof this.props.monitoredUserId === 'undefined' ? this.props.user.uid : 
+                this.props.monitoredUserId;
         if(this.props.user && this.props.user.uid && treeId && this.state.doneLoading){
-            db.collection('results')
-            .doc(this.props.user.uid)
-            .collection('skilltrees')
-            .doc(treeId)
-            .set({
-                skills, 
-                id: treeId,
-                compositionId: this.props.compositionId
-            })
-            .then( _ => {
-                db.collection('results').doc(this.props.user.uid).set({
-                    user: this.props.user.uid,
-                    email: this.props.user.email,
-                    displayName: this.props.user.displayName,
-                    compositions: firebase.firestore.FieldValue.arrayUnion(this.props.compositionId),
-                    skilltrees: firebase.firestore.FieldValue.arrayUnion(treeId),
-                    progress: {
-                        [this.props.compositionId]: 
-                        parseInt(this.progress.current?.textContent ? this.progress.current?.textContent : '0') 
-                    }
-                }, {merge: true})
+            if( typeof monitoredUserId === 'undefined' &&
+                monitoredUserId !== this.props.composition.user && !this.props.composition.loggedInUsersCanEdit){
+                toast.info(
+                    'Please ask your instructor to update the completion status of this skill. Changes will not be saved.',
+                    { toastId: 'cannotduplicatethistoast'});
+            } else {
+                db.collection('results')
+                .doc(monitoredUserId)
+                .collection('skilltrees')
+                .doc(treeId)
+                .set({
+                    skills, 
+                    id: treeId,
+                    compositionId: this.props.composition.id
+                })
+                .then( _ => {
+                    const compositionId: string = this.props.composition.id || '';
+                    db.collection('users').doc(monitoredUserId).get()
+                    .then((snap) => {
+                        const user = snap.data() as IUser;
+                        db.collection('results').doc(monitoredUserId).set({
+                            user: monitoredUserId,
+                            email: user.email,
+                            displayName: user.displayName,
+                            photoURL: user.photoURL ? user.photoURL : '',
+                            compositions: firebase.firestore.FieldValue.arrayUnion(this.props.composition.id),
+                            progress: {
+                                 [compositionId]: 
+                                 parseInt(this.progress.current?.textContent ? this.progress.current?.textContent : '0') 
+                             }
+                         }, {merge: true})
+                         .catch(err => {
+                             toast.error(err.message);
+                         });
+                    })
+                })
                 .catch(err => {
                     toast.error(err.message);
-                });
-            })
-            .catch(err => {
-                toast.error(err.message);
-            })
+                })
+            } 
         } else if (this.state.doneLoading){
             //not logged in
             storage.setItem(`skills-${treeId}`, JSON.stringify(skills));

@@ -10,6 +10,7 @@ import {standardSkilltree, allColors, gradients} from './StandardData';
 import features from '../payments/Features';
 import { toast } from 'react-toastify';
 import firebase from 'firebase/app';
+import IComposition from '../../models/composition.model';
 
 type TParams =  { compositionId: string };
 
@@ -19,6 +20,7 @@ interface ICompositionThemeState {
     hasUnlockedAllCustomThemeOptions: boolean;
     fontFamilies?: any[];
     theme?: any;
+    composition?: IComposition;
     unsubscribe?: any;
 }
 
@@ -88,8 +90,9 @@ export class CompositionTheme extends Component<RouteComponentProps<TParams>, IC
 
         db.collection('compositions').doc(currentComponent.props.match.params.compositionId).get()
             .then(doc => {
-                const data = doc.data();
+                const data = doc.data() as IComposition;
                 currentComponent.setState({
+                    composition: data,
                     theme: data?.theme
                 });
             })
@@ -268,9 +271,9 @@ export class CompositionTheme extends Component<RouteComponentProps<TParams>, IC
                             </div>
                             </div>
                             <div className="column is-narrow">
-                                {this.state.theme && <CompositionDisplay
+                                {this.state.theme && this.state.composition && <CompositionDisplay
                                 showController={false}
-                                compositionId={this.props.match.params.compositionId} 
+                                composition={this.state.composition} 
                                 theme={this.state.theme} 
                                 skilltrees={[standardSkilltree]}
                                 title='' />} 

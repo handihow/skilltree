@@ -1,5 +1,5 @@
 
-import { myFirebase, googleProvider, microsoftProvider } from "../firebase/firebase";
+import { myFirebase, googleProvider, microsoftProvider, db } from "../firebase/firebase";
 import { toast } from 'react-toastify';
 
 export const LOGIN_REQUEST = "LOGIN_REQUEST";
@@ -68,6 +68,7 @@ export const registerUser = (displayName, email, password) => dispatch => {
     .auth()
     .createUserWithEmailAndPassword(email, password)
     .then(result => {
+      if(!result || !result.user){return console.error('no user record')};
       result.user.updateProfile({
         displayName: displayName
       })
@@ -137,6 +138,14 @@ export const verifyAuth = () => dispatch => {
     .auth()
     .onAuthStateChanged(user => {
       if (user !== null) {
+        //create or update user record in firestore db
+        db.collection('users').doc(user.uid).set({
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL ? user.photoURL : `https://eu.ui-avatars.com/api/?name=${user.displayName}`,
+          emailVerified: user.emailVerified,
+        }, {merge: true})
         dispatch(receiveLogin(user));
       }
       dispatch(verifySuccess());
