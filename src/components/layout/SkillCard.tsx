@@ -1,13 +1,26 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { linkIcons } from '../compositions/StandardData';
+import ISkill from '../../models/skill.model';
 
-export class SkillCard extends Component {
+interface ISkillCardProps {
+    skill: ISkill;
+    editSkill: Function;
+    deleteSkill: Function;
+}
 
-    state = {
-        isActive: false
-    };
+interface ISkillCardState {
+    isActive: boolean;
+}
+
+export class SkillCard extends Component<ISkillCardProps, ISkillCardState> {
+
+    constructor(props: ISkillCardProps){
+        super(props);
+        this.state = {
+            isActive: false
+        };
+    }
 
     editSkill = () => {
         this.props.editSkill(this.props.skill);
@@ -21,6 +34,10 @@ export class SkillCard extends Component {
         this.setState({
             isActive: !this.state.isActive
         });
+    }
+
+    addChild = () => {
+        
     }
 
     render() {
@@ -42,11 +59,11 @@ export class SkillCard extends Component {
                         {skill.description}
                         <br></br>
                         <ul style={{listStyleType: 'none', margin: '10px'}}>
-                        {skill.links.map((link) => (
+                        {skill.links && skill.links.map((link) => (
                             <li key={link.id}>
                                 <a href={link.reference} target="_blank" rel="noopener noreferrer">
                                 <span style={{marginRight: '10px'}}>
-                                <FontAwesomeIcon icon={[linkIcons[link.icon].iconLibrary, linkIcons[link.icon].icon]} />
+                                <FontAwesomeIcon icon={[link.iconPrefix, link.iconName]} />
                                 </span>
                                 {link.title}
                                 </a>
@@ -96,11 +113,5 @@ export class SkillCard extends Component {
         )
     }
 }
-
-SkillCard.propTypes = {
-    skill: PropTypes.object.isRequired,
-    editSkill: PropTypes.func.isRequired,
-    deleteSkill: PropTypes.func.isRequired
-};
 
 export default SkillCard

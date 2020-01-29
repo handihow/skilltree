@@ -169,7 +169,7 @@ export class CompositionSkilltrees extends Component<RouteComponentProps<TParams
                     <div className="column is-2">
                         <CompositionMenu id={this.props.match.params.compositionId} />
                     </div>
-                    <div className="column" style={{ marginTop: "10px" }}>
+                    <div className="column" style={{ marginTop: "10px", height:"calc(100vh - 3.5rem)", overflow: 'auto' }}>
                         <div className="title">Branches</div>
                         <div className="buttons">
                         <button className="button" onClick={this.addSkilltree}>Add branch</button>

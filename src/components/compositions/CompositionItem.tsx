@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {storage, db, functions} from '../../firebase/firebase';
+import {storage, db} from '../../firebase/firebase';
 import IComposition from '../../models/composition.model';
 import { connect } from "react-redux";
 import IResult from '../../models/result.model';
@@ -14,10 +14,10 @@ interface ICompositionItemProps {
     editCompositionTitle: Function;
     isAuthenticated: boolean;
     user: any
+    deleteComposition: Function;
 }
 
 interface ICompositionItemState {
-    isActive: boolean;
     thumbnail: string;
     progress: number;
 }
@@ -27,7 +27,6 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
     constructor(props: ICompositionItemProps){
         super(props);
         this.state = {
-            isActive: false,
             thumbnail: 'https://via.placeholder.com/128x128.png?text=Skilltree',
             progress: 0
         };
@@ -117,42 +116,7 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
         }
       }
 
-      delComposition = (composition) => {
-        const toastId = uuid.v4();
-        toast.info('Deleting skilltree and all related data is in progress... please wait', {
-          toastId: toastId,
-          autoClose: 5000
-        });
-        const path = `compositions/${composition.id}`;
-        const deleteFirestorePathRecursively = functions.httpsCallable('deleteFirestorePathRecursively');
-        deleteFirestorePathRecursively({
-            collection: 'Skilltree',
-            path: path
-        })
-        .then(function(result) {
-          if(result.data.error){
-              toast.update(toastId, {
-                render: result.data.error
-              });
-          } else {
-            toast.update(toastId, {
-              render: 'Skill tree deleted successfully'
-            });
-          }
-        })
-        .catch(function(error) {
-          toast.update(toastId, {
-            render: error.message,
-            type: toast.TYPE.ERROR
-          });
-        });
-      }
-    
-    removeSharedSkilltree = (composition) => {
-      db.collection('compositions').doc(composition.id).update({
-        sharedUsers: firebase.firestore.FieldValue.arrayRemove(this.props.user.uid)
-      })
-    }
+      
 
     componentDidMount(){
         if(this.props.composition.hasBackgroundImage){
@@ -175,17 +139,10 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
             })
         }
     }
-
-    toggleIsActive = () =>{
-        this.setState({
-            isActive: !this.state.isActive
-        });
-    }
     
     render() {
         const { id, title, username } = this.props.composition;
         return (
-          <React.Fragment>
             <div className="box">
             <div className="media">
             <div className="media-left">
@@ -239,30 +196,10 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
                         max={this.props.composition.skillcount}></progress>
             </div>
             <div className="media-right">
-            <button className="delete" onClick={this.toggleIsActive}></button>
+            <button className="delete" onClick={this.props.deleteComposition.bind(this, this.props.composition)}></button>
             </div>
             </div>
             </div>
-            <div className={`modal ${this.state.isActive ? "is-active" : ""}`}>
-              <div className="modal-background"></div>
-              <div className="modal-card">
-              <header className="modal-card-head">
-                  <p className="modal-card-title">Are you sure?</p>
-                  <button className="delete" aria-label="close" onClick={this.toggleIsActive}></button>
-              </header>
-              <section className="modal-card-body">
-                  You are about to delete skill tree page '{title}'. Do you want to delete?
-              </section>
-              <footer className="modal-card-foot">
-                  <button className="button is-danger" 
-                  onClick={this.props.user.uid === this.props.composition.user ? 
-                            () => this.delComposition(this.props.composition) : 
-                            () => this.removeSharedSkilltree(this.props.composition)}>
-                      Delete</button>
-                  <button className="button" onClick={this.toggleIsActive}>Cancel</button>
-              </footer>
-              </div>
-          </div></React.Fragment>
         )
     }
 }

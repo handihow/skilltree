@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Compositions from './compositions/Compositions';
 import AddComposition from './compositions/AddComposition';
 import Header from './layout/Header';
-import { db } from '../firebase/firebase';
+import { db, functions } from '../firebase/firebase';
 import uuid from 'uuid';
 import { connect } from "react-redux";
 import { toast } from 'react-toastify';
@@ -23,6 +23,7 @@ interface IHomeState {
   unsubscribeOwned?: any;
   unsubscribeShared?: any;
   activeTab: string;
+  isActive: boolean;
 }
 
 class Home extends Component<IHomeProps, IHomeState> {
@@ -33,7 +34,8 @@ class Home extends Component<IHomeProps, IHomeState> {
       activeTab: 'owned',
       compositions: [],
       sharedCompositions: [],
-      isEditingTitle: false
+      isEditingTitle: false,
+      isActive: false,
     }
   }
   
@@ -157,10 +159,59 @@ class Home extends Component<IHomeProps, IHomeState> {
     })
   }
 
+  delComposition = (composition) => {
+    this.toggleIsActive();
+    const toastId = uuid.v4();
+    toast.info('Deleting skilltree and all related data is in progress... please wait', {
+      toastId: toastId,
+      autoClose: 10000
+    });
+    const path = `compositions/${composition.id}`;
+    const deleteFirestorePathRecursively = functions.httpsCallable('deleteFirestorePathRecursively');
+    deleteFirestorePathRecursively({
+        collection: 'Skilltree',
+        path: path
+    })
+    .then(function(result) {
+      if(result.data.error){
+          toast.update(toastId, {
+            render: result.data.error,
+            type: toast.TYPE.ERROR,
+            autoClose: 5000
+          });
+      } else {
+        toast.update(toastId, {
+          render: 'Skill tree deleted successfully',
+          autoClose: 3000
+        });
+      }
+    })
+    .catch(function(error) {
+      toast.update(toastId, {
+        render: error.message,
+        type: toast.TYPE.ERROR,
+        autoClose: 5000
+      });
+    });
+  }
+
+  removeSharedSkilltree = (composition) => {
+    db.collection('compositions').doc(composition.id).update({
+      sharedUsers: firebase.firestore.FieldValue.arrayRemove(this.props.user.uid)
+    })
+  }
+
   changeActiveTab = (tab: string) => {
     this.setState({
         activeTab: tab
     });
+  }
+
+  toggleIsActive = (composition?: IComposition) =>{
+      this.setState({
+          currentComposition: composition? composition : undefined,
+          isActive: !this.state.isActive
+      });
   }
 
   render() {
@@ -188,9 +239,31 @@ class Home extends Component<IHomeProps, IHomeState> {
         </ul>
         </div>
         {this.state.compositions && 
-          <Compositions compositions={this.state.activeTab === 'owned' ? this.state.compositions : this.state.sharedCompositions} 
-            editCompositionTitle={this.editCompositionTitle} />
+          <Compositions 
+            compositions={this.state.activeTab === 'owned' ? this.state.compositions : this.state.sharedCompositions} 
+            editCompositionTitle={this.editCompositionTitle}
+            deleteComposition={this.toggleIsActive} />
         }
+      </div>
+      <div className={`modal ${this.state.isActive ? "is-active" : ""}`}>
+          <div className="modal-background"></div>
+          <div className="modal-card">
+          <header className="modal-card-head">
+              <p className="modal-card-title">Are you sure?</p>
+              <button className="delete" aria-label="close" onClick={() => this.toggleIsActive()}></button>
+          </header>
+          <section className="modal-card-body">
+              You are about to delete skill tree page '{this.state.currentComposition?.title}'. Do you want to delete?
+          </section>
+          <footer className="modal-card-foot">
+              <button className="button is-danger" 
+              onClick={this.props.user.uid === this.state.currentComposition?.user ? 
+                        () => this.delComposition(this.state.currentComposition) : 
+                        () => this.removeSharedSkilltree(this.state.currentComposition)}>
+                  Delete</button>
+              <button className="button" onClick={() => this.toggleIsActive()}>Cancel</button>
+          </footer>
+          </div>
       </div>
       </section>    
     );

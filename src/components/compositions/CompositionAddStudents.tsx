@@ -128,9 +128,9 @@ export class CompositionAddStudents extends Component<RouteComponentProps<TParam
                 length: 10,
                 uppercase: false
             })
-            let email: string =  autostring + '@auto.skilltree.com';
+            let email: string =  autostring + '@skilltree.student';
             if(typeof displayNames !== 'undefined'){
-                email = displayNames[index].toLowerCase().split(' ').join('.') + '@auto.skilltree.com';
+                email = displayNames[index].toLowerCase().split(' ').join('.') + '@skilltree.student';
             }
             emails.push(email);
         }
@@ -220,8 +220,13 @@ export class CompositionAddStudents extends Component<RouteComponentProps<TParam
             .then(function(result) {
             if(result.data.error){
                 toast.update(toastId, {
-                    render: result.data.error
+                    render: result.data.error,
+                    type: toast.TYPE.ERROR,
+                    autoClose: 5000
                 });
+                currentComponent.setState({
+                    showWarning: false
+                })
             } else {
                 toast.update(toastId, {
                 render: 'Student list added',
@@ -238,6 +243,9 @@ export class CompositionAddStudents extends Component<RouteComponentProps<TParam
                 type: toast.TYPE.ERROR,
                 autoClose: 5000
             });
+            currentComponent.setState({
+                showWarning: false
+            })
             });
         } else {
             this.setState({
@@ -292,12 +300,12 @@ export class CompositionAddStudents extends Component<RouteComponentProps<TParam
                         <React.Fragment>
                             <div>Enter the email addresses of your students in the input box below.</div>
                             <div>Put each student email on a new line.</div>
-                            <div>Next button is enabled when number of valid email address equals the number of student names.
-                                </div></React.Fragment>}
+                            </React.Fragment>}
                         {this.state.step === 4 && 
                         <React.Fragment>
-                            <div>Verify the list below. Please download the list so you can share account information with your students.</div>
                             <div>Go back to previous step if you see a mistake.</div>
+                            <div>Download the list so you can share emails/passwords with your students.</div>
+                            <div>You must save the student list to create the accounts.</div>
                             <div className="buttons is-right">
                                 <CSVLink 
                                     data={this.generateCSVData()}

@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { Treebeard, decorators } from 'react-treebeard';
 import {treebeardTheme} from '../compositions/StandardData';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import PropTypes from 'prop-types';
 
 const CustomHeader = ({ node, style, prefix }) =>
   <div style={style.base}>
@@ -29,6 +28,14 @@ class CustomContainer extends decorators.Container {
 
     addRootSkill = (node) => {
       setTimeout(() => node.decorators.addSkill(undefined, node), 100);
+    }
+
+    moveBranchUp = (node) => {
+      console.log(node);
+    }
+
+    moveBranchDown = (node) => {
+      console.log(node);
     }
 
     render() {
@@ -60,8 +67,9 @@ class CustomContainer extends decorators.Container {
           <div className="level-item has-text-danger has-tooltip-left" data-tooltip="Delete skill" 
               onClick={() => this.deleteSkill(node)} style={{cursor: 'pointer'}} >
             <FontAwesomeIcon icon='trash' />
-          </div></React.Fragment> :
-          <div className="level-item has-text-success has-tooltip-left" data-tooltip="Add root skill" onClick={() => this.addRootSkill(node)} style={{cursor: 'pointer'}}>
+          </div>
+          </React.Fragment> :
+          <div className="level-item has-text-success" data-tooltip="Add root skill" onClick={() => this.addRootSkill(node)} style={{cursor: 'pointer'}}>
             <FontAwesomeIcon icon='plus' />
           </div>}
         </div>
@@ -70,7 +78,17 @@ class CustomContainer extends decorators.Container {
     }
   }
 
-export class TreeView extends Component {
+interface ITreeViewProps {
+    data: any;
+    editSkill: Function;
+    deleteSkill: Function;
+}
+
+interface ITreeViewState {
+  cursor?: any;
+}
+
+export class TreeView extends Component<ITreeViewProps, ITreeViewState> {
 
     constructor(props) {
         super(props);
@@ -107,10 +125,5 @@ export class TreeView extends Component {
     }
 }
 
-TreeView.propTypes = {
-    data: PropTypes.object.isRequired,
-    editSkill: PropTypes.func.isRequired,
-    deleteSkill: PropTypes.func.isRequired
-};
 
 export default TreeView
