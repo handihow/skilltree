@@ -18,7 +18,7 @@ export class SelectFieldWithColumn extends Component<ISelectFieldWithColumnProps
                         <div className="select">
                             <select name={this.props.name}
                                 value={this.props.value}
-                                onChange={() => this.props.onChange()}>
+                                onChange={this.props.onChange.bind(this)}>
                                 {this.props.options.map((option) => (
                                 <option key={option.value} value={option.value}>{option.title}</option>
                                 ))}

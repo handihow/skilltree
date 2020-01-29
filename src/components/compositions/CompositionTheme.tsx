@@ -38,7 +38,7 @@ export class CompositionTheme extends Component<RouteComponentProps<TParams>, IC
     }
     
 
-    handleChange = ({ target }) => {
+    handleChange = ({target}) => {
         this.setState({
             theme: {
                 ...this.state.theme,
