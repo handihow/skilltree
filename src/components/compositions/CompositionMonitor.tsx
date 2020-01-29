@@ -23,6 +23,7 @@ interface ICompositionMonitorState {
     isActive: boolean;
     result?: IResult;
     unsubscribe?: any;
+    url?: string;
 }
 
 export class CompositionMonitor extends Component<ICompositionMonitorProps, ICompositionMonitorState> {
@@ -32,7 +33,7 @@ export class CompositionMonitor extends Component<ICompositionMonitorProps, ICom
         this.state = {
             doneLoading: false,
             toHome: false,
-            isActive: false
+            isActive: false,
         }
     }
 
@@ -56,7 +57,8 @@ export class CompositionMonitor extends Component<ICompositionMonitorProps, ICom
                                 composition: composition,
                                 results: filteredResults,
                                 doneLoading: true,
-                                unsubscribe: unsubscribe
+                                unsubscribe: unsubscribe,
+                                url: window.location.protocol + '//' + window.location.host + '/compositions/' + composition.id + '/viewer'
                             });
                     }, 
                     (error) => {
@@ -100,6 +102,15 @@ export class CompositionMonitor extends Component<ICompositionMonitorProps, ICom
         })
     }
 
+    copyToClipboard = () => {
+        if(this.state.url){
+            navigator.clipboard.writeText(this.state.url);
+            toast.info('Link copied to clipboard!');
+        } else {
+            toast.error('The link could not be copied!');
+        }
+    }
+
     render() {
         return (
             <article style={{height:"95vh"}}>
@@ -120,10 +131,32 @@ export class CompositionMonitor extends Component<ICompositionMonitorProps, ICom
                         </div>
                     </div>
                 </div>
-                
                 <hr></hr>
                 {this.state.results && this.state.results.length === 0 && 
-                <div>No students yet... You can create a list of students with the button above.</div>}
+                <React.Fragment>
+                <article className="message is-primary">
+                    <div className="message-header">No students yet... </div>
+                <div className="message-body">
+                <div>You can add students or share the link. </div>
+                <div>When students visit your link and log in, they will appear automatically in this overview.</div>
+                <div className="columns" style={{marginTop: "20px"}}>
+                <div className="column is-narrow">
+                    <Link to={`/compositions/${this.state.composition?.id || ''}/add-students`} 
+                    className="button">
+                    Add students</Link></div>
+                <div className="is-divider-vertical" data-content="OR"></div>
+                <div className="column">
+                    <button className="button" onClick={this.copyToClipboard}
+                        data-tooltip="Copy link to clipboard">
+                            Copy Share Link
+                    </button>
+                </div>
+                </div>
+                </div>
+                </article>
+                
+                </React.Fragment>
+                }
                 {this.state.composition && this.state.results && this.state.results?.map((result: IResult) => 
                 <div className="box" key={result.user}>
                 <div className="media">

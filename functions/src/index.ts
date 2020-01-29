@@ -119,6 +119,7 @@ exports.secret = functions.https.onCall((data, context) => {
     }
     const emailAddresses : string[] = data.emailAddresses || [];
     const displayNames : string[] = data.displayNames || [];
+    const passwords : string[] = data.passwords || [];
     const compositionId : string = data.compositionId || '';
 
     if(emailAddresses.length !== displayNames.length){
@@ -138,7 +139,8 @@ exports.secret = functions.https.onCall((data, context) => {
         //user record needs to be created
         user = await admin.auth().createUser({
           email: email,
-          displayName: displayNames[index]
+          displayName: displayNames[index],
+          password: passwords[index]
         });
       }
       try{

@@ -109,13 +109,14 @@ class Home extends Component<IHomeProps, IHomeState> {
         .then( _ => {
           const batch = db.batch();
           standardChildSkills.forEach((child) => {
+            const newChildId = uuid.v4();
             const dbRef = db.collection('compositions').doc(newComposition.id)
             .collection('skilltrees').doc(newSkilltree.id)
-            .collection('skills').doc(newRootSkill.id).collection('skills').doc(child.id);
+            .collection('skills').doc(newRootSkill.id).collection('skills').doc(newChildId);
             batch.set(dbRef, {
               skilltree: newSkilltree.id, 
               composition: newComposition.id, 
-              id: uuid.v4(),
+              id: newChildId,
               ...child
             });
           })

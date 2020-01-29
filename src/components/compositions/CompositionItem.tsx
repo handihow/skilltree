@@ -185,6 +185,7 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
     render() {
         const { id, title, username } = this.props.composition;
         return (
+          <React.Fragment>
             <div className="box">
             <div className="media">
             <div className="media-left">
@@ -241,27 +242,27 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
             <button className="delete" onClick={this.toggleIsActive}></button>
             </div>
             </div>
+            </div>
             <div className={`modal ${this.state.isActive ? "is-active" : ""}`}>
-                <div className="modal-background"></div>
-                <div className="modal-card">
-                <header className="modal-card-head">
-                    <p className="modal-card-title">Are you sure?</p>
-                    <button className="delete" aria-label="close" onClick={this.toggleIsActive}></button>
-                </header>
-                <section className="modal-card-body">
-                    You are about to delete skill tree page '{title}'. Do you want to delete?
-                </section>
-                <footer className="modal-card-foot">
-                    <button className="button is-danger" 
-                    onClick={this.props.user.uid === this.props.composition.user ? 
-                              () => this.delComposition(this.props.composition) : 
-                              () => this.removeSharedSkilltree(this.props.composition)}>
-                        Delete</button>
-                    <button className="button" onClick={this.toggleIsActive}>Cancel</button>
-                </footer>
-                </div>
-            </div>
-            </div>
+              <div className="modal-background"></div>
+              <div className="modal-card">
+              <header className="modal-card-head">
+                  <p className="modal-card-title">Are you sure?</p>
+                  <button className="delete" aria-label="close" onClick={this.toggleIsActive}></button>
+              </header>
+              <section className="modal-card-body">
+                  You are about to delete skill tree page '{title}'. Do you want to delete?
+              </section>
+              <footer className="modal-card-foot">
+                  <button className="button is-danger" 
+                  onClick={this.props.user.uid === this.props.composition.user ? 
+                            () => this.delComposition(this.props.composition) : 
+                            () => this.removeSharedSkilltree(this.props.composition)}>
+                      Delete</button>
+                  <button className="button" onClick={this.toggleIsActive}>Cancel</button>
+              </footer>
+              </div>
+          </div></React.Fragment>
         )
     }
 }
