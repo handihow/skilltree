@@ -191,7 +191,7 @@ class CompositionDisplay extends Component<ICompositionDisplayProps, ICompositio
                                     placeholder="Filter by skill name..."
                                     onChange={this.updateQueryValue}
                                     value={this.state.skillQuery ? this.state.skillQuery : ""}/>
-                                <p className="help">Only show branches that contain a skill that matches your query</p>
+                                <p className="help">Only show skilltrees that contain a skill that matches your query</p>
                                 </div>
                                 <p className="control">
                                     <button className="button" onClick={() => treeData.handleFilter(this.state.skillQuery || '')}>

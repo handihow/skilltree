@@ -81,7 +81,7 @@ export class SkilltreeForm extends Component<ISkilltreeFormProps,ISkilltreeFormS
             <div className="modal-background"></div>
             <div className="modal-card">
                 <header className="modal-card-head">
-                <p className="modal-card-title">{this.props.isEditing ? 'Edit branch' : 'Add branch'}</p>
+                <p className="modal-card-title">{this.props.isEditing ? 'Edit skilltree' : 'Add skilltree'}</p>
                 <button className="delete" aria-label="close" onClick={() =>this.props.closeModal()}></button>
                 </header>
                 <form onSubmit={this.onSubmit}>

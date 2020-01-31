@@ -18,7 +18,7 @@ export default function CompositionMenu(props: ICompositionMenuProps) {
         <p className="menu-label">
           Content
         </p>
-          <li><NavLink to={"/compositions/"+props.id +"/skilltrees"} activeClassName='is-active'>Branches</NavLink></li>
+          <li><NavLink to={"/compositions/"+props.id +"/skilltrees"} activeClassName='is-active'>Skilltrees</NavLink></li>
           <li><NavLink to={"/compositions/"+props.id +"/skills"} activeClassName='is-active'>Skills</NavLink></li>
         <p className="menu-label">
           Share

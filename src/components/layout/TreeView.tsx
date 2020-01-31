@@ -30,11 +30,11 @@ class CustomContainer extends decorators.Container {
       setTimeout(() => node.decorators.addSkill(undefined, node), 100);
     }
 
-    moveBranchUp = (node) => {
+    moveSkilltreeUp = (node) => {
       console.log(node);
     }
 
-    moveBranchDown = (node) => {
+    moveSkilltreeDown = (node) => {
       console.log(node);
     }
 
