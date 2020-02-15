@@ -150,6 +150,27 @@ exports.secret = functions.https.onCall((data, context) => {
       });
   })
 
+  exports.deleteUser = functions.https.onCall((data, context) => {
+    if(!context.auth || !context.auth.uid ){
+        return {
+            error: 'Request denied. You are not logged in.'
+        }
+    }
+    const uid = context.auth.uid;
+
+    return admin.auth().deleteUser(uid)
+      .then( _ => {
+        return {
+          result: 'Account was deleted' 
+        };
+      })
+      .catch( err => {
+        return {
+          error: 'Something went wrong ... ' + err.message
+        }
+      })
+  })
+
   exports.addStudentList = functions.https.onCall(async (data,context) => {
     if(!context.auth || !context.auth.uid ){
         return {

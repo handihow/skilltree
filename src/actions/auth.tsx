@@ -145,7 +145,7 @@ export const verifyAuth = () => dispatch => {
           displayName: user.displayName,
           photoURL: user.photoURL ? user.photoURL : `https://eu.ui-avatars.com/api/?name=${user.displayName}`,
           emailVerified: user.emailVerified,
-        }, {merge: true})
+        }, {merge: true});
         dispatch(receiveLogin(user));
       }
       dispatch(verifySuccess());

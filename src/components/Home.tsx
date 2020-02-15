@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { standardChildSkills, standardRootSkill } from "./compositions/StandardData";
 import IComposition from '../models/composition.model';
 import firebase from 'firebase/app';
+import { Redirect } from "react-router-dom";
 
 interface IHomeProps {
   isAuthenticated: boolean;
@@ -24,18 +25,24 @@ interface IHomeState {
   unsubscribeShared?: any;
   activeTab: string;
   isActive: boolean;
+  mustEditProfile: boolean;
 }
 
 class Home extends Component<IHomeProps, IHomeState> {
   
   constructor(props: IHomeProps){
     super(props)
+    const mustEditProfile = props.user.email.endsWith('@skilltree.student') ? true : false;
+    if(mustEditProfile){
+      toast.error('You have logged in with an automatically created Skill Tree email account. Please update your account with a real email address.')
+    }
     this.state = {
       activeTab: 'owned',
       compositions: [],
       sharedCompositions: [],
       isEditingTitle: false,
       isActive: false,
+      mustEditProfile: mustEditProfile
     }
   }
   
@@ -224,57 +231,63 @@ class Home extends Component<IHomeProps, IHomeState> {
 
   render() {
     const header = "Skilltrees"
-    return (
-      <section className="section">
-      <div className="container">
-        <div className="level">
-          <div className="level-left">
-          <Header header={header} />
+    if(this.state.mustEditProfile){
+      return (
+        <Redirect to="/profile/edit" />
+      )
+    } else {
+      return (
+        <section className="section">
+        <div className="container">
+          <div className="level">
+            <div className="level-left">
+            <Header header={header} />
+            </div>
+            <div className="level-right">
+            <AddComposition addComposition={this.addComposition} isEditingTitle={this.state.isEditingTitle}
+               composition={this.state.currentComposition} updateCompositionTitle={this.updateCompositionTitle}/>  
+            </div>
           </div>
-          <div className="level-right">
-          <AddComposition addComposition={this.addComposition} isEditingTitle={this.state.isEditingTitle}
-             composition={this.state.currentComposition} updateCompositionTitle={this.updateCompositionTitle}/>  
+          <div className="tabs">
+          <ul>
+              <li className={this.state.activeTab ==='owned' ? "is-active" : undefined}>
+                  <a href="# " onClick={() => this.changeActiveTab('owned')}>Your skilltrees</a>
+              </li>
+              <li className={this.state.activeTab ==='shared' ? "is-active" : undefined}>
+                  <a href="# " onClick={() => this.changeActiveTab('shared')}>Shared skilltrees</a>
+              </li>
+          </ul>
           </div>
+          {this.state.compositions && 
+            <Compositions 
+              compositions={this.state.activeTab === 'owned' ? this.state.compositions : this.state.sharedCompositions} 
+              editCompositionTitle={this.editCompositionTitle}
+              deleteComposition={this.toggleIsActive} />
+          }
         </div>
-        <div className="tabs">
-        <ul>
-            <li className={this.state.activeTab ==='owned' ? "is-active" : undefined}>
-                <a href="# " onClick={() => this.changeActiveTab('owned')}>Your skilltrees</a>
-            </li>
-            <li className={this.state.activeTab ==='shared' ? "is-active" : undefined}>
-                <a href="# " onClick={() => this.changeActiveTab('shared')}>Shared skilltrees</a>
-            </li>
-        </ul>
+        <div className={`modal ${this.state.isActive ? "is-active" : ""}`}>
+            <div className="modal-background"></div>
+            <div className="modal-card">
+            <header className="modal-card-head">
+                <p className="modal-card-title">Are you sure?</p>
+                <button className="delete" aria-label="close" onClick={() => this.toggleIsActive()}></button>
+            </header>
+            <section className="modal-card-body">
+                You are about to delete skill tree page '{this.state.currentComposition?.title}'. Do you want to delete?
+            </section>
+            <footer className="modal-card-foot">
+                <button className="button is-danger" 
+                onClick={this.props.user.uid === this.state.currentComposition?.user ? 
+                          () => this.delComposition(this.state.currentComposition) : 
+                          () => this.removeSharedSkilltree(this.state.currentComposition)}>
+                    Delete</button>
+                <button className="button" onClick={() => this.toggleIsActive()}>Cancel</button>
+            </footer>
+            </div>
         </div>
-        {this.state.compositions && 
-          <Compositions 
-            compositions={this.state.activeTab === 'owned' ? this.state.compositions : this.state.sharedCompositions} 
-            editCompositionTitle={this.editCompositionTitle}
-            deleteComposition={this.toggleIsActive} />
-        }
-      </div>
-      <div className={`modal ${this.state.isActive ? "is-active" : ""}`}>
-          <div className="modal-background"></div>
-          <div className="modal-card">
-          <header className="modal-card-head">
-              <p className="modal-card-title">Are you sure?</p>
-              <button className="delete" aria-label="close" onClick={() => this.toggleIsActive()}></button>
-          </header>
-          <section className="modal-card-body">
-              You are about to delete skill tree page '{this.state.currentComposition?.title}'. Do you want to delete?
-          </section>
-          <footer className="modal-card-foot">
-              <button className="button is-danger" 
-              onClick={this.props.user.uid === this.state.currentComposition?.user ? 
-                        () => this.delComposition(this.state.currentComposition) : 
-                        () => this.removeSharedSkilltree(this.state.currentComposition)}>
-                  Delete</button>
-              <button className="button" onClick={() => this.toggleIsActive()}>Cancel</button>
-          </footer>
-          </div>
-      </div>
-      </section>    
-    );
+        </section>    
+      );
+    }
   }
 }
 

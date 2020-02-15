@@ -3,6 +3,7 @@ import CompositionExample from '../compositions/CompositionExample';
 
 const physicsExampleCompositionId = '74b40838-1b5e-463c-a0d2-0fa0040c8ed4';
 const soccerExampleCompositionId = '2b1c7bfc-ee23-455e-89e8-15d170d74aab';
+const officeExampleCompositionId = '8a0decbb-c03e-4828-ae44-7e8633bf0418';
 
 export default function About() {
     return (
@@ -80,6 +81,49 @@ export default function About() {
                 are allowed to update the skill tree themselves or keep full control over completion status.
                 There is an overview page where you can view the progress of your students. The skill tree now allows students
                 to choose the <strong style={{marginLeft: "5px"}}>path and the pace</strong> of their learning.
+            </p>
+            </div>
+        </section>
+        <section className="section">
+            <div className="container">
+            <h1 className="title">Business</h1>
+            <h3 className="subtitle">Application of Skill Trees in Business</h3>
+            </div>
+            <div className="columns" style={{marginTop: "10px"}}>
+                <div className="column">
+                <CompositionExample compositionId={officeExampleCompositionId}/>
+                </div>
+                <div className="column">
+                <p>
+                    Motivate your employees by creating a clear path to reaching the next level.
+                    You can create Skill Trees to define paths to master new skills and get promoted to the next job.
+                </p>
+                <div className="content">
+                    <ul>
+                        <li>
+                        clear description of skills that are required
+                        </li>
+                        <li>
+                        empower your employees to reach new heights
+                        </li>
+                    </ul>
+                </div>
+                <p>Employees can now get proficient in the areas of interest. 
+                    As manager, you can monitor the progress of your team and mark skills as completed along the way.
+                </p>
+                </div>
+            </div>
+            <div className="container">
+            <article className="message is-primary">
+                <div className="message-body">
+                Give clear guidance to your employees what is expected to reach a new level or promotion
+                </div>
+            </article>
+            <p>Managers or company trainers can create skill trees with this application and choose whether the employees
+                are allowed to update the skill tree themselves or keep full control over completion status.
+                You can keep full control if you want to see which employee is more complete or
+                comes to mind for a certain job or position. Otherwise, you can also have employees
+                update the completion status and you can monitor their progress.
             </p>
             </div>
         </section>
