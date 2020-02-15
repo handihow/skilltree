@@ -77,11 +77,11 @@ class Login extends Component<ILoginProps, ILoginState> {
                         <div className="hero-body">
                             <div className="container has-text-centered">
                                 <h1 className="title">
-                                    Skilltree
+                                    Skill Tree
                                 </h1>
                                 <h2 className="subtitle">
-                                    {this.props.onCompositionPage ? 'You need to sign in to view this skilltree'
-                                    : 'Sign in to create awesome skilltrees'}
+                                    {this.props.onCompositionPage ? 'You need to sign in to view this skill tree'
+                                    : 'Sign in to create awesome skill trees'}
                                 </h2>
                             </div>
                         </div>
@@ -117,6 +117,7 @@ class Login extends Component<ILoginProps, ILoginState> {
                             </div>
                             <div><Link to="/register">Click here to create an account</Link></div>
                             <div><Link to="/recover">Forgot password?</Link></div>
+                            <div><Link to="/about">Learn more about this application</Link></div>
                         </div>
                         
                     </section>

@@ -1,27 +1,37 @@
-import React, { Component } from "react";
+import React, { Component } from 'react'
 import { connect } from "react-redux";
-import { Redirect } from "react-router-dom";
-import { registerUser } from "../actions";
 import { toast } from 'react-toastify';
+import { logoutUser } from "../../actions";
+import uuid from 'uuid';
+import { functions } from '../../firebase/firebase';
+import { Redirect } from 'react-router-dom';
 
-interface IRegisterProps {
+interface IEditProfileProps {
     isAuthenticated: boolean;
+    user: any;
     dispatch: any;
 }
 
-interface IRegisterState {
+interface IEditProfileState {
     displayName: string;
     email: string;
     password: string;
     repeatPassword: string;
+    toProfilePage: boolean;
 }
 
-class Register extends Component<IRegisterProps, IRegisterState> {
-    constructor(props: IRegisterProps) {
-        super(props);
-        this.state = { displayName: "", email: "", password: "", repeatPassword: "" };
-    }
 
+export class EditProfile extends Component<IEditProfileProps, IEditProfileState> {
+    constructor(props: IEditProfileProps) {
+        super(props);
+        this.state = { 
+            displayName: props.user.displayName ? props.user.displayName : '', 
+            email: props.user.email ? props.user.email : '', 
+            password: "", 
+            repeatPassword: "",
+            toProfilePage: false
+        };
+    }
 
     handleDisplayNameChange = ({ target }) => {
         this.setState({ displayName: target.value });
@@ -39,8 +49,15 @@ class Register extends Component<IRegisterProps, IRegisterState> {
         this.setState({ repeatPassword: target.value });
     };
 
+    backToProfile = () => {
+        this.setState({
+            toProfilePage: true
+        })
+    }
+
     handleSubmit = () => {
         const { displayName, email, password, repeatPassword } = this.state;
+        const currentComponent = this;
         //form validation
         if( displayName === '' ){
             return toast.error('Full name is required')
@@ -51,17 +68,46 @@ class Register extends Component<IRegisterProps, IRegisterState> {
         } else if(repeatPassword !== password){
             return toast.error('Passwords do not match');
         }
-
-        const { dispatch } = this.props; 
-
-        dispatch(registerUser(displayName, email, password));
+        const toastId = uuid.v4();
+        toast.info('Update of user record in progress... please wait', {
+        toastId: toastId,
+        autoClose: 10000
+        });
+        const editUser = functions.httpsCallable('editUser');
+        editUser({
+            email: email,
+            displayName: displayName,
+            password: password
+        })
+        .then(function(result) {
+            if(result.data.error){
+                toast.update(toastId, {
+                    render: result.data.error,
+                    type: toast.TYPE.ERROR,
+                    autoClose: 5000
+                });
+            } else {
+                toast.update(toastId, {
+                render: result.data.result,
+                autoClose: 3000
+                });
+                const { dispatch } = currentComponent.props;
+                dispatch(logoutUser());
+            }
+        })
+        .catch(function(error) {
+        toast.update(toastId, {
+            render: error.message,
+            type: toast.TYPE.ERROR,
+            autoClose: 5000
+        });
+        });
+    
     };
-
+    
     render() {
-        const { isAuthenticated } = this.props;
-
-        if (isAuthenticated) {
-            return <Redirect to="/" />;
+        if(this.state.toProfilePage){
+            return <Redirect to="/profile" />
         } else {
             return (
                 <React.Fragment>
@@ -69,10 +115,10 @@ class Register extends Component<IRegisterProps, IRegisterState> {
                         <div className="hero-body">
                             <div className="container has-text-centered">
                                 <h1 className="title">
-                                    Skill Tree
+                                Edit your account
                                 </h1>
                                 <h2 className="subtitle">
-                                    Create an account and start creating awesome skill trees
+                                     You must log in with new credentials after updating your account
                                 </h2>
                             </div>
                         </div>
@@ -82,24 +128,28 @@ class Register extends Component<IRegisterProps, IRegisterState> {
                             <div className="field">
                                 <label className="label" htmlFor="displayName">Full name</label>
                                 <div className="control">
-                                    <input className="input" name="displayName" type="text" placeholder="full name" required onChange={this.handleDisplayNameChange} />
+                                    <input className="input" name="displayName" type="text" 
+                                    value={this.state.displayName}
+                                    placeholder="full name" required onChange={this.handleDisplayNameChange} />
                                 </div>
                             </div>
-
+        
                             <div className="field">
                                 <label className="label" htmlFor="email">Email</label>
                                 <div className="control">
-                                    <input className="input" name="email" type="email" placeholder="email" required onChange={this.handleEmailChange} />
+                                    <input className="input" name="email" type="email" placeholder="email" 
+                                    value={this.state.email}
+                                    required onChange={this.handleEmailChange} />
                                 </div>
                             </div>
-
+        
                             <div className="field">
                                 <label className="label" htmlFor="password">Password</label>
                                 <div className="control">
                                     <input className="input" name="password" type="password" placeholder="password" required onChange={this.handlePasswordChange} />
                                 </div>
                             </div>
-
+        
                             <div className="field">
                                 <label className="label" htmlFor="repeatPassword">Repeat Password</label>
                                 <div className="control">
@@ -109,21 +159,26 @@ class Register extends Component<IRegisterProps, IRegisterState> {
                             
                             <div className="field">
                                 <div className="control buttons is-centered">
-                                    <input className="button is-medium is-primary is-fullwidth" type="button" value="Register" onClick={this.handleSubmit} />
+                                    <input className="button is-primary" 
+                                    type="button" value="Update account" onClick={this.handleSubmit} />
+                                    <button className="button" onClick={this.backToProfile}>Cancel</button>
                                 </div>
                             </div>
                         </div>
                     </section>
                 </React.Fragment>
-            );
+            )
         }
+        
     }
 }
 
 function mapStateToProps(state) {
     return {
-        isAuthenticated: state.auth.isAuthenticated
-    }
-};
+      isAuthenticated: state.auth.isAuthenticated,
+      user: state.auth.user
+    };
+  }
 
-export default (connect(mapStateToProps)(Register));
+
+export default connect(mapStateToProps)(EditProfile)

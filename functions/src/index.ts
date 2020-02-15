@@ -111,6 +111,45 @@ exports.secret = functions.https.onCall((data, context) => {
     }, {merge: true});
   })
 
+  exports.editUser = functions.https.onCall((data, context) => {
+    if(!context.auth || !context.auth.uid ){
+        return {
+            error: 'Request denied. You are not logged in.'
+        }
+    }
+    const uid = context.auth.uid;
+    const email : string = data.email;
+    const displayName : string = data.displayName;
+    const password : string = data.password;
+
+    return admin.auth().updateUser(uid, {
+      email: email,
+      password: password,
+      displayName: displayName,
+    })
+      .then( _ => {
+        return db.collection('users').doc(uid).set({
+          email: email,
+          displayName: displayName
+        }, {merge: true})
+        .then( __ => {
+          return {
+            result: `User record for ${displayName} was updated successfully` 
+          };
+        })
+        .catch( err => {
+          return {
+            error: 'Something went wrong ... ' + err.message
+          }
+        })
+      })
+      .catch(error => {
+        return {
+          error: 'Something went wrong ... ' + error.message
+        }
+      });
+  })
+
   exports.addStudentList = functions.https.onCall(async (data,context) => {
     if(!context.auth || !context.auth.uid ){
         return {

@@ -28,6 +28,7 @@ import './App.sass';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import CompositionMonitor from "./components/compositions/CompositionMonitor";
+import EditProfile from "./components/pages/EditProfile";
 
 // Call it once in your app. At the root of your app is the best place
 toast.configure()
@@ -50,6 +51,13 @@ function App(props) {
         exact
         path="/profile"
         component={Profile}
+        isAuthenticated={isAuthenticated}
+        isVerifying={isVerifying}
+      />
+      <ProtectedRoute
+        exact
+        path="/profile/edit"
+        component={EditProfile}
         isAuthenticated={isAuthenticated}
         isVerifying={isVerifying}
       />

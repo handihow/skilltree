@@ -7,6 +7,7 @@ import { db } from '../../firebase/firebase';
 import IResult from '../../models/result.model';
 import Header from '../layout/Header';
 import firebase from "firebase/app";
+import ReactImageFallback from "react-image-fallback";
 
 type TParams =  { compositionId: string };
 
@@ -162,8 +163,12 @@ export class CompositionMonitor extends Component<ICompositionMonitorProps, ICom
                 <div className="media">
                 <div className="media-left">
                     <p className="image is-64x64">
-                    <img className="is-rounded" src={result.photoURL && result.photoURL.length > 0 ? result.photoURL : 
-                    `https://eu.ui-avatars.com/api/?name=${result.displayName}`} alt="thumbnail"></img>
+                    <ReactImageFallback
+                    src={result.photoURL}
+                    fallbackImage={`https://eu.ui-avatars.com/api/?name=${result.displayName}`}
+                    initialImage="Spinner-1s-200px.gif"
+                    alt="thumbnail"
+                    className="is-rounded" />
                     </p>
                 </div>
                 <div className="media-content">

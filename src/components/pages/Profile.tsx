@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from "react-redux";
+import { Link } from 'react-router-dom';
 
 interface IProfileProps {
     isAuthenticated: boolean;
@@ -42,6 +43,10 @@ export class Profile extends Component<IProfileProps> {
                 <p>Last sign in: {this.props.user?.metadata?.lastSignInTime}</p>
                 </div>
             </div>
+            <footer className="card-footer">
+                <Link to="/profile/edit"  className="card-footer-item">Edit</Link>
+                <Link to="/profile/delete" className="card-footer-item">Delete</Link>
+            </footer>
             </div>
 
         )

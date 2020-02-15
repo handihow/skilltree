@@ -199,6 +199,14 @@ class Home extends Component<IHomeProps, IHomeState> {
     db.collection('compositions').doc(composition.id).update({
       sharedUsers: firebase.firestore.FieldValue.arrayRemove(this.props.user.uid)
     })
+    .then( _ => {
+      toast.info('Skill tree removed');
+      this.toggleIsActive();
+    })
+    .catch(e => {
+      toast.error('Something went wrong... ' + e.message);
+      this.toggleIsActive();
+    })
   }
 
   changeActiveTab = (tab: string) => {

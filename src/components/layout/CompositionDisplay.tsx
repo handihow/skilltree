@@ -16,6 +16,7 @@ import firebase from "firebase/app";
 import { toast } from 'react-toastify';
 import IComposition from '../../models/composition.model';
 import BackButton from './BackButton';
+import './CompositionDisplay.css';
 
 interface ICompositionDisplayProps {
     theme: any;
@@ -108,8 +109,7 @@ class CompositionDisplay extends Component<ICompositionDisplayProps, ICompositio
         const monitoredUserId = typeof this.props.monitoredUserId === 'undefined' ? this.props.user.uid : 
                 this.props.monitoredUserId;
         if(this.props.user && this.props.user.uid && treeId && this.state.doneLoading){
-            if( typeof monitoredUserId === 'undefined' &&
-                monitoredUserId !== this.props.composition.user && !this.props.composition.loggedInUsersCanEdit){
+            if(this.props.user.uid !== this.props.composition.user && !this.props.composition.loggedInUsersCanEdit){
                 toast.info(
                     'Please ask your instructor to update the completion status of this skill. Changes will not be saved.',
                     { toastId: 'cannotduplicatethistoast'});
@@ -174,9 +174,10 @@ class CompositionDisplay extends Component<ICompositionDisplayProps, ICompositio
                                     /{treeData.skillCount.required + treeData.skillCount.optional}</h6>
                                   </div>
                                   <div className="level-right">
-                                      {/* <div className="level-item">
+                                      {this.props.user?.uid === this.props.composition.user &&
+                                      <div className="level-item">
                                         <button className="button" onClick={treeData.resetSkills}>Reset</button>
-                                      </div> */}
+                                      </div>}
                                       <div className="level-item">
                                         <BackButton />
                                       </div>
