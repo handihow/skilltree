@@ -230,7 +230,7 @@ class Home extends Component<IHomeProps, IHomeState> {
   }
 
   render() {
-    const header = "Skilltrees"
+    const header = "SkillTrees"
     if(this.state.mustEditProfile){
       return (
         <Redirect to="/profile/edit" />
@@ -251,10 +251,10 @@ class Home extends Component<IHomeProps, IHomeState> {
           <div className="tabs">
           <ul>
               <li className={this.state.activeTab ==='owned' ? "is-active" : undefined}>
-                  <a href="# " onClick={() => this.changeActiveTab('owned')}>Your skilltrees</a>
+                  <a href="# " onClick={() => this.changeActiveTab('owned')}>Your SkillTrees</a>
               </li>
               <li className={this.state.activeTab ==='shared' ? "is-active" : undefined}>
-                  <a href="# " onClick={() => this.changeActiveTab('shared')}>Shared skilltrees</a>
+                  <a href="# " onClick={() => this.changeActiveTab('shared')}>Shared SkillTrees</a>
               </li>
           </ul>
           </div>

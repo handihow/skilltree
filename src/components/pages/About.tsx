@@ -10,7 +10,7 @@ export default function About() {
         <article>
         <section className="section">
             <div className="container">
-            <h1 className="title">Skill Tree</h1>
+            <h1 className="title">SkillTree</h1>
             <h3 className="subtitle">Support autonomy with gamification</h3>
             <article className="message is-primary">
                 <div className="message-body">

@@ -69,7 +69,7 @@ class Register extends Component<IRegisterProps, IRegisterState> {
                         <div className="hero-body">
                             <div className="container has-text-centered">
                                 <h1 className="title">
-                                    Skill Tree
+                                    SkillTree
                                 </h1>
                                 <h2 className="subtitle">
                                     Create an account and start creating awesome skill trees

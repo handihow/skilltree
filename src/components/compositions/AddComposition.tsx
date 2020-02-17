@@ -50,7 +50,7 @@ export class AddComposition extends Component<IAddCompositionProps, IAddComposit
                 <input 
                     className="input" 
                     type="text" 
-                    placeholder="Title of skilltree..."
+                    placeholder="Title new SkillTree..."
                     value={this.state.title}
                     onChange={this.onChange} />
                 </div>

@@ -43,7 +43,7 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                 <div className="navbar-brand">
                     <Link to="/" className="navbar-item">
                         <img 
-                        alt="Skilltree logo"
+                        alt="SkillTree"
                         src="https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/SkillTree_logo.png?alt=media&token=0cbc6c2a-58c2-46e7-bfec-47eafb6ddb01" ></img>
                     </Link>
                     <a role="button" className={this.state.isActive ? "navbar-burger is-active" : "navbar-burger"}
@@ -57,7 +57,7 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                 <div className="navbar-end">
                 {isAuthenticated ?
                     <Link to="/" className="navbar-item">
-                        Skilltrees
+                        SkillTrees
                     </Link> :
                     <Link to="/about" className="navbar-item">
                         About

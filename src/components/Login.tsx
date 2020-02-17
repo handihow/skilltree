@@ -77,7 +77,7 @@ class Login extends Component<ILoginProps, ILoginState> {
                         <div className="hero-body">
                             <div className="container has-text-centered">
                                 <h1 className="title">
-                                    Skill Tree
+                                    SkillTree
                                 </h1>
                                 <h2 className="subtitle">
                                     {this.props.onCompositionPage ? 'You need to sign in to view this skill tree'
