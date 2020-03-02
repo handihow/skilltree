@@ -3,6 +3,7 @@ import "firebase/auth";
 import "firebase/firestore";
 import "firebase/storage";
 import "firebase/functions";
+import "firebase/analytics";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDl9VV59P2M9kGx2257t6qL6y3OyeVTvVg",
@@ -15,6 +16,7 @@ const firebaseConfig = {
     measurementId: "G-B4S062TGSB"
   };
   export const myFirebase = firebase.initializeApp(firebaseConfig);
+  myFirebase.analytics();
   const baseDb = myFirebase.firestore();
   export const db = baseDb;
   const fbStorage = myFirebase.storage();

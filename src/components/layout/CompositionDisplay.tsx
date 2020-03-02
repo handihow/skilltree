@@ -162,7 +162,7 @@ class CompositionDisplay extends Component<ICompositionDisplayProps, ICompositio
                 {(treeData: SkillGroupDataType) => (
                     <React.Fragment>
                       {this.props.showController && this.state.doneLoading && 
-                      <div className="message is-primary" style={{marginTop: "15px"}}>
+                      <div className="message is-primary" style={{marginTop: "15px", height:"210px"}}>
                       <div className="message-header">{this.props.title}</div>
                           <div className="message-body">
                               <div className="level">
@@ -173,7 +173,7 @@ class CompositionDisplay extends Component<ICompositionDisplayProps, ICompositio
                                     </span>
                                     /{treeData.skillCount.required + treeData.skillCount.optional}</h6>
                                   </div>
-                                  <div className="level-right">
+                                  <div className="level-right is-hidden-mobile">
                                       {this.props.user?.uid === this.props.composition.user &&
                                       <div className="level-item">
                                         <button className="button" onClick={treeData.resetSkills}>Reset</button>
