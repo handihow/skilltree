@@ -76,7 +76,7 @@ export class CompositionExample extends Component<ICompositionExampleProps, ICom
                     backgroundImage: `url(${this.state.backgroundImage})`,
                     backgroundSize: 'cover',
                     position : 'relative',
-                    height:"calc(100vh - 3.5rem)",
+                    height:"calc(70vh)",
                     padding: '0px',
                     marginTop: '0.75rem',
                     width: '100%'

@@ -1,7 +1,7 @@
 import React from 'react'
 import CompositionExample from '../compositions/CompositionExample';
 
-const physicsExampleCompositionId = '74b40838-1b5e-463c-a0d2-0fa0040c8ed4';
+const physicsExampleCompositionId = '579fa4b4-9bc9-4665-ba3a-a135b03a5aa8'; //74b40838-1b5e-463c-a0d2-0fa0040c8ed4
 const soccerExampleCompositionId = '2b1c7bfc-ee23-455e-89e8-15d170d74aab';
 const officeExampleCompositionId = '8a0decbb-c03e-4828-ae44-7e8633bf0418';
 
@@ -45,9 +45,7 @@ export default function About() {
             <div className="container">
             <h1 className="title">Education</h1>
             <h3 className="subtitle">Application of Skill Trees in Education</h3>
-            </div>
-            <div className="columns" style={{marginTop: "10px"}}>
-                <div className="column">
+            <div>
                 <p>We all understand well the idea of a normal educational curricula: a series of classes that combined 
                 together lead to some form of degree, all marked by specific explicit checks and markers. 
                 While the specific of this educational approach are worth a review, 
@@ -66,10 +64,10 @@ export default function About() {
                 These skills can be connected and interrelated in trees, that build up in incremental steps.
                 Borrowing from game design, skill trees can help regain the student's control to learn skills
                 at their own pace and of their own interest.</p>
-                </div>
-                <div className="column">
+            </div>
+            </div>
+            <div style={{marginTop: "10px", marginBottom:"10px"}}>
                 <CompositionExample compositionId={physicsExampleCompositionId}/>
-                </div>
             </div>
             <div className="container">
             <article className="message is-primary">

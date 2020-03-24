@@ -5,6 +5,7 @@ import renderHTML from 'react-render-html';
 export default function SkillContent(props) {
     return (
         <React.Fragment>
+            {props.optional && <div className="tag" style={{marginBottom: '10px'}}>optional</div>}
             {renderHTML(props.description)}
             <ul style={{listStyleType: 'none', marginTop: '10px'}}>
                 {props.links.map((link) => (

@@ -140,14 +140,20 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
     }
 
     editSkill = (skill) => {
+        const parentId = skill.parent[skill.parent.length - 3];
+        const parentSkillIndex = this.state.skills.findIndex(s => s.id === parentId);
+        const parentSkilltreeIndex = this.state.skilltrees.findIndex(st => st.id === parentId);
+
         this.setState({
             showEditor: true,
             currentSkill: skill,
-            isEditing: true
+            isEditing: true,
+            parentSkill: parentSkillIndex > -1 ? this.state.skills[parentSkillIndex] : undefined,
+            parentSkilltree: parentSkilltreeIndex > -1 ? this.state.skilltrees[parentSkilltreeIndex] : undefined
         })
     }
 
-    updateSkill = (updatedSkill: ISkill) => {
+    updateSkill = (updatedSkill: ISkill, parentId: string, hasUpdatedParent: boolean) => {
         let path = '';
         if(this.state.isEditing && updatedSkill.path){
             path = updatedSkill.path;
@@ -165,7 +171,8 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
             direction: updatedSkill.direction,
             links: updatedSkill.links,
             optional: updatedSkill.optional,
-            countChildren: updatedSkill.countChildren
+            countChildren: updatedSkill.countChildren,
+            order: updatedSkill.order
         }
         if(!this.state.isEditing && !this.state.isAddingRootSkill){
             skill.composition = this.state.parentSkill?.composition;
@@ -180,13 +187,13 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
             db.doc(path).set(skill, {merge: true})
             .then( _ => {
                 if(this.state.isEditing || (!this.state.isEditing && this.state.isAddingRootSkill)){
-                    this.onSuccessfullUpdate(skill);
+                    this.onSuccessfullUpdate(skill, path, parentId, hasUpdatedParent);
                 } else if(!this.state.isEditing && this.state.parentSkill && this.state.parentSkill.path) {
                     db.doc(this.state.parentSkill.path).set({
                         countChildren: this.state.parentSkill?.countChildren + 1
                     }, {merge: true})
                     .then( _ => {
-                        this.onSuccessfullUpdate(skill);
+                        this.onSuccessfullUpdate(skill, path, parentId, hasUpdatedParent);
                     })
                 }
             })
@@ -198,7 +205,99 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
         }
     }  
 
-    onSuccessfullUpdate(skill: ISkill){
+    moveSkillToDifferentParent(skill: ISkill, path: string, parentId: string) {
+        const toastId = uuid.v4();
+        toast.info(`${skill.title} is moved to a different parent now... please wait...`, {
+            toastId: toastId,
+            autoClose: 10000
+        })
+        //find the skill or the skilltree that is the new parent
+        const parentSkillIndex = this.state.skills.findIndex(s => s.id === parentId);
+        const parentSkilltreeIndex = this.state.skilltrees.findIndex(st => st.id === parentId);
+        let batch = db.batch();
+        //the new parent is a skill
+        let newPath = '';
+        const newID = uuid.v4();
+        if(parentSkillIndex > -1){
+            let newParentSkill = this.state.skills[parentSkillIndex];
+            newPath = `${newParentSkill.path}/skills/${newID}`;
+            skill.order = newParentSkill.countChildren;
+        } else if(parentSkilltreeIndex > -1){
+            let newParentSkilltree = this.state.skilltrees[parentSkilltreeIndex];
+            newPath =  `${newParentSkilltree.path}/skills/${newID}`;
+            skill.order = newParentSkilltree.countChildren;
+        }
+        let documentRef = db.doc(newPath);
+        skill.skilltree = newPath.split('/')[3];
+        skill.composition = newPath.split('/')[1];
+        skill.id = newID;
+        batch.set(documentRef, skill);
+        if(skill.countChildren > 0){
+            this.copyChildSkills(path, newPath, batch);
+        }
+        batch.commit()
+            .then( _ => {
+                //skill and child skills are copied, now we need to recursively delete the items from the previous location
+                toast.update(toastId, {
+                    render: 'Skill copied successfully to new parent.. ',
+                    type: toast.TYPE.SUCCESS,
+                    autoClose: 3000
+                });
+                this.confirmDeleteSkill();
+            }, (err) => {
+                toast.update(toastId, {
+                    render: err.message,
+                    type: toast.TYPE.ERROR,
+                    autoClose: 5000
+                });
+            })
+            .catch(err => {
+                toast.update(toastId, {
+                    render: err.message,
+                    type: toast.TYPE.ERROR,
+                    autoClose: 5000
+                });
+            })
+    }
+
+
+    copyChildSkills(path: string, newPath: string, batch: firebase.firestore.WriteBatch){
+        let childSkills = this.state.skills.filter(s => s.parent && this.checkIfParent(s.parent,path.split('/')));
+        childSkills.forEach(child => {
+            const newID = uuid.v4();
+            const newChildPath = `${newPath}/skills/${newID}`;
+            console.log(newChildPath);
+            let childDocumentRef = db.doc(newChildPath);
+            const childPath = child.path || '';
+            delete child.path;
+            delete child.name;
+            delete child.isSkill;
+            delete child.decorators;
+            delete child.toggled;
+            delete child.parent;
+            child.skilltree = newChildPath.split('/')[3];
+            child.composition = newChildPath.split('/')[1];
+            child.id = newID;
+            batch.set(childDocumentRef, child);
+            if(child.countChildren > 0){
+                this.copyChildSkills(childPath, newChildPath, batch);
+            }
+        })
+    }
+
+
+    checkIfParent(arr1: string[], arr2: string[]) {
+        if(arr1.length !== arr2.length + 2)
+            return false;
+        for(var i = arr2.length; i--;) {
+            if(arr1[i] !== arr2[i])
+                return false;
+        }
+    
+        return true;
+    }
+
+    onSuccessfullUpdate(skill: ISkill, path: string, parentId: string, hasUpdatedParent: boolean){
         toast.info(`${skill.title} updated successfully`);
         this.setState({
             showEditor: false,
@@ -207,6 +306,11 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
         db.collection('compositions').doc(this.props.match.params.compositionId).update({
             skillcount: this.state.skills.length,
             lastUpdate: firebase.firestore.Timestamp.now()
+        })
+        .then(_ => {
+            if(hasUpdatedParent){
+                this.moveSkillToDifferentParent(skill, path, parentId);
+            }
         });
     }
 
@@ -300,7 +404,13 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
                     skill={this.state.currentSkill ? this.state.currentSkill : {id: uuid.v4(), ...standardEmptySkill}} 
                     updateSkill={this.updateSkill}
                     closeModal={this.closeModal}
-                    parentName={this.state.parentSkill ? this.state.parentSkill.title : ''}
+                    parentName={this.state.parentSkill ? this.state.parentSkill.title : this.state.parentSkilltree ? this.state.parentSkilltree.title : ''}
+                    parentId = {this.state.parentSkill && this.state.parentSkill.id ? 
+                            this.state.parentSkill.id : 
+                            this.state.parentSkilltree && this.state.parentSkilltree.id ? 
+                            this.state.parentSkilltree.id : ''}
+                    skills={this.state.skills}
+                    skilltrees={this.state.skilltrees}
                     />}
                     </div>
                 </div>

@@ -4,6 +4,8 @@ import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import LinkCard from './LinkCard';
 import ISkill from '../../models/skill.model';
+import ISkilltree from '../../models/skilltree.model';
+
 import YouTubeForm from './YouTubeForm';
 import LinkFileUploader from './LinkFileUploader';
 import LinkForm from './LinkForm';
@@ -17,7 +19,10 @@ interface ISkillFormProps {
     updateSkill: Function;
     closeModal: Function;
     parentName: string;
+    parentId: string;
     skill: ISkill;
+    skills: ISkill[];
+    skilltrees: ISkilltree[];
 }
 
 interface ISkillFormState{
@@ -27,14 +32,18 @@ interface ISkillFormState{
     description: any;
     title: string;
     optional: boolean;
+    direction: string;
+    order: number;
+    parent: string;
     links: ILink[];
+    moreOptions: boolean;
+    hasUpdatedParent: boolean;
 }
 
 export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
 
     constructor(props: ISkillFormProps){
         super(props);
-        console.log(props);
         this.state = {
             isShowYouTubeModal: false,
             description: this.props.skill?.description ? 
@@ -42,7 +51,12 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                     RichTextEditor.createEmptyValue(),
             title: this.props.skill?.title ? this.props.skill.title : '',
             optional: this.props.skill?.optional ? this.props.skill.optional : false,
-            links: this.props.skill?.links && this.props.skill.links.length > 0  ? this.props.skill.links : []
+            direction: this.props.skill?.direction ? this.props.skill.direction : 'bottom',
+            order: this.props.skill?.order ? this.props.skill.order : 0,
+            parent: this.props.parentId,
+            links: this.props.skill?.links && this.props.skill.links.length > 0  ? this.props.skill.links : [],
+            moreOptions: false,
+            hasUpdatedParent: false
         };
     }
 
@@ -64,6 +78,12 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
         })
     }
 
+    toggleOptions = () => {
+        this.setState({
+            moreOptions: !this.state.moreOptions
+        })
+    }
+
     handleTitleChange = (e : React.FormEvent<HTMLInputElement>) => {
         this.setState({
             title: e.currentTarget.value
@@ -74,17 +94,33 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
         this.setState({
             description: value
         })
-        // if(this.state.skill){
-        //     this.setState({
-        //         skill: {...this.state.skill, description: e.currentTarget.value}
-        //     })
-        // }
     }
 
     handleOptionalChange = (value: string) => {
         this.setState({
             optional: value === 'true' ? true : false
         })
+    }
+
+    handleTooltipChange = (e : React.FormEvent<HTMLInputElement>) => {
+        this.setState({
+            direction: e.currentTarget.value
+        })
+    }
+
+    handleOrderChange = (e : React.FormEvent<HTMLInputElement>) => {
+        this.setState({
+            order: e.currentTarget.valueAsNumber
+        })
+    }
+
+    handleParentChange  = ({target}) => {
+        if(target.value !== this.props.parentId){
+            this.setState({
+                parent: target.value,
+                hasUpdatedParent: true
+            })
+        }
     }
 
     onSubmit = (e:any) => {
@@ -108,8 +144,10 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                 title: this.state.title,
                 description: this.state.description.toString('html'),
                 optional: this.state.optional,
-                links: this.state.links
-            });
+                links: this.state.links,
+                direction: this.state.direction,
+                order: this.state.order
+            }, this.state.parent, this.state.hasUpdatedParent);
         }
     }
 
@@ -136,8 +174,22 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
         })
     }
 
+    sortTitles = (a: string, b: string) => {
+        var nameA = a.toUpperCase(); // ignore upper and lowercase
+        var nameB = b.toUpperCase(); // ignore upper and lowercase
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+      
+        // names must be equal
+        return 0;
+      }
 
     render(){
+        console.log(this.props.parentId);
         return (
             <React.Fragment>
             <div className="has-background-white" style={{
@@ -192,23 +244,7 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                         </div>
                     </div>
                 </div>
-                {/* <div className="field is-inline-block-desktop" style={{marginLeft: "20px"}}>
-                    <div className="field is-narrow">
-                        <label className="label">
-                            Tooltip direction
-                        </label>
-                        <div className="control">
-                        {['top', 'left', 'right', 'bottom'].map((direction) => (
-                            <label className="radio" key={direction}>
-                                <input type="radio" name="direction" value={direction}
-                                    checked={this.state.skill && this.state.skill.direction === direction ? true : false}
-                                    onChange={this.handleChange} />
-                                <span style={{marginLeft: "5px"}}>{direction}</span>
-                            </label>
-                        ))}
-                        </div>
-                    </div>
-                </div> */}
+                
                 </div>
                 <div className="field">
                     <label className="label" htmlFor="description">Description</label>
@@ -220,6 +256,63 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                         />
                     </div>
                 </div>
+                {this.state.moreOptions && <React.Fragment><div className="columns">
+                        {this.props.isEditing && 
+                        <React.Fragment>
+                        <div className="column is-narrow">
+                            <div className="field">
+                            <label className="label" htmlFor="order">Order</label>
+                            <div className="control">
+                                <input className="input" 
+                                name="order" type="number" required 
+                                onChange={this.handleOrderChange}
+                                value={this.state.order} />
+                            </div>
+                        </div>
+                        </div>
+                        <div className="column">
+                            <div className="field">
+                            <label className="label">Parent</label>
+                                <div className="control">
+                                    <div className="select">
+                                        <select name="parent"
+                                            value={this.state.parent}
+                                            onChange={this.handleParentChange.bind(this)}>
+                                            {this.props.skilltrees.sort((a,b) => this.sortTitles (a.title,b.title)).map((skilltree) => (
+                                            <option key={skilltree.id} value={skilltree.id}>Root of {skilltree.title}</option>
+                                            ))}
+                                            {this.props.skills.sort((a,b) => this.sortTitles (a.title,b.title)).map((skill) => (
+                                                this.props.skill.id !== skill.id 
+                                                && this.props.skill.parent && skill.parent
+                                                && this.props.skill.parent.length >= skill.parent.length
+                                                && <option key={skill.id} value={skill.id}>{skill.title}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div></React.Fragment>
+                        }
+                        </div>
+                        <div className="field is-inline-block-desktop" style={{marginLeft: "20px"}}>
+                            <div className="field is-narrow">
+                                <label className="label">
+                                    Tooltip direction
+                                </label>
+                                <div className="control">
+                                {['top', 'left', 'right', 'bottom'].map((direction) => (
+                                    <label className="radio" key={direction}>
+                                        <input type="radio" name="direction" value={direction}
+                                            checked={this.state.direction === direction ? true : false}
+                                            onChange={this.handleTooltipChange} />
+                                        <span style={{marginLeft: "5px"}}>{direction}</span>
+                                    </label>
+                                ))}
+                                </div>
+                            </div>
+                        </div>
+                        <hr></hr></React.Fragment>
+                    }
                 <div className="buttons">
                     <button className="button has-tooltip-right" data-tooltip="Add YouTube video" 
                         onClick={this.toggleYouTubeModal} type="button">
@@ -241,6 +334,9 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                     </button>
                 </div>
                 <div className="buttons is-right">
+                <button className="button" type="button" onClick={this.toggleOptions}>
+                    {this.state.moreOptions ? 'Less options' : 'More options'}
+                </button>
                 <button className="button is-success">Save changes</button>
                 </div>
             </form>

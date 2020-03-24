@@ -16,7 +16,10 @@ const filterChildren = (skill, skills) => {
     rawChildren.forEach(rawChild => {
         let childSkill = {
             tooltip: {
-                content: <SkillContent description={rawChild.description} links={rawChild.links ? rawChild.links : []}/>,
+                content: <SkillContent 
+                    description={rawChild.description} 
+                    links={rawChild.links ? rawChild.links : []}
+                    optional={rawChild.optional ? true : false}/>,
                 direction: rawChild.direction ? rawChild.direction : 'top'
             },
             children: filterChildren(rawChild, skills),
@@ -35,13 +38,15 @@ export const skillArrayToSkillTree = (skills) => {
         if(skill.parent.length===6){
             let rootSkill = {
                 tooltip: {
-                    content: <SkillContent description={skill.description} links={skill.links ? skill.links : []}/>,
+                    content: <SkillContent 
+                        description={skill.description} 
+                        links={skill.links ? skill.links : []} 
+                        optional={skill.optional ? true : false}/>,
                     direction: skill.direction ? skill.direction : 'top'
                 },
                 children: filterChildren(skill, skills),
                 ...skill
             };
-
             //this is a root skill
             skilltree.push(rootSkill);
         }
@@ -55,7 +60,10 @@ const addToSkillArray = (arr, child, parent) => {
         title: child.title,
         optional: child.optional ? true : false,
         tooltip: {
-            content: <SkillContent description={child.tooltip.description} links={child.tooltip.links}/>,
+            content: <SkillContent 
+                        description={child.tooltip.description} 
+                        links={child.tooltip.links} 
+                        optional={child.optional ? true : false}/>,
             description: child.tooltip.description,
             links: child.tooltip.links,
         },
@@ -72,7 +80,13 @@ const addToSkillArray = (arr, child, parent) => {
     arr.push(flatSkill);
     if(child.children.length>0){
         child.children.forEach((nestedChild, index) => {
-            addToSkillArray(arr, nestedChild, [...flatSkill.parent || [], {parentId: flatSkill.id, childIndex: index}]);
+            addToSkillArray(
+                arr, nestedChild, 
+                [
+                    ...flatSkill.parent || [], 
+                    {parentId: flatSkill.id, childIndex: index}
+                ]
+            );
         })
     }
 }
