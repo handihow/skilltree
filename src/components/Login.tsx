@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { Redirect, Link } from "react-router-dom";
 import { loginUser, loginWithGoogle, loginWithMicrosoft } from "../actions";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import YouTube from 'react-youtube';
 
 const hrStyle =  {
     display: 'inline-block',
@@ -87,37 +88,55 @@ class Login extends Component<ILoginProps, ILoginState> {
                         </div>
                     </section>
                     <section className="section">
-                    <div className="has-text-centered">
-                    <LoginButton icon="google" iconPrefix="fab" buttonText="Sign in with Google" onClick={this.handleLoginWithGoogle} color="is-danger" />
-                    <LoginButton icon="microsoft" iconPrefix="fab" buttonText="Sign in with Microsoft" onClick={this.handleLoginWithMicrosoft} color="is-info" />
-                    </div>
-
-                    <div className="has-text-centered" style={{ margin: '10px 0' }}>
-                    <hr style={hrStyle}/>
-                    <span style={{ verticalAlign: 'middle', padding: '0 10px' }}>OR</span>
-                    <hr style={hrStyle}/>
-                    </div>
-                        <div className="container has-text-centered box" style={{ maxWidth: '350px' }}>
-                            <div className="field">
-                                <label className="label" htmlFor="email">Email</label>
-                                <div className="control">
-                                    <input className="input" name="email" type="email" placeholder="email" required onChange={this.handleEmailChange} />
-                                </div>
+                        <div className="container">
+                        <div className="columns">
+                            <div className="column is-half is-hidden-mobile">
+                                <div style={{
+                                margin: "0",
+                                position: "absolute",
+                                top: "50%",
+                                transform: "translateY(-50%)"
+                            }}>
+                                <YouTube
+                                videoId="RGJJt1Vl3Ro"
+                                opts = {{height: '270', width: '450'}}/></div>
+                            </div>
+                            <div className="column is-half">
+                            <div className="has-text-centered">
+                            <LoginButton icon="google" iconPrefix="fab" buttonText="Sign in with Google" onClick={this.handleLoginWithGoogle} color="is-danger" />
+                            <LoginButton icon="microsoft" iconPrefix="fab" buttonText="Sign in with Microsoft" onClick={this.handleLoginWithMicrosoft} color="is-info" />
                             </div>
 
-                            <div className="field">
-                                <label className="label" htmlFor="password">Password</label>
-                                <div className="control">
-                                    <input className="input" name="password" type="password" placeholder="password" required onChange={this.handlePasswordChange} />
+                            <div className="has-text-centered" style={{ margin: '10px 0' }}>
+                            <hr style={hrStyle}/>
+                            <span style={{ verticalAlign: 'middle', padding: '0 10px' }}>OR</span>
+                            <hr style={hrStyle}/>
+                            </div>
+                                <div className="container has-text-centered box" style={{ maxWidth: '350px' }}>
+                                    <div className="field">
+                                        <label className="label" htmlFor="email">Email</label>
+                                        <div className="control">
+                                            <input className="input" name="email" type="email" placeholder="email" required onChange={this.handleEmailChange} />
+                                        </div>
+                                    </div>
+
+                                    <div className="field">
+                                        <label className="label" htmlFor="password">Password</label>
+                                        <div className="control">
+                                            <input className="input" name="password" type="password" placeholder="password" required onChange={this.handlePasswordChange} />
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="field">
+                                    <LoginButton icon="sign-in-alt" iconPrefix="fas" buttonText="Sign In" onClick={this.handleSubmit} color="is-primary" />
+                                    </div>
+                                    <div><Link to="/register">Click here to create an account</Link></div>
+                                    <div><Link to="/recover">Forgot password?</Link></div>
+                                    <div><Link to="/about">Learn more about this application</Link></div>
                                 </div>
+
                             </div>
-                            
-                            <div className="field">
-                            <LoginButton icon="sign-in-alt" iconPrefix="fas" buttonText="Sign In" onClick={this.handleSubmit} color="is-primary" />
-                            </div>
-                            <div><Link to="/register">Click here to create an account</Link></div>
-                            <div><Link to="/recover">Forgot password?</Link></div>
-                            <div><Link to="/about">Learn more about this application</Link></div>
+                        </div>
                         </div>
                         
                     </section>

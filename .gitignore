@@ -7,7 +7,7 @@
 
 #firebase connection
 /src/firebase/firebase.tsx
-
+.firebase*
 # testing
 /coverage
 

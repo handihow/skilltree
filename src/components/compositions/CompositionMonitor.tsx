@@ -8,6 +8,7 @@ import IResult from '../../models/result.model';
 import Header from '../layout/Header';
 import firebase from "firebase/app";
 import ReactImageFallback from "react-image-fallback";
+import { CSVLink } from "react-csv";
 
 type TParams =  { compositionId: string };
 
@@ -25,6 +26,7 @@ interface ICompositionMonitorState {
     result?: IResult;
     unsubscribe?: any;
     url?: string;
+    headers: any;
 }
 
 export class CompositionMonitor extends Component<ICompositionMonitorProps, ICompositionMonitorState> {
@@ -35,6 +37,10 @@ export class CompositionMonitor extends Component<ICompositionMonitorProps, ICom
             doneLoading: false,
             toHome: false,
             isActive: false,
+            headers: [
+                { label: "Name", key: "displayName" },
+                { label: "Email", key: "email" },
+              ]
         }
     }
 
@@ -52,10 +58,28 @@ export class CompositionMonitor extends Component<ICompositionMonitorProps, ICom
                 const unsubscribe = db.collection('results').where('compositions', 'array-contains', compositionId).orderBy('displayName')
                 .onSnapshot(
                     (snap) => {
-                        const results =  snap.empty ? [] : snap.docs.map(r => r.data() as IResult);
+                        const results =  snap.empty ? [] : snap.docs.map(r => {
+                            const result = r.data() as IResult;
+                            return {
+                                ...result, 
+                                max: composition.skillcount,
+                                percentage: composition.skillcount ? 
+                                    Math.round(result.progress[compositionId] * 100 / composition.skillcount) : 0
+                            }
+                        });
                         const filteredResults = results.filter(r => r.user !== this.props.user.uid);
                         this.setState({
                                 composition: composition,
+                                headers: [...this.state.headers, {
+                                    label: "Progress",
+                                    key: "progress." + compositionId
+                                }, {
+                                    label: "Max",
+                                    key: "max"
+                                }, {
+                                    label: "Percentage",
+                                    key: "percentage"
+                                }],
                                 results: filteredResults,
                                 doneLoading: true,
                                 unsubscribe: unsubscribe,
@@ -112,6 +136,10 @@ export class CompositionMonitor extends Component<ICompositionMonitorProps, ICom
         }
     }
 
+    onDownload = () => {
+        console.log('downloading progress')
+    }
+
     render() {
         return (
             <article style={{height:"95vh"}}>
@@ -129,6 +157,13 @@ export class CompositionMonitor extends Component<ICompositionMonitorProps, ICom
                             <Link to={`/compositions/${this.state.composition?.id || ''}/add-students`} 
                             className="button">
                                 Add students</Link>}
+                        </div>
+                        <div className="level-item">
+                            {this.state.composition && this.state.results && this.state.results.length > 0 && 
+                            <CSVLink className="button" 
+                            data={this.state.results} 
+                            headers={this.state.headers}
+                            filename={"skilltree-student-progress-overview.csv"}>Download progress</CSVLink>}
                         </div>
                     </div>
                 </div>

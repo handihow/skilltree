@@ -1,5 +1,6 @@
 import React from 'react'
 import CompositionExample from '../compositions/CompositionExample';
+import YouTube from 'react-youtube';
 
 const physicsExampleCompositionId = '579fa4b4-9bc9-4665-ba3a-a135b03a5aa8'; //74b40838-1b5e-463c-a0d2-0fa0040c8ed4
 const soccerExampleCompositionId = '2b1c7bfc-ee23-455e-89e8-15d170d74aab';
@@ -17,15 +18,8 @@ export default function About() {
                 Gamification is the use of game design elements in non-game contexts.
                 </div>
             </article>
-            <div className="columns is-mobile">
-                <div className="column is-3">
-                    <figure className="image is-3by2">
-                    <img alt="" 
-                        src="https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/SelfDeterminationTheory.png?alt=media&token=06447e6b-5fac-4560-ad7e-707c1393f281" />
-                    </figure>
-                    
-                </div>
-                <div className="column">
+            <div className="columns">
+                <div className="column is-two-fifths">
                     <p>Self Determination Theory identifies three innate needs that, if satisfied, 
                     allow optimal function and growth:
                     Competence, Relatedness and Autonomy. 
@@ -37,8 +31,12 @@ export default function About() {
                     <h5 className="title is-6" style={{marginTop: "10px"}}>
                         This application makes it easy to create skill trees and monitor learning progress.</h5>
                 </div>
+                <div className="column is-three-fifths">
+                <YouTube
+                    videoId="RGJJt1Vl3Ro"
+                    opts = {{height: '300', width: '550'}}/>
+                </div>
             </div>
-             
             </div>
         </section>
         <section className="section">
@@ -66,8 +64,8 @@ export default function About() {
                 at their own pace and of their own interest.</p>
             </div>
             </div>
-            <div style={{marginTop: "10px", marginBottom:"10px"}}>
-                <CompositionExample compositionId={physicsExampleCompositionId}/>
+            <div style={{marginTop: "10px", marginBottom:"10px", maxWidth: '95%', marginLeft:"auto", marginRight:"auto"}}>
+                <CompositionExample compositionId={physicsExampleCompositionId} />
             </div>
             <div className="container">
             <article className="message is-primary">
