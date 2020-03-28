@@ -41,6 +41,7 @@ function App(props) {
   const { isAuthenticated, isVerifying } = props;
   return (
     <React.Fragment>
+    <div style={{minHeight:'100%'}}>
     <NavBar />
     <Switch>
       <ProtectedRoute
@@ -152,6 +153,7 @@ function App(props) {
       <Route path="/register" component={Register} />
       <Route path="/about" component={About} />
     </Switch>
+    </div>
     <Footer />
     </React.Fragment>
   );

@@ -192,7 +192,7 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
         console.log(this.props.parentId);
         return (
             <React.Fragment>
-            <div className="has-background-white" style={{
+            <div className="has-background-light" style={{
                     height: "calc(100vh - 3.5rem)",
                     padding: "20px",
                     overflow: 'auto'

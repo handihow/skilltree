@@ -133,8 +133,14 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
             .get()
             .then(snapShot => {
                 const result = snapShot.data() as IResult;
+                let progress = 0;
+                try{
+                    progress = result.progress[this.props.composition.id || ''];
+                } catch(e){
+                    console.error(e)
+                }
                 this.setState({
-                    progress: result.progress[this.props.composition.id || ''] || 0
+                    progress: progress
                 })
             })
         }

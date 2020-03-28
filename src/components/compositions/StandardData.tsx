@@ -339,7 +339,7 @@ export const treebeardTheme =  {
   tree: {
       base: {
           listStyle: 'none',
-          backgroundColor: '#eff0eb',
+          backgroundColor: 'white',
           margin: 0,
           padding: 0,
           color: '0xFF',

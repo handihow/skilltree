@@ -7,7 +7,7 @@ interface ICompositionMenuProps {
 
 export default function CompositionMenu(props: ICompositionMenuProps) {
   return (
-      <aside className="menu has-background-white" style={{padding: '10px', height: "calc(100vh - 3.5rem)"}}>
+      <aside className="menu has-background-light" style={{padding: '10px', height: "calc(100vh - 3.5rem)"}}>
         <ul className="menu-list">
         <p className="menu-label">
           Appearance
