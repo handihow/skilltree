@@ -10,9 +10,11 @@ export default function Footer() {
          }}>
         <div className="content has-text-centered">
             <p>
-            <strong>SkillTree</strong> by <a href="https://handihow.com">HandiHow</a>. The source code is licensed
+            <strong>SkillTree</strong> by 
+            <a href="https://handihow.com"
+            target="_blank" rel="noopener noreferrer" style={{marginLeft:"5px"}}>HandiHow</a>. The source code is licensed
             <a href="http://opensource.org/licenses/mit-license.php" 
-            target="_blank" rel="noopener noreferrer">MIT</a>. The source code
+            target="_blank" rel="noopener noreferrer" style={{marginLeft:"5px"}}>MIT</a> and
             is located on <a href="https://github.com/handihow/skilltree" 
             target="_blank" rel="noopener noreferrer">Github</a>.
             </p>
