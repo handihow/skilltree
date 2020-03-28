@@ -10,6 +10,7 @@ import Recover from './components/Recover';
 import Register from './components/Register';
 import About from "./components/pages/About";
 import NavBar from './components/layout/Navbar';
+import Footer from './components/layout/Footer';
 import Profile from './components/pages/Profile';
 import EditProfile from "./components/pages/EditProfile";
 import DeleteProfile from "./components/pages/DeleteProfile";
@@ -151,6 +152,7 @@ function App(props) {
       <Route path="/register" component={Register} />
       <Route path="/about" component={About} />
     </Switch>
+    <Footer />
     </React.Fragment>
   );
 }
