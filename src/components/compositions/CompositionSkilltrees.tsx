@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Redirect, Link } from 'react-router-dom';
 import { db, functions } from '../../firebase/firebase';
 import { RouteComponentProps } from 'react-router-dom';
-import uuid from 'uuid';
+import {v4 as uuid} from "uuid"; 
 import firebase from 'firebase/app';
 
 import SkilltreeForm from '../layout/SkilltreeForm';
@@ -120,7 +120,7 @@ export class CompositionSkilltrees extends Component<RouteComponentProps<TParams
 
     deleteSkilltree = (skilltree) => {
         const currentComponent = this;
-        const toastId = uuid.v4();
+        const toastId = uuid();
         toast.info('Deleting skilltree all related child skills is in progress... please wait', {
           toastId: toastId
         })

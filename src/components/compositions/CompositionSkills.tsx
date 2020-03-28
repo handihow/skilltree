@@ -3,7 +3,7 @@ import { Redirect, Link } from 'react-router-dom';
 import { db, functions } from '../../firebase/firebase';
 import firebase from 'firebase/app';
 
-import uuid from 'uuid';
+import {v4 as uuid} from "uuid"; 
 import SkillForm from '../layout/SkillForm';
 import CompositionMenu from '../layout/CompositionMenu';
 import {toast} from 'react-toastify';
@@ -130,7 +130,7 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
             //add a child to an existing skill
             this.setState({
                 showEditor: true,
-                currentSkill: {id: uuid.v4(),...standardEmptySkill},
+                currentSkill: {id: uuid(),...standardEmptySkill},
                 isEditing: false,
                 parentSkill: skill,
                 parentSkilltree: skilltree,
@@ -206,7 +206,7 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
     }  
 
     moveSkillToDifferentParent(skill: ISkill, path: string, parentId: string) {
-        const toastId = uuid.v4();
+        const toastId = uuid();
         toast.info(`${skill.title} is moved to a different parent now... please wait...`, {
             toastId: toastId,
             autoClose: 10000
@@ -217,7 +217,7 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
         let batch = db.batch();
         //the new parent is a skill
         let newPath = '';
-        const newID = uuid.v4();
+        const newID = uuid();
         if(parentSkillIndex > -1){
             let newParentSkill = this.state.skills[parentSkillIndex];
             newPath = `${newParentSkill.path}/skills/${newID}`;
@@ -264,7 +264,7 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
     copyChildSkills(path: string, newPath: string, batch: firebase.firestore.WriteBatch){
         let childSkills = this.state.skills.filter(s => s.parent && this.checkIfParent(s.parent,path.split('/')));
         childSkills.forEach(child => {
-            const newID = uuid.v4();
+            const newID = uuid();
             const newChildPath = `${newPath}/skills/${newID}`;
             console.log(newChildPath);
             let childDocumentRef = db.doc(newChildPath);
@@ -323,7 +323,7 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
 
     confirmDeleteSkill = () => {
         const currentComponent = this;
-        const toastId = uuid.v4();
+        const toastId = uuid();
         toast.info('Deleting skill all related child skills is in progress... please wait', {
           toastId: toastId
         })
@@ -401,7 +401,7 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
                     <div className={this.state.showEditor ? "column is-6" : "column is-1"}>
                     {this.state.showEditor && <SkillForm 
                     isEditing={this.state.isEditing} 
-                    skill={this.state.currentSkill ? this.state.currentSkill : {id: uuid.v4(), ...standardEmptySkill}} 
+                    skill={this.state.currentSkill ? this.state.currentSkill : {id: uuid(), ...standardEmptySkill}} 
                     updateSkill={this.updateSkill}
                     closeModal={this.closeModal}
                     parentName={this.state.parentSkill ? this.state.parentSkill.title : this.state.parentSkilltree ? this.state.parentSkilltree.title : ''}

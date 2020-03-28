@@ -1,6 +1,6 @@
 import ISkill from '../../models/skill.model';
 import ISkilltree from '../../models/skilltree.model';
-import uuid from 'uuid';
+import {v4 as uuid} from "uuid"; 
 
 export const standardTheme  = {
     backgroundColor: 'transparent',
@@ -118,7 +118,7 @@ export const standardData = [
       description:
           'This is a child of the top node, and will be locked while the parent isn’t in a selected state.',
       links: [{
-            id: uuid.v4(),
+            id: uuid(),
             reference: 'https://youtube.com', 
             title: 'Link to YouYube', 
             iconName: 'youtube-square',

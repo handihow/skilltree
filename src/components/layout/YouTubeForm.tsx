@@ -4,7 +4,7 @@ import {youtubeAPIKey} from '../../firebase/firebase';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { toast } from 'react-toastify';
 import ILink from '../../models/link.model';
-import uuid from 'uuid';
+import {v4 as uuid} from "uuid"; 
 import LinkCard from './LinkCard';
 
 const opts: youtubeSearch.YouTubeSearchOptions = {
@@ -39,7 +39,7 @@ export class YouTubeForm extends Component<IYouTubeFormProps, IYouTubeFormState>
                 
                 const links : ILink[] = results?.map(r => {
                     const link : ILink = {
-                        id: r.id ? r.id : uuid.v4(),
+                        id: r.id ? r.id : uuid(),
                         iconName: 'youtube-square',
                         iconPrefix: 'fab',
                         reference: r.link ? r.link : '',

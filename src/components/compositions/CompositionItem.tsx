@@ -5,7 +5,7 @@ import {storage, db} from '../../firebase/firebase';
 import IComposition from '../../models/composition.model';
 import { connect } from "react-redux";
 import IResult from '../../models/result.model';
-import uuid from 'uuid';
+import {v4 as uuid} from "uuid"; 
 import { toast } from 'react-toastify';
 import firebase from 'firebase/app'
 
@@ -33,7 +33,7 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
     }
     
     copyComposition = async (composition) => {
-        const toastId = uuid.v4();
+        const toastId = uuid();
         toast.info('Copying skilltree and all related data is in progress... please wait', {
             toastId: toastId,
             autoClose: 5000
@@ -44,7 +44,7 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
           ...composition, 
           user: this.props.user.uid,
           username: this.props.user.email, 
-          id: uuid.v4(), 
+          id: uuid(), 
           sharedUsers: [], 
           title: 'Copy of ' + composition.title,
           lastUpdate: firebase.firestore.Timestamp.now()
@@ -58,7 +58,7 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
         for(let i = 0; i < skilltrees.length; i++){
           const newSkilltree = {
             ...skilltrees[i], 
-            id: uuid.v4(), 
+            id: uuid(), 
             composition: newComposition.id
           };
           const newSkilltreeRef = db.collection('compositions').doc(newComposition.id)
@@ -73,7 +73,7 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
           const rootSkillPaths = rootSkillSnapshot.empty ? [] : rootSkillSnapshot.docs.map(snap => snap.ref.path)
           for(let j = 0; j < rootSkills.length; j ++){
     
-            const newRootSkill = {...rootSkills[j], composition: newComposition.id, skilltree: newSkilltree.id, id: uuid.v4()};
+            const newRootSkill = {...rootSkills[j], composition: newComposition.id, skilltree: newSkilltree.id, id: uuid()};
             const newRootSkillRef = db.collection('compositions').doc(newComposition.id)
                                       .collection('skilltrees').doc(newSkilltree.id)
                                       .collection('skills').doc(newRootSkill.id);
@@ -107,7 +107,7 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
               ...childSkills[index], 
               composition: newCompositionId, 
               skilltree: newSkilltreeId, 
-              id: uuid.v4()
+              id: uuid()
             };
             const newChildSkillRef = newSkillRef.collection('skills').doc(newChildSkill.id);
             batch.set(newChildSkillRef, newChildSkill);
@@ -140,7 +140,7 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
                     console.error(e)
                 }
                 this.setState({
-                    progress: progress
+                    progress: progress ? progress : 0
                 })
             })
         }

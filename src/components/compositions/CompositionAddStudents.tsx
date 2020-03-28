@@ -3,7 +3,7 @@ import AddStudentStepper from '../layout/AddStudentsStepper';
 import RichTextEditor from 'react-rte';
 import { RouteComponentProps, Redirect } from 'react-router-dom';
 import {isEmail} from 'validator';
-import uuid from 'uuid';
+import {v4 as uuid} from "uuid"; 
 import { toast } from 'react-toastify';
 import { functions } from '../../firebase/firebase';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -205,7 +205,7 @@ export class CompositionAddStudents extends Component<RouteComponentProps<TParam
     addStudentList = (wasWarned: boolean) => {
         if(this.state.hasDownloadedStudentList || wasWarned){
             const currentComponent = this;
-            const toastId = uuid.v4();
+            const toastId = uuid();
             toast.info('Adding student list in progress... please wait', {
             toastId: toastId,
             autoClose: 60000

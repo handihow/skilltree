@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import ILink from '../../models/link.model';
 import { toast } from 'react-toastify';
-import uuid from 'uuid';
+import {v4 as uuid} from "uuid"; 
 import urlMetadata from 'url-metadata';
 import normalize from 'normalize-url';
 
@@ -51,7 +51,7 @@ export class LinkForm extends Component<ILinkFormProps, ILinkFormState> {
             urlMetadata('https://cors-anywhere.herokuapp.com/' + normalizedUrl).then((metadata) => { // success handler
                 console.log(metadata);
                 const link:ILink = {
-                    id: uuid.v4(),
+                    id: uuid(),
                     iconName: 'link',
                     iconPrefix: 'fas',
                     reference: normalizedUrl,
@@ -67,7 +67,7 @@ export class LinkForm extends Component<ILinkFormProps, ILinkFormState> {
             (error) => { // failure handler
                 toast.error('Could not find information about the link. Set title and description manually.')
                 const link:ILink = {
-                    id: uuid.v4(),
+                    id: uuid(),
                     iconName: 'link',
                     iconPrefix: 'fas',
                     reference: normalizedUrl,

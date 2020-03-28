@@ -3,7 +3,7 @@ import FileUploader from "react-firebase-file-uploader";
 import { storage } from '../../firebase/firebase';
 import ILink from '../../models/link.model';
 import { toast } from 'react-toastify';
-import uuid from 'uuid';
+import {v4 as uuid} from "uuid"; 
 
 interface ILinkFileUploaderProps {
     isShowFileModal: boolean;
@@ -52,7 +52,7 @@ export class LinkFileUploader extends Component<ILinkFileUploaderProps, ILinkFil
           .getDownloadURL()
           .then((url : string) => {
                 const link : ILink = {
-                    id: uuid.v4(),
+                    id: uuid(),
                     reference: url,
                     iconName: 'file',
                     iconPrefix: 'fas',

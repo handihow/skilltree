@@ -3,7 +3,7 @@ import Compositions from './compositions/Compositions';
 import AddComposition from './compositions/AddComposition';
 import Header from './layout/Header';
 import { db, functions } from '../firebase/firebase';
-import uuid from 'uuid';
+import {v4 as uuid} from "uuid"; 
 import { connect } from "react-redux";
 import { toast } from 'react-toastify';
 import { standardChildSkills, standardRootSkill } from "./compositions/StandardData";
@@ -82,7 +82,7 @@ class Home extends Component<IHomeProps, IHomeState> {
 
   addComposition = (title, theme, data) => {
     const newComposition : IComposition = {
-      id: uuid.v4(), 
+      id: uuid(), 
       title, 
       theme, 
       user: this.props.user.uid,
@@ -94,7 +94,7 @@ class Home extends Component<IHomeProps, IHomeState> {
     db.collection('compositions').doc(newComposition.id).set(newComposition)
     .then(_ => {
       const newSkilltree = {
-        id: uuid.v4(),
+        id: uuid(),
         title,
         description: 'More information about my skill tree',
         collapsible: true,
@@ -109,7 +109,7 @@ class Home extends Component<IHomeProps, IHomeState> {
         const newRootSkill = {
           skilltree: newSkilltree.id, 
           composition: newComposition.id, 
-          id: uuid.v4(),
+          id: uuid(),
           ...standardRootSkill
         };
         db.collection('compositions').doc(newComposition.id)
@@ -118,7 +118,7 @@ class Home extends Component<IHomeProps, IHomeState> {
         .then( _ => {
           const batch = db.batch();
           standardChildSkills.forEach((child) => {
-            const newChildId = uuid.v4();
+            const newChildId = uuid();
             const dbRef = db.collection('compositions').doc(newComposition.id)
             .collection('skilltrees').doc(newSkilltree.id)
             .collection('skills').doc(newRootSkill.id).collection('skills').doc(newChildId);
@@ -168,7 +168,7 @@ class Home extends Component<IHomeProps, IHomeState> {
 
   delComposition = (composition) => {
     this.toggleIsActive();
-    const toastId = uuid.v4();
+    const toastId = uuid();
     toast.info('Deleting skilltree and all related data is in progress... please wait', {
       toastId: toastId,
       autoClose: 10000

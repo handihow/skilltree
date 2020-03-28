@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from "react-redux";
 import { toast } from 'react-toastify';
 import { logoutUser } from "../../actions";
-import uuid from 'uuid';
+import {v4 as uuid} from "uuid"; 
 import { functions } from '../../firebase/firebase';
 import { Redirect } from 'react-router-dom';
 
@@ -68,7 +68,7 @@ export class EditProfile extends Component<IEditProfileProps, IEditProfileState>
         } else if(repeatPassword !== password){
             return toast.error('Passwords do not match');
         }
-        const toastId = uuid.v4();
+        const toastId = uuid();
         toast.info('Update of user record in progress... please wait', {
         toastId: toastId,
         autoClose: 10000

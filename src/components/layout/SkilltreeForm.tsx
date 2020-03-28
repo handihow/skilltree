@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import uuid from 'uuid';
+import {v4 as uuid} from "uuid"; 
 import ISkilltree from '../../models/skilltree.model';
 
 interface ISkilltreeFormProps {
@@ -37,7 +37,7 @@ export class SkilltreeForm extends Component<ISkilltreeFormProps,ISkilltreeFormS
                     collapsible: true,
                     description: '',
                     title: '',
-                    id: uuid.v4(),
+                    id: uuid(),
                     order: this.props.order
                 },
                 doneLoading: true

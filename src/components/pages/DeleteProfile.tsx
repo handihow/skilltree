@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from "react-redux";
 import { toast } from 'react-toastify';
 import { logoutUser } from "../../actions";
-import uuid from 'uuid';
+import {v4 as uuid} from "uuid"; 
 import { functions } from '../../firebase/firebase';
 import { Redirect } from 'react-router-dom';
 
@@ -33,7 +33,7 @@ export class DeleteProfile extends Component<IDeleteProfileProps, IDeleteProfile
 
     deleteAccount = () => {
         const currentComponent = this;
-        const toastId = uuid.v4();
+        const toastId = uuid();
         toast.info('Deleting of user record in progress... please wait', {
         toastId: toastId,
         autoClose: 10000
