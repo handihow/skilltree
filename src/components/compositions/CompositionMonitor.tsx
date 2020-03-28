@@ -9,6 +9,7 @@ import Header from '../layout/Header';
 import firebase from "firebase/app";
 import ReactImageFallback from "react-image-fallback";
 import { CSVLink } from "react-csv";
+import YouTube from 'react-youtube';
 
 type TParams =  { compositionId: string };
 
@@ -190,6 +191,10 @@ export class CompositionMonitor extends Component<ICompositionMonitorProps, ICom
                 </div>
                 </div>
                 </article>
+                <h5 className="title is-5">Watch the video for more information</h5>
+                <YouTube
+                    videoId="nO3VHR9aezc"
+                    opts = {{height: '300', width: '550'}}/>
                 
                 </React.Fragment>
                 }

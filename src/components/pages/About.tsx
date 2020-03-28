@@ -197,6 +197,12 @@ export default function About() {
                      alt="Student monitoring page"
                      src="https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/Schermafbeelding%202020-03-28%20om%2011.48.22.png?alt=media&token=12679ba7-182f-4d23-bdb4-01bef60506e4"></img>
                 </figure>
+                
+                <h3 className="title is-3">Monitor progress</h3>
+                <p>Learn how to add students and monitor their progress by viewing the video below.</p>
+                <YouTube
+                    videoId="nO3VHR9aezc"
+                    opts = {{height: '300', width: '550'}}/>
                 <Link to="/login" className="button is-large is-primary is-outlined is-rounded">Start Now</Link>
             </div>
         </section>

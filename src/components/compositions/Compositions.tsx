@@ -1,6 +1,7 @@
 import React from 'react'
 import CompositionItem from './CompositionItem';
 import IComposition from '../../models/composition.model';
+import YouTube from 'react-youtube';
 
 interface ICompositionsProps {
     compositions: IComposition[];
@@ -22,6 +23,10 @@ export default function Compositions(props: ICompositionsProps) {
             </div>
         </div>
         </article>
+        <h5 className="title is-5">Watch the video for more information</h5>
+            <YouTube
+                    videoId="RGJJt1Vl3Ro"
+                    opts = {{height: '300', width: '550'}}/>
         
         </React.Fragment>
              : 

@@ -62,6 +62,12 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                     <Link to="/about" className="navbar-item">
                         About
                     </Link> }
+                    <a href="https://github.com/handihow/skilltree/issues" 
+                    target="_blank"
+                    rel="noopener noreferrer" className="navbar-item">Support</a>
+                    <a href="https://handihow.com/en/contact/" 
+                    target="_blank"
+                    rel="noopener noreferrer" className="navbar-item">Contact</a>
                 <div className="navbar-item">
                     <div className="buttons">
                         {isAuthenticated && <Link to="/profile" className="button is-light">Profile</Link>}

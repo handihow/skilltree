@@ -18,6 +18,15 @@ export default function Footer() {
             is located on <a href="https://github.com/handihow/skilltree" 
             target="_blank" rel="noopener noreferrer">Github</a>.
             </p>
+            <p>
+                You can submit
+                <a href="https://github.com/handihow/skilltree/issues" 
+                    target="_blank"
+                    rel="noopener noreferrer" style={{marginLeft:"5px", marginRight:"5px"}}>support and improvement request tickets</a>
+                    on our Github repo, fill the <a href="https://handihow.com/en/contact/" 
+                    target="_blank"
+                    rel="noopener noreferrer" style={{marginLeft:"5px"}}>contact form</a> of HandiHow.
+            </p>
         </div>
         </footer>
     )
