@@ -23,7 +23,7 @@ export default function Footer() {
                 <a href="https://github.com/handihow/skilltree/issues" 
                     target="_blank"
                     rel="noopener noreferrer" style={{marginLeft:"5px", marginRight:"5px"}}>support and improvement request tickets</a>
-                    on our Github repo, fill the <a href="https://handihow.com/en/contact/" 
+                    on our Github repo, or fill the <a href="https://handihow.com/en/contact/" 
                     target="_blank"
                     rel="noopener noreferrer" style={{marginLeft:"5px"}}>contact form</a> of HandiHow.
             </p>

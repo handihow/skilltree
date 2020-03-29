@@ -9,6 +9,7 @@ import Login from "./components/Login";
 import Recover from './components/Recover';
 import Register from './components/Register';
 import About from "./components/pages/About";
+import Support from "./components/pages/Support";
 import NavBar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import Profile from './components/pages/Profile';
@@ -152,6 +153,7 @@ function App(props) {
       <Route path="/recover" component={Recover} />
       <Route path="/register" component={Register} />
       <Route path="/about" component={About} />
+      <Route path="/support" component={Support} />
     </Switch>
     </div>
     <Footer />
