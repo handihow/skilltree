@@ -120,7 +120,7 @@ export class CompositionViewer extends Component<ICompositionViewerProps,ICompos
                                                     backgroundSize: 'cover',
                                                     position : 'relative',
                                                     height:"calc(100vh - 3.5rem)",
-                                                    padding: '0px',
+                                                    padding: '0px'
                                                 }
                                                 : undefined}>
                     <div style={{maxHeight:'100%',overflow:'auto'}}>
