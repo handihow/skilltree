@@ -26,6 +26,7 @@ export default function Footer() {
                     on our Github repo, or fill the <a href="https://handihow.com/en/contact/" 
                     target="_blank"
                     rel="noopener noreferrer" style={{marginLeft:"5px"}}>contact form</a> of HandiHow.
+                <a href="https://www.patreon.com/bePatron?u=32959269" data-patreon-widget-type="become-patron-button" style={{marginLeft:"5px"}}>Become a Patron!</a><script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
             </p>
         </div>
         </footer>

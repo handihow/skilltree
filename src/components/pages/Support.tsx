@@ -1,4 +1,5 @@
 import React from 'react'
+import YouTube from 'react-youtube';
 
 export default function Support() {
     return (
@@ -14,8 +15,12 @@ export default function Support() {
             </article>
             <div className="content">
                 <p>
-                    SkillTree is an open source project maintained by HandiHow - Education Developers.
+                    SkillTree is an open source project maintained by HandiHow - Education Developers. 
+                    Check out the short introduction video to learn more.
                 </p>
+                <YouTube
+                                videoId="XgAQkkm6MpA"
+                                opts = {{height: '270', width: '450'}}/>
                 <p>
                     You can create <a href="https://github.com/handihow/skilltree/issues" 
                     target="_blank"
@@ -28,23 +33,46 @@ export default function Support() {
                     You can also 
                     <a href="https://handihow.com/en/contact/" 
                     target="_blank"
-                    rel="noopener noreferrer" >contact HandiHow</a> directly if you have any questions or comments 
+                    rel="noopener noreferrer" style={{marginLeft:"5px"}}>contact HandiHow</a> directly if you have any questions or comments 
                     about the project, or you just want to get in touch.
             </div>
-            <h3 className="title is-3">Why are some features locked?</h3>
+            <h3 className="title is-3">Supporting SkillTree</h3>
             <div className="content">
                 <p>
                     We gladly contributed to society with this open source project. However, some level of funding
-                    will be required in the future if we want to keep maintaining the project and build great new features.
+                    is desired if we want to keep maintaining the project and build great new features.
                 </p>
                 <p>
+                    Therefore, we have locked some advanced features when you build skilltrees.
                     The unlock features will sponsor the project with $1 every time. 
+                    This will help us maintain and improve the project.
                     You can use the software free of charge without the more advanced features.
                 </p>
                 <p>
                     All features of SkillTree will be completely free until summer 2020. 
                     We have provided a credit card number for anyone who wishes to unlock certain features until that time.
                 </p>
+                <p>
+                    You can also support us by
+                <a href="https://www.patreon.com/bePatron?u=32959269" data-patreon-widget-type="become-patron-button" style={{marginLeft:"5px"}}>becoming a Patron!</a><script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
+                </p>
+            </div>
+            <h3 className="title is-3">Credits</h3>
+            <div className="content">
+                <p>
+                    We would not have been able to create this application without the javascript library "Beautiful Skill Tree".
+                </p>
+                <p>
+                    This javascript library provides the core functionality of SkillTree application: creating online skill trees.
+                </p>
+                <p>
+                    Please give a big hand to Andrico Karoulla, visit 
+                    <a href="https://github.com/andrico1234/beautiful-skill-tree" 
+                    target="_blank"
+                    rel="noopener noreferrer" style={{marginLeft:"5px"}}>his project on Github </a>
+                    and give him the credits that he deserves!
+                </p>
+                
             </div>
             </div>
         </section>

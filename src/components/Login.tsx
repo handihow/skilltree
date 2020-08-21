@@ -98,7 +98,7 @@ class Login extends Component<ILoginProps, ILoginState> {
                                 transform: "translateY(-50%)"
                             }}>
                                 <YouTube
-                                videoId="RGJJt1Vl3Ro"
+                                videoId="XgAQkkm6MpA"
                                 opts = {{height: '270', width: '450'}}/></div>
                             </div>
                             <div className="column is-half">

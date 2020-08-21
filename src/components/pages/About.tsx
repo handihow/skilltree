@@ -37,7 +37,7 @@ export default function About() {
                 </div>
                 <div className="column is-three-fifths">
                 <YouTube
-                    videoId="RGJJt1Vl3Ro"
+                    videoId="XgAQkkm6MpA"
                     opts = {{height: '300', width: '550'}}/>
                 </div>
             </div>
@@ -47,37 +47,43 @@ export default function About() {
             <div className="container">
             <h1 className="title">Roadmap</h1>
             <h3 className="subtitle">Tips on creating your own skilltree step by step</h3>
-            <div className="content">
-                <ol>
-                    <li>
-                    Start with a definition of the skill tree: how big will it be? For how long will it be used? 
-                    Does this skill tree cover one assignment, a chapter or perhaps the entire grade? 
-                    Is it used cross-curricular? The definition of a skill tree must be clear.
-                    </li>
-                    <li>
-                    Promise something nice. Give the students a goal to go to to work. 
-                    This can be an outing, a fun assignment or watch a movie. 
-                    </li>
-                    <li> 
-                    Identify which parts belong in the skill tree. Make a
-                    list of all chapters, skills or knowledge covered.
-                    For each part, remember: what should I know before I start the next skill? 
-                    Where does the skill tree lead towards?
-                    </li>
-                    <li>
-                    Create connections. Which skills belong together? Which
-                    parts have a causal relationship? Which in-depth material can
-                    I offer and how does this relate to the trunk of the skill tree?
-                    </li>
-                    <li>
-                    Clean up. Make sure all skills work towards the end goal or
-                    an interesting in-depth branch. Make sure everything is together
-                    is connected.
-                    </li>
-                
-                </ol>
+            
+                <div className="content">
+                    <ol>
+                        <li>
+                        Start with a definition of the skill tree: how big will it be? For how long will it be used? 
+                        Does this skill tree cover one assignment, a chapter or perhaps the entire grade? 
+                        Is it used cross-curricular? The definition of a skill tree must be clear.
+                        </li>
+                        <li>
+                        Promise something nice. Give the students a goal to go to to work. 
+                        This can be an outing, a fun assignment or watch a movie. 
+                        </li>
+                        <li> 
+                        Identify which parts belong in the skill tree. Make a
+                        list of all chapters, skills or knowledge covered.
+                        For each part, remember: what should I know before I start the next skill? 
+                        Where does the skill tree lead towards?
+                        </li>
+                        <li>
+                        Create connections. Which skills belong together? Which
+                        parts have a causal relationship? Which in-depth material can
+                        I offer and how does this relate to the trunk of the skill tree?
+                        </li>
+                        <li>
+                        Clean up. Make sure all skills work towards the end goal or
+                        an interesting in-depth branch. Make sure everything is together
+                        is connected.
+                        </li>
+                    
+                    </ol>
 
-            </div>
+                </div>
+                Learn how to create a digital skill tree! Check out the video below.
+                <YouTube
+                    videoId="RGJJt1Vl3Ro"
+                    opts = {{height: '300', width: '550'}}/>
+            
             </div>
         </section>
         <section className="section">

@@ -74,7 +74,7 @@ export class CompositionTheme extends Component<RouteComponentProps<TParams>, IC
 
     componentDidMount() {
         const currentComponent = this;
-        axios.get(`https://www.googleapis.com/webfonts/v1/webfonts?key=${googleFontAPIKey}&sort=popularity&limit=50`)
+        axios.get(`https://www.googleapis.com/webfonts/v1/webfonts?key=${googleFontAPIKey}&sort=popularity`)
         .then(response => {
             const fontFamilyResponse = response.data.items.map(i => {
                 return {value: i.family, title: i.family}
@@ -85,7 +85,7 @@ export class CompositionTheme extends Component<RouteComponentProps<TParams>, IC
             })
         })
         .catch(e => {
-            toast.error('Could not load Google fonts');
+            toast.error('Could not load Google fonts ' + e);
         })
 
         db.collection('compositions').doc(currentComponent.props.match.params.compositionId).get()
