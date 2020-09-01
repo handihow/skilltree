@@ -421,6 +421,10 @@ export const toolbarConfig = {
     {label: 'Italic', style: 'ITALIC'},
     {label: 'Underline', style: 'UNDERLINE'}
   ],
+  LINK_BUTTONS: [
+      {label: 'Link'},
+      {label: 'Unlink'}
+      ],
   BLOCK_TYPE_DROPDOWN: [
     {label: 'Normal', style: 'unstyled'},
     {label: 'Heading Large', style: 'header-one'},

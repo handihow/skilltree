@@ -48,7 +48,7 @@ export class LinkForm extends Component<ILinkFormProps, ILinkFormState> {
     startScraping = () => {
         if(this.state.url){
             const normalizedUrl = normalize(this.state.url, {forceHttps: true});
-            urlMetadata('https://cors-anywhere.herokuapp.com/' + normalizedUrl).then((metadata) => { // success handler
+            urlMetadata(normalizedUrl).then((metadata) => { // success handler
                 console.log(metadata);
                 const link:ILink = {
                     id: uuid(),
