@@ -7,6 +7,8 @@ import ImageUploader from '../layout/ImageUploader';
 import features from '../payments/Features';
 import { RouteComponentProps } from 'react-router-dom';
 import BackgroundImage from '../../models/backgroundimage.model';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Header from '../layout/Header';
 
 type TParams =  { compositionId: string };
 
@@ -86,13 +88,16 @@ export class CompositionBackground extends Component<RouteComponentProps<TParams
                     <CompositionMenu id={compositionId} />
                 </div>
                 <div className="column" style={{marginTop: "30px", marginRight: "10px"}}>
-                    <div className="level">
+                    <div className="level is-mobile">
                         <div className="level-left">
-                            <div className="title">Customize Background</div>
+                            <Header header='Background' icon="image"></Header>
                         </div>
                         <div className="level-right">
                             <div className="level-item">
-                                <button className="button is-danger" onClick={this.removeBackground}>Remove background</button>
+                                <button className="button is-danger is-outlined is-medium is-rounded" 
+                                onClick={this.removeBackground} data-tooltip="Remove Background">
+                                    <FontAwesomeIcon icon='trash' />
+                                </button>
                             </div>
                             <div className="level-item">
                                 {this.state.hasUnlockedCustomImageUpload ? 

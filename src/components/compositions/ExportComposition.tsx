@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { RouteComponentProps } from 'react-router';
 import CompositionMenu from '../layout/CompositionMenu'
+import Header from '../layout/Header';
 
 type TParams =  { compositionId: string };
 
@@ -18,7 +19,7 @@ export class ExportComposition extends Component<RouteComponentProps<TParams>> {
                     <CompositionMenu id={compositionId} />
                 </div>
                 <div className="column" style={{marginTop: "30px"}}>
-                        <div className="title">Export skilltree</div>
+                        <Header header='Export' icon="file-export"></Header>
                         <hr></hr>
                         <p>Do you want to export to PDF?</p>
                         <p>Let us know your feedback and feature requests!</p>

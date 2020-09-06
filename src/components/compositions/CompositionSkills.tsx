@@ -14,6 +14,7 @@ import ISkill from '../../models/skill.model';
 import ISkilltree from '../../models/skilltree.model';
 import { RouteComponentProps } from 'react-router-dom';
 import { standardEmptySkill } from './StandardData';
+import Header from '../layout/Header';
 
 interface ICompositionSkillsState{
     hasUnlockedUnlimitedSkills: boolean;
@@ -382,7 +383,7 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
                     <div className="column" style={{ marginTop: "30px", height:"calc(100vh - 3.5rem)", overflow: 'auto' }}>
                         <div className="level">
                             <div className="level-left">
-                                <div className="title">Skills</div>
+                                <Header header='Skills' icon="pager"></Header>
                             </div>
                             <div className="level-right">
                                 {!this.state.hasUnlockedUnlimitedSkills && 

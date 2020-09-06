@@ -5,6 +5,8 @@ import { db } from '../../firebase/firebase';
 import IComposition from '../../models/composition.model';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { toast } from 'react-toastify';
+import Header from '../layout/Header';
+
 
 type TParams =  { compositionId: string };
 
@@ -71,7 +73,7 @@ export class PublishComposition extends Component<RouteComponentProps<TParams>, 
                     <CompositionMenu id={compositionId} />
                 </div>
                 <div className="column" style={{marginTop: "30px"}}>
-                        <div className="title">Publish skilltree</div>
+                        <Header header='Publish' icon="share"></Header>
                         <hr></hr>
                         <h5 className="title is-5">Define your settings</h5>
                         <div className="field is-inline-block-desktop" style={{marginLeft: "20px"}}>

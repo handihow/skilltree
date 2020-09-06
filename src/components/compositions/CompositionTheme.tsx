@@ -11,6 +11,8 @@ import features from '../payments/Features';
 import { toast } from 'react-toastify';
 import firebase from 'firebase/app';
 import IComposition from '../../models/composition.model';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Header from '../layout/Header';
 
 type TParams =  { compositionId: string };
 
@@ -229,13 +231,16 @@ export class CompositionTheme extends Component<RouteComponentProps<TParams>, IC
                         <CompositionMenu id={this.props.match.params.compositionId} />
                     </div>
                     <div className="column" style={{ marginTop: "30px", marginRight: "10px" }}>
-                        <div className="level">
+                        <div className="level is-mobile">
                             <div className="level-left">
-                                <div className="title">Customize Appearance</div>
+                                <Header header='Appearance' icon="sliders-h"></Header>
                             </div>
                             <div className="level-right">
                                 <div className="level-item">
-                                    <button className="button is-primary" onClick={this.saveChanges}>Save Changes</button>
+                                    <button className="button is-medium is-primary is-outlined is-rounded" 
+                                    onClick={this.saveChanges} data-tooltip="Save Changes">
+                                        <FontAwesomeIcon icon='save' />
+                                    </button>
                                 </div>
                                 <div className="level-item">
                                     {!this.state.hasUnlockedAllCustomThemeOptions && 

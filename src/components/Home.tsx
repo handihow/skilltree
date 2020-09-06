@@ -245,14 +245,15 @@ class Home extends Component<IHomeProps, IHomeState> {
       )
     } else {
       return (
-        <section className="section">
+        <section className="section has-background-white-ter">
         <div className="container">
-          <div className="level">
+          <div className="level is-mobile">
             <div className="level-left">
-            <Header header={header} />
+            <Header header={header} icon='sitemap'/>
+            
             </div>
             <div className="level-right">
-              <button className="is-primary is-medium is-rounded button" 
+              <button className="is-primary is-medium is-rounded is-outlined button" 
               data-tooltip="Add Skilltree" onClick={() => this.toggleIsAddingOrEditing()}>
                 <span className="icon">
                   <FontAwesomeIcon icon='plus' />

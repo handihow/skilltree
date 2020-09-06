@@ -11,6 +11,9 @@ import SkilltreeCard from '../layout/SkilltreeCard';
 import {toast} from 'react-toastify';
 import features from '../payments/Features';
 import ISkilltree from '../../models/skilltree.model';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Header from '../layout/Header';
+
 
 interface ICompositionSkilltreesState{
     hasUnlockedUnlimitedSkilltrees: boolean;
@@ -170,13 +173,18 @@ export class CompositionSkilltrees extends Component<RouteComponentProps<TParams
                         <CompositionMenu id={this.props.match.params.compositionId} />
                     </div>
                     <div className="column" style={{ marginTop: "30px", marginRight: "10px", height:"calc(100vh - 3.5rem)", overflow: 'auto' }}>
-                        <div className="level">
+                        <div className="level is-mobile">
                             <div className="level-left">
-                                <div className="title">Skilltrees</div>
+                                <Header header='Skilltrees' icon="sitemap"></Header>
                             </div>
                             <div className="level-right">
-                                <div className="level-item">
-                                    <button className="is-primary button" onClick={this.addSkilltree}>Add skilltree</button>
+                                <div className="level-item">                                
+                                    <button className="is-primary is-medium is-rounded is-outlined button has-tooltip-bottom" 
+                                      data-tooltip="Add Skilltree" onClick={this.addSkilltree}>
+                                        <span className="icon">
+                                          <FontAwesomeIcon icon='plus' />
+                                        </span>
+                                    </button>
                                 </div>
                                 <div className="level-item">
                                     {!this.state.hasUnlockedUnlimitedSkilltrees && 

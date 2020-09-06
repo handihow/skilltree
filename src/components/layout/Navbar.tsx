@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom';
 import { logoutUser } from "../../actions";
 import { connect } from "react-redux";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface INavbarProps {
     isLoggingOut: any;
@@ -55,22 +56,42 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                 </div>
                 <div className={this.state.isActive ? "navbar-menu is-active" : "navbar-menu"}>
                 <div className="navbar-end">
-                {isAuthenticated ?
-                    <Link to="/" className="navbar-item">
-                        SkillTrees
-                    </Link> :
-                    <Link to="/about" className="navbar-item">
-                        About
-                    </Link> }
-                    <Link to="/support" className="navbar-item">
-                        Support
-                    </Link>
+                
+                    
                 <div className="navbar-item">
                     <div className="buttons">
-                        {isAuthenticated && <Link to="/profile" className="button is-light">Profile</Link>}
+                        {isAuthenticated ?
+                        <Link to="/" className="button is-primary is-rounded is-medium">
+                            <span className="icon has-tooltip-bottom" data-tooltip="Skilltrees">
+                              <FontAwesomeIcon icon='home' />
+                            </span>
+                        </Link> :
+                        <Link to="/about" className="button is-primary is-rounded is-medium">
+                            <span className="icon has-tooltip-bottom" data-tooltip="About">
+                              <FontAwesomeIcon icon='info' />
+                            </span>
+                        </Link> }
+                        <Link to="/support" className="button is-primary is-rounded is-medium">
+                            <span className="icon has-tooltip-bottom" data-tooltip="Support">
+                              <FontAwesomeIcon icon='question-circle' />
+                            </span>
+                        </Link>
+                        {isAuthenticated && <Link to="/profile" className="button is-primary is-rounded is-medium">
+                            <span className="icon has-tooltip-bottom" data-tooltip="Profile">
+                              <FontAwesomeIcon icon='user-circle' />
+                            </span>
+                        </Link>}
                         {isAuthenticated ? 
-                            <button className="button is-primary" onClick={this.handleLogout}>Logout</button> : 
-                            <Link to="/login" className="button is-light">Login</Link>}
+                            <button className="button is-primary is-rounded is-medium" onClick={this.handleLogout}>
+                                <span className="icon has-tooltip-bottom" data-tooltip="Logout">
+                                  <FontAwesomeIcon icon='sign-out-alt' />
+                                </span>
+                            </button> : 
+                            <Link to="/login" className="button is-primary is-rounded is-medium">
+                                <span className="icon has-tooltip-bottom" data-tooltip="Login">
+                                  <FontAwesomeIcon icon='sign-in-alt' />
+                                </span>
+                            </Link>}
                         </div>
                     </div>  
                 </div>

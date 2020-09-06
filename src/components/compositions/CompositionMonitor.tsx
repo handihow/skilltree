@@ -149,7 +149,7 @@ export class CompositionMonitor extends Component<ICompositionMonitorProps, ICom
                 <div className="level">
                     <div className="level-left">
                         <div className="level-item">
-                            <Header header={this.state.composition?.title || ''}></Header>
+                            <Header header={this.state.composition?.title || ''} icon="users"></Header>
                         </div>
                     </div>
                     <div className="level-right">
