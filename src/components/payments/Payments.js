@@ -70,12 +70,6 @@ export class Payments extends Component {
                             Pay ${this.state.amount},- to unlock
                         </h2>
                         {this.state.description}
-                        <p style={{marginTop: "10px"}}>
-                            <div><span class="tag is-info" style={{marginRight: "10px"}}>Info</span>
-                            During this bèta testing phase, you can use credit card number 4242 4242 4242 4242
-                            to unlock the feature.</div>
-                            <small>This will work with any postal code and cvc number.</small>
-                        </p>
                         
                     </div>
                 </div>
@@ -85,7 +79,7 @@ export class Payments extends Component {
                 <div className="container">
                     <div className="box">
                         <div className="title is-5">Enter your credit card information</div>
-                        <StripeProvider apiKey="pk_test_2mPZastNCiUv7dQQmesE21G8003EqXrrN3">
+                        <StripeProvider apiKey="pk_live_fknPMfH6PNSa1vJOADgc4plB00sxSP1D9b">
                             <StoreCheckout 
                             clientSecret={this.state.clientSecret}
                             compositionId={this.state.compositionId}

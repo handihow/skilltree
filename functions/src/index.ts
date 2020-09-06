@@ -3,10 +3,10 @@ import * as admin from 'firebase-admin';
 const client = require('firebase-tools');
 admin.initializeApp(functions.config().firebase);
 
-const stripe = require("stripe")("sk_test_NBsrImMpFMEJboledtXIgBni00M9Z3A95l");
+const stripe = require("stripe")("sk_live_uXZpRqj2QizXeAsNIoqiHOrq00WJpeRCwL");
 const db = admin.firestore();
 
-exports.events = functions.https.onRequest((request, response) => {
+exports.events = functions.https.onRequest((request:any, response:any) => {
   // Get the signature from the request header
   let event;
   try {
@@ -60,6 +60,7 @@ exports.secret = functions.https.onCall((data, context) => {
         }
     })
     .then((intent: any) => {
+      console.log(intent);
         return {
             result: intent.client_secret
         }

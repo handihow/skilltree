@@ -10,6 +10,7 @@ import { standardChildSkills, standardRootSkill } from "./compositions/StandardD
 import IComposition from '../models/composition.model';
 import firebase from 'firebase/app';
 import { Redirect } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface IHomeProps {
   isAuthenticated: boolean;
@@ -25,6 +26,7 @@ interface IHomeState {
   unsubscribeShared?: any;
   activeTab: string;
   isActive: boolean;
+  isAddingOrEditing: boolean;
   mustEditProfile: boolean;
 }
 
@@ -42,6 +44,7 @@ class Home extends Component<IHomeProps, IHomeState> {
       sharedCompositions: [],
       isEditingTitle: false,
       isActive: false,
+      isAddingOrEditing: false,
       mustEditProfile: mustEditProfile
     }
   }
@@ -81,6 +84,9 @@ class Home extends Component<IHomeProps, IHomeState> {
   }
 
   addComposition = (title, theme, data) => {
+    this.setState({
+      isAddingOrEditing: false
+    });
     const newComposition : IComposition = {
       id: uuid(), 
       title, 
@@ -147,13 +153,6 @@ class Home extends Component<IHomeProps, IHomeState> {
     })
   }
 
-  editCompositionTitle = (composition: IComposition) => {
-    this.setState({
-      isEditingTitle: true,
-      currentComposition: composition
-    })
-  }
-
   updateCompositionTitle = (updatedTitle: string) => {
     db.collection('compositions').doc(this.state.currentComposition?.id).update({
       title: updatedTitle,
@@ -162,6 +161,7 @@ class Home extends Component<IHomeProps, IHomeState> {
       this.setState({
         isEditingTitle: false,
         currentComposition: undefined,
+        isAddingOrEditing: false
       })
     })
   }
@@ -229,6 +229,14 @@ class Home extends Component<IHomeProps, IHomeState> {
       });
   }
 
+  toggleIsAddingOrEditing = (composition?: IComposition) =>{
+      this.setState({
+          isAddingOrEditing: !this.state.isAddingOrEditing,
+          isEditingTitle: composition? true : false,
+          currentComposition: composition? composition : undefined
+      });
+  }
+
   render() {
     const header = "SkillTrees"
     if(this.state.mustEditProfile){
@@ -244,8 +252,12 @@ class Home extends Component<IHomeProps, IHomeState> {
             <Header header={header} />
             </div>
             <div className="level-right">
-            <AddComposition addComposition={this.addComposition} isEditingTitle={this.state.isEditingTitle}
-               composition={this.state.currentComposition} updateCompositionTitle={this.updateCompositionTitle}/>  
+              <button className="is-primary is-medium is-rounded button" 
+              data-tooltip="Add Skilltree" onClick={() => this.toggleIsAddingOrEditing()}>
+                <span className="icon">
+                  <FontAwesomeIcon icon='plus' />
+                </span>
+              </button>
             </div>
           </div>
           <div className="tabs">
@@ -261,7 +273,7 @@ class Home extends Component<IHomeProps, IHomeState> {
           {this.state.compositions && 
             <Compositions 
               compositions={this.state.activeTab === 'owned' ? this.state.compositions : this.state.sharedCompositions} 
-              editCompositionTitle={this.editCompositionTitle}
+              editCompositionTitle={this.toggleIsAddingOrEditing}
               deleteComposition={this.toggleIsActive} />
           }
         </div>
@@ -285,6 +297,21 @@ class Home extends Component<IHomeProps, IHomeState> {
             </footer>
             </div>
         </div>
+        <div className={`modal ${this.state.isAddingOrEditing ? "is-active" : ""}`}>
+          <div className="modal-background"></div>
+          <div className="modal-card">
+            <header className="modal-card-head">
+              <p className="modal-card-title">{this.state.isEditingTitle ? 'Edit skilltree title' : 'Add skilltree'}</p>
+              <button className="delete" aria-label="close" onClick={() => this.toggleIsAddingOrEditing()}></button>
+            </header>
+            
+              <AddComposition addComposition={this.addComposition} isEditingTitle={this.state.isEditingTitle}
+               composition={this.state.currentComposition} updateCompositionTitle={this.updateCompositionTitle}
+               isHidden={this.state.isAddingOrEditing}/>
+            
+          </div>
+        </div>
+        
         </section>    
       );
     }

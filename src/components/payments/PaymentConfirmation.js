@@ -17,8 +17,6 @@ export class PaymentConfirmation extends Component {
         const currentComponent = this;
         const compositionId = this.props.match.params.compositionId;
         const featureId = this.props.match.params.featureId;
-        console.log(featureId);
-        console.log(compositionId);
         const unsubscribe = db.collection('compositions').doc(compositionId).collection('payments').doc(featureId).onSnapshot(function(doc) {
             if(doc.exists){
                 const paymentRecord = doc.data();
@@ -34,7 +32,9 @@ export class PaymentConfirmation extends Component {
     }
 
     componentWillUnmount(){
-        this.state.unsubscribe();
+        if(this.state.unsubscribe){
+            this.state.unsubscribe();    
+        }
     }
     
     render() {

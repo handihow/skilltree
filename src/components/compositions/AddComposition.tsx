@@ -5,6 +5,7 @@ import ICompostion from '../../models/composition.model';
 interface IAddCompositionProps {
     addComposition: Function;
     isEditingTitle: boolean;
+    isHidden: boolean;
     composition?: ICompostion;
     updateCompositionTitle: Function;
 }
@@ -27,6 +28,10 @@ export class AddComposition extends Component<IAddCompositionProps, IAddComposit
             this.setState({
                 title: this.props.composition?.title || '',
             })
+        } else if(!prevProps.isHidden && this.props.isHidden){
+            this.setState({
+                title: ''
+            })
         }
     }
     
@@ -45,21 +50,19 @@ export class AddComposition extends Component<IAddCompositionProps, IAddComposit
     render() {
         return (
             <form onSubmit={this.onSubmit}>
-                <div className="field is-fullwidth has-addons">
-                <div className="control">
-                <input 
-                    className="input" 
-                    type="text" 
-                    placeholder="Title new SkillTree..."
-                    value={this.state.title}
-                    onChange={this.onChange} />
-                </div>
-                <p className="control">
-                    <button className="button">
-                    Submit
-                    </button>
-                </p>
-                </div>
+                <section className="modal-card-body">
+                    
+                    <input 
+                        className="input" 
+                        type="text" 
+                        placeholder="Title new SkillTree..."
+                        value={this.state.title}
+                        onChange={this.onChange} />
+                        
+                </section>
+                <footer className="modal-card-foot">
+                  <button className="is-primary button">Save</button>
+                </footer>
             </form>
         )
     }

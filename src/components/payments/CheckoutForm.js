@@ -28,6 +28,7 @@ class CheckoutForm extends React.Component {
       }
     })
     .then(result => {
+      console.log(result);
       if(result.paymentIntent && result.paymentIntent.status==='succeeded'){
         this.setState({
           toPaymentConfirmation: true

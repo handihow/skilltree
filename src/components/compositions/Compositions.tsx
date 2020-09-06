@@ -18,8 +18,7 @@ export default function Compositions(props: ICompositionsProps) {
             <div className="message-header">No SkillTrees yet.. </div>
         <div className="message-body">
             <div className="content">
-            <p>You can add a new SkillTree by entering a title and hit "Submit". </p>
-            <p>See the input box on the top right.</p>
+                <p>You can add a new SkillTree clicking on the button top right.</p>
             </div>
         </div>
         </article>

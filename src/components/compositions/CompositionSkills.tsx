@@ -38,7 +38,7 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
     constructor(props: RouteComponentProps<TParams>){
         super(props);
         this.state = {
-            hasUnlockedUnlimitedSkills: false,
+            hasUnlockedUnlimitedSkills: true,
             toEditor: false,
             showEditor: false,
             showWarning: false,
@@ -380,11 +380,15 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
                         <CompositionMenu id={this.props.match.params.compositionId} />
                     </div>
                     <div className="column" style={{ marginTop: "10px", height:"calc(100vh - 3.5rem)", overflow: 'auto' }}>
-                        <div className="title">Skills</div>
-                        <div className="buttons">
-                        {!this.state.hasUnlockedUnlimitedSkills && 
-                        <Link to={`/compositions/${this.props.match.params.compositionId}/unlock/${this.state.featureId}`} 
-                        className="button">Unlimited skills ${features[this.state.featureId].amount}</Link>}
+                        <div className="level">
+                            <div className="level-left">
+                                <div className="title">Skills</div>
+                            </div>
+                            <div className="level-right">
+                                {!this.state.hasUnlockedUnlimitedSkills && 
+                                <Link to={`/compositions/${this.props.match.params.compositionId}/unlock/${this.state.featureId}`} 
+                                className="button">Unlimited skills ${features[this.state.featureId].amount}</Link>}
+                            </div>
                         </div>
                         <hr></hr>
                         <div className="container">
