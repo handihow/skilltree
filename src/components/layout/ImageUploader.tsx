@@ -65,7 +65,7 @@ export class ImageUploader extends Component<IImageUploaderProps, IImageUploader
             this.state.toEditor ? 
             <Redirect to={`/compositions/${this.props.compositionId}`}/> :
             <React.Fragment>
-            <label className="button">
+            <label className="button is-primary">
             Upload background
             <FileUploader
                 accept="image/*"

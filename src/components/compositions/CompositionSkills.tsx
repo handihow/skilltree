@@ -379,7 +379,7 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
                     <div className="column is-2">
                         <CompositionMenu id={this.props.match.params.compositionId} />
                     </div>
-                    <div className="column" style={{ marginTop: "10px", height:"calc(100vh - 3.5rem)", overflow: 'auto' }}>
+                    <div className="column" style={{ marginTop: "30px", height:"calc(100vh - 3.5rem)", overflow: 'auto' }}>
                         <div className="level">
                             <div className="level-left">
                                 <div className="title">Skills</div>

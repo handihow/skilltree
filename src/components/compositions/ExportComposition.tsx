@@ -17,7 +17,7 @@ export class ExportComposition extends Component<RouteComponentProps<TParams>> {
                 <div className="column is-2">
                     <CompositionMenu id={compositionId} />
                 </div>
-                <div className="column" style={{marginTop: "10px"}}>
+                <div className="column" style={{marginTop: "30px"}}>
                         <div className="title">Export skilltree</div>
                         <hr></hr>
                         <p>Do you want to export to PDF?</p>

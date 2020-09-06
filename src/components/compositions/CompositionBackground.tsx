@@ -85,19 +85,19 @@ export class CompositionBackground extends Component<RouteComponentProps<TParams
                 <div className="column is-2" style={{marginBottom: "10px"}}>
                     <CompositionMenu id={compositionId} />
                 </div>
-                <div className="column" style={{marginTop: "10px", marginRight: "10px"}}>
+                <div className="column" style={{marginTop: "30px", marginRight: "10px"}}>
                     <div className="level">
                         <div className="level-left">
                             <div className="title">Customize Background</div>
                         </div>
                         <div className="level-right">
                             <div className="level-item">
-                                <button className="button" onClick={this.removeBackground}>Remove background</button>
+                                <button className="button is-danger" onClick={this.removeBackground}>Remove background</button>
                             </div>
                             <div className="level-item">
                                 {this.state.hasUnlockedCustomImageUpload ? 
                                 <ImageUploader compositionId={compositionId} /> :
-                                <Link to={`/compositions/${compositionId}/unlock/custom-image-upload`} className="button">
+                                <Link to={`/compositions/${compositionId}/unlock/custom-image-upload`} className="is-primary button">
                                     Unlock upload ${features[featureId].amount}</Link>}
                             </div>
                         </div>

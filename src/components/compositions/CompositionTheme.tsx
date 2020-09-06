@@ -228,14 +228,14 @@ export class CompositionTheme extends Component<RouteComponentProps<TParams>, IC
                     <div className="column is-2">
                         <CompositionMenu id={this.props.match.params.compositionId} />
                     </div>
-                    <div className="column" style={{ marginTop: "10px", marginRight: "10px" }}>
+                    <div className="column" style={{ marginTop: "30px", marginRight: "10px" }}>
                         <div className="level">
                             <div className="level-left">
                                 <div className="title">Customize Appearance</div>
                             </div>
                             <div className="level-right">
                                 <div className="level-item">
-                                    <button className="button" onClick={this.saveChanges}>Save Changes</button>
+                                    <button className="button is-primary" onClick={this.saveChanges}>Save Changes</button>
                                 </div>
                                 <div className="level-item">
                                     {!this.state.hasUnlockedAllCustomThemeOptions && 

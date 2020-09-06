@@ -70,7 +70,7 @@ export class PublishComposition extends Component<RouteComponentProps<TParams>, 
                 <div className="column is-2">
                     <CompositionMenu id={compositionId} />
                 </div>
-                <div className="column" style={{marginTop: "10px"}}>
+                <div className="column" style={{marginTop: "30px"}}>
                         <div className="title">Publish skilltree</div>
                         <hr></hr>
                         <h5 className="title is-5">Define your settings</h5>

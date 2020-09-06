@@ -169,14 +169,14 @@ export class CompositionSkilltrees extends Component<RouteComponentProps<TParams
                     <div className="column is-2">
                         <CompositionMenu id={this.props.match.params.compositionId} />
                     </div>
-                    <div className="column" style={{ marginTop: "10px", height:"calc(100vh - 3.5rem)", overflow: 'auto' }}>
+                    <div className="column" style={{ marginTop: "30px", marginRight: "10px", height:"calc(100vh - 3.5rem)", overflow: 'auto' }}>
                         <div className="level">
                             <div className="level-left">
                                 <div className="title">Skilltrees</div>
                             </div>
                             <div className="level-right">
                                 <div className="level-item">
-                                    <button className="button" onClick={this.addSkilltree}>Add skilltree</button>
+                                    <button className="is-primary button" onClick={this.addSkilltree}>Add skilltree</button>
                                 </div>
                                 <div className="level-item">
                                     {!this.state.hasUnlockedUnlimitedSkilltrees && 
