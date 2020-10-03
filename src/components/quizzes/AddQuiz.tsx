@@ -1,22 +1,21 @@
 import React, { Component } from 'react'
-import {standardData, standardTheme} from './StandardData';
-import IComposition from '../../models/composition.model';
+import IQuiz from '../../models/quiz.model';
 
-interface IAddCompositionProps {
-    addComposition: Function;
+interface IAddQuizProps {
+    addQuiz: Function;
     isEditingTitle: boolean;
     isHidden: boolean;
-    composition?: IComposition;
-    updateCompositionTitle: Function;
+    quiz?: IQuiz;
+    updateQuizTitle: Function;
 }
 
-interface IAddCompositionState {
+interface IAddQuizState {
     title: string;
 }
 
-export class AddComposition extends Component<IAddCompositionProps, IAddCompositionState> {
+export class AddQuiz extends Component<IAddQuizProps, IAddQuizState> {
 
-    constructor(props: IAddCompositionProps){
+    constructor(props: IAddQuizProps){
         super(props);
         this.state = {
             title: ''
@@ -26,7 +25,7 @@ export class AddComposition extends Component<IAddCompositionProps, IAddComposit
     componentDidUpdate(prevProps) {
         if (!prevProps.isEditingTitle && this.props.isEditingTitle) {
             this.setState({
-                title: this.props.composition?.title || '',
+                title: this.props.quiz?.title || '',
             })
         } else if(!prevProps.isHidden && this.props.isHidden){
             this.setState({
@@ -40,9 +39,9 @@ export class AddComposition extends Component<IAddCompositionProps, IAddComposit
     onSubmit = (e) => {
         e.preventDefault();
         if(this.props.isEditingTitle) {
-            this.props.updateCompositionTitle(this.state.title);
+            this.props.updateQuizTitle(this.state.title);
         } else {
-            this.props.addComposition(this.state.title, standardTheme, standardData);
+            this.props.addQuiz(this.state.title);
         }
         this.setState({title: ''});
     }
@@ -55,7 +54,7 @@ export class AddComposition extends Component<IAddCompositionProps, IAddComposit
                     <input 
                         className="input" 
                         type="text" 
-                        placeholder="Title new SkillTree..."
+                        placeholder="Title New Quiz..."
                         value={this.state.title}
                         onChange={this.onChange} />
                         
@@ -68,4 +67,4 @@ export class AddComposition extends Component<IAddCompositionProps, IAddComposit
     }
 }
 
-export default AddComposition
+export default AddQuiz

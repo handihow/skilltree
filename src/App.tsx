@@ -25,6 +25,8 @@ import PublishComposition from './components/compositions/PublishComposition';
 import ExportComposition from './components/compositions/ExportComposition';
 import Payments from './components/payments/Payments';
 import PaymentConfirmation from './components/payments/PaymentConfirmation';
+import Quizzes from './components/quizzes/Quizzes';
+import QuizBuilder from './components/quizzes/QuizBuilder';
 
 import CompositionAddStudents from './components/compositions/CompositionAddStudents';
 
@@ -49,6 +51,13 @@ function App(props) {
         exact
         path="/"
         component={Home}
+        isAuthenticated={isAuthenticated}
+        isVerifying={isVerifying}
+      />
+      <ProtectedRoute
+        exact
+        path="/quizzes"
+        component={Quizzes}
         isAuthenticated={isAuthenticated}
         isVerifying={isVerifying}
       />
@@ -145,6 +154,12 @@ function App(props) {
       <ProtectedRoute 
         path="/compositions/:compositionId/confirmation/:featureId"
         component={PaymentConfirmation}
+        isAuthenticated={isAuthenticated}
+        isVerifying={isVerifying}
+      />
+      <ProtectedRoute 
+        path="/quizzes/:quizId/builder"
+        component={QuizBuilder}
         isAuthenticated={isAuthenticated}
         isVerifying={isVerifying}
       />

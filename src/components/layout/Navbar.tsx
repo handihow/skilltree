@@ -71,6 +71,11 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                               <FontAwesomeIcon icon='info' />
                             </span>
                         </Link> }
+                        {isAuthenticated && <Link to="/quizzes" className="button is-primary is-rounded is-medium">
+                            <span className="icon has-tooltip-bottom" data-tooltip="Quizzes">
+                              <FontAwesomeIcon icon='poll-h' />
+                            </span>
+                        </Link>}
                         <Link to="/support" className="button is-primary is-rounded is-medium">
                             <span className="icon has-tooltip-bottom" data-tooltip="Support">
                               <FontAwesomeIcon icon='question-circle' />

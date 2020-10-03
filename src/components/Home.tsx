@@ -245,7 +245,7 @@ class Home extends Component<IHomeProps, IHomeState> {
       )
     } else {
       return (
-        <section className="section has-background-white-ter">
+        <section className="section has-background-white-ter" style={{minHeight: "100vh"}}>
         <div className="container">
           <div className="level is-mobile">
             <div className="level-left">

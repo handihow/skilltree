@@ -1,6 +1,6 @@
 import { SkillThemeType } from "beautiful-skill-tree";
 
-export default interface ICompostion {
+export default interface IComposition {
     id?: string;
     title: string;
     user?: string; //refers to user uid

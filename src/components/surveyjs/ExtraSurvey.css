@@ -1,0 +1,226 @@
+
+.sv-visuallyhidden{
+  display: none;
+}
+
+.sa-question__title{
+  font-family: BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+}
+
+.sa-question__title:after{
+  content: unset;
+}
+
+/* styles related to surveyjs and survey builder */
+.svd_content.card {
+  background-color: unset;
+  box-shadow: unset;
+  color: unset;
+  max-width: unset;
+  position: unset;
+}
+
+.svd_content.panel {
+	font-size: unset;
+}
+
+.svd_content.panel
+.svd_properties {
+	font-size: unset;
+}
+
+.progress-text.sv-hidden{
+  display: none;
+}
+
+.sv-hidden {
+  display: none;
+}
+
+.legend {
+  display: none;
+}
+
+div.sv_container {
+    font-family: unset;
+    font-size: unset;
+}
+
+.noUi-connect {
+    background: #DF015A;
+}
+
+.noUi-horizontal
+.noUi-tooltip {
+    bottom: -150%;
+}
+
+.progress-bar {
+    margin-top: 10px;
+    border-radius: 7px;
+    overflow: hidden;
+    width: 100%;
+ 
+    span {
+        display: block;
+    }
+    background-color: #eef1f3;
+ 
+}
+
+.progress-bar-inner {
+    display: block;
+    height: 8px;
+    background-color: #DF015A;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .5) inset;
+    position: relative;
+    animation: auto-progress 10s infinite linear;
+}
+// text progress bar
+.progress-bar > span {
+    display: none;
+}
+
+.progress.is-primary.is-small {
+    width: 100%;
+    max-width: 1000px;
+}
+
+.help.is-danger{
+    margin-bottom: 10px;
+}
+
+.container.max-scan-width {
+	max-width: 1000px;
+}
+
+
+/*.box.checked{
+	background-color: #009CDE;
+} */
+
+.imagepicker {
+    float: left;
+    margin-right: 10px;
+    margin-left: 10px;
+    
+}
+/*.imagepicker:hover, :focus {
+    background: #009CDE;
+}*/
+ 
+/*.imagepicker.checked {
+    background: #009CDE;
+    color: white;
+}*/
+ 
+.colored-box {
+    padding: 10px;
+    border-radius: 7px;
+}
+
+.box.colored-box {
+    background-color: #f5fcff;
+}
+
+.box.lighted-box {
+  background-color: hsl(0, 0%, 100%);
+}
+
+.added__question__color .lighted-box {
+  background-color: #f5fcff;
+}
+
+.item-background {
+    padding: 5px;
+    margin: 5px;
+    background:rgb(199, 235, 250); 
+}
+
+/*.item-background:hover, :focus {
+    background:  #009CDE;
+}*/
+
+/*.matrix-cell-background {
+    background:  #009CDE;
+    color: white;
+}*/
+
+.title-background {
+    background-color: rgb(199, 235, 250);
+}
+
+/*.item-background.checked {
+    background:  #009CDE;
+    color: white;
+}*/
+
+.label.item-background {
+    text-align: center;
+}
+
+.select-label{
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  margin-bottom: 5px;
+  margin-right: 10px;
+}
+
+.select-item-control {
+  flex: 0 0 auto;
+  margin-right: 10px;
+}
+
+.select-control-label {
+  flex: 1 1 auto;
+}
+
+div.sv_q_select_column {
+    display: inline-block;
+}
+
+/*.rating-background.checked {
+    background: #009CDE;
+    padding: 3px;
+}
+*/
+.rating-background {
+    padding: 3px;
+    font-size: 11px;
+}
+/*.rating-background:hover, :focus {
+    background: #009CDE;
+}*/
+
+.sjs-sortablejs-item {
+     background-color: hsl(0, 0%, 96%) !important;
+     color: #363636 !important;
+}
+
+/*.sjs-sortablejs-result {
+    border: 3px solid #009CDE !important;
+    border-radius: 5px;
+    background: white;
+    padding: 5px;
+}*/
+
+.sjs-sortablejs-source {
+    border: 1px solid rgb(199, 235, 250) !important;
+    padding: 5px;
+}
+
+
+.sv-boolean__label {
+    visibility: hidden;
+}
+ 
+@media (max-width: 900px) {
+    .field.max-width-mobile {
+        width: 100% !important
+    }
+}
+
+.table tbody tr:not(.is-selected):nth-child(even) {
+    background:hsl(0, 0%, 96%);
+}
