@@ -1,3 +1,13 @@
+#surveyCreatorContainer{
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-right: auto;
+  margin-left: auto;
+  max-width: 1300px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
 
 .sv-visuallyhidden{
   display: none;

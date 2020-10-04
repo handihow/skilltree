@@ -98,6 +98,10 @@ export class QuizItem extends Component<IQuizItemProps, IQuizItemState> {
                     <span className="icon is-small"><FontAwesomeIcon icon='edit' /></span>
                     </Link>}
                     {this.props.user.uid === this.props.quiz.user &&
+                        <Link to={"/quizzes/"+id+"/test"} className="level-item" data-tooltip="Do the quiz">
+                    <span className="icon is-small"><FontAwesomeIcon icon='external-link-alt' /></span>
+                    </Link>}
+                    {this.props.user.uid === this.props.quiz.user &&
                         <Link to={"/quizzes/"+id+"/results"} className="level-item" data-tooltip="Quiz results">
                     <span className="icon is-small"><FontAwesomeIcon icon='poll-h' /></span>
                     </Link>}

@@ -46,7 +46,9 @@ export class Quiz extends Component<IQuizProps,IQuizState> {
         return (
             this.state.toEditor ?
             <Redirect to={'/quizzes'} /> :
-            <SurveyCreator />
+            <SurveyCreator quiz={this.state.quiz} 
+                dotest={() => this.props.history.push("/quizzes/"+this.state.quiz?.id+"/test")}
+                goback={() => this.props.history.push("/quizzes")}/>
         )
     }
 }

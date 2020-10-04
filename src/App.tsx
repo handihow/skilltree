@@ -27,6 +27,7 @@ import Payments from './components/payments/Payments';
 import PaymentConfirmation from './components/payments/PaymentConfirmation';
 import Quizzes from './components/quizzes/Quizzes';
 import QuizBuilder from './components/quizzes/QuizBuilder';
+import DoQuiz from './components/quizzes/DoQuiz';
 
 import CompositionAddStudents from './components/compositions/CompositionAddStudents';
 
@@ -160,6 +161,12 @@ function App(props) {
       <ProtectedRoute 
         path="/quizzes/:quizId/builder"
         component={QuizBuilder}
+        isAuthenticated={isAuthenticated}
+        isVerifying={isVerifying}
+      />
+      <Route 
+        path="/quizzes/:quizId/test"
+        component={DoQuiz}
         isAuthenticated={isAuthenticated}
         isVerifying={isVerifying}
       />
