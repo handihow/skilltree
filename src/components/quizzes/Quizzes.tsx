@@ -47,7 +47,7 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
             unsubscribeOwned: unsubscribeOwned 
           });
         });
-      } 
+    } 
 
     componentWillUnmount() {
         if(this.state.unsubscribeOwned){

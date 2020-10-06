@@ -37,5 +37,10 @@
 }
 
 .sv-root-modern .sv-checkbox--checked .sv-checkbox__svg {
-	background-color: rgba(212,130,58, 1) !important;
+	background-color: #27405f !important;
+}
+
+.sv-root-modern .sv-rating__item--selected .sv-rating__item-text {
+	background-color: #27405f !important;
+	border-color: #27405f !important;
 }

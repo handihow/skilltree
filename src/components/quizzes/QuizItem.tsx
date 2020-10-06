@@ -84,7 +84,7 @@ export class QuizItem extends Component<IQuizItemProps, IQuizItemState> {
                 </div>
                 <nav className="level is-mobile">
                 <div className="level-left">
-                {this.props.user.uid === this.props.quiz.user &&
+                    {this.props.user.uid === this.props.quiz.user &&
                     <div className="level-item" data-tooltip="Edit quiz title">
                         <a href="# " onClick={this.props.editQuizTitle.bind(this, this.props.quiz)}>
                             <FontAwesomeIcon icon='pen' /></a>
@@ -97,10 +97,9 @@ export class QuizItem extends Component<IQuizItemProps, IQuizItemState> {
                         <Link to={"/quizzes/"+id+"/builder"} className="level-item" data-tooltip="Quiz editor">
                     <span className="icon is-small"><FontAwesomeIcon icon='edit' /></span>
                     </Link>}
-                    {this.props.user.uid === this.props.quiz.user &&
-                        <Link to={"/quizzes/"+id+"/test"} className="level-item" data-tooltip="Do the quiz">
+                    <Link to={"/quizzes/"+id+"/test"} className="level-item" data-tooltip="Do the quiz">
                     <span className="icon is-small"><FontAwesomeIcon icon='external-link-alt' /></span>
-                    </Link>}
+                    </Link>
                     {this.props.user.uid === this.props.quiz.user &&
                         <Link to={"/quizzes/"+id+"/results"} className="level-item" data-tooltip="Quiz results">
                     <span className="icon is-small"><FontAwesomeIcon icon='poll-h' /></span>
@@ -109,7 +108,8 @@ export class QuizItem extends Component<IQuizItemProps, IQuizItemState> {
                 </nav>
             </div>
             <div className="media-right">
-            <button className="delete" onClick={this.props.deleteQuiz.bind(this, this.props.quiz)}></button>
+                {this.props.user.uid === this.props.quiz.user && 
+                    <button className="delete" onClick={this.props.deleteQuiz.bind(this, this.props.quiz)}></button>}
             </div>
             </div>
             </div>

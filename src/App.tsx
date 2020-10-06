@@ -164,7 +164,7 @@ function App(props) {
         isAuthenticated={isAuthenticated}
         isVerifying={isVerifying}
       />
-      <Route 
+      <ProtectedRoute 
         path="/quizzes/:quizId/test"
         component={DoQuiz}
         isAuthenticated={isAuthenticated}

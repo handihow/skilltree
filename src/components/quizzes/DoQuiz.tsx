@@ -2,9 +2,11 @@ import React, { Component } from 'react'
 import { db } from '../../firebase/firebase';
 import { RouteComponentProps } from 'react-router-dom';
 import IQuiz from '../../models/quiz.model';
+import IAnswer from '../../models/answer.model';
 import { connect } from "react-redux";
-import { SurveyPage } from "../surveyjs/Survey";
+import SurveyPage from "../surveyjs/Survey";
 import Loading from '../layout/Loading';
+import firebase from 'firebase/app';
 
 type TParams =  { quizId: string };
 
@@ -15,13 +17,16 @@ interface IDoQuizProps extends RouteComponentProps<TParams>{
 
 interface IDoQuizState {
     quiz?: IQuiz;
+    answer?: IAnswer;
+    doneLoading: boolean;
 }
 
 export class DoQuiz extends Component<IDoQuizProps,IDoQuizState> {
     constructor(props: IDoQuizProps){
         super(props);
         this.state = {
-            quiz: undefined
+            quiz: undefined,
+            doneLoading: false
         }
     }
 
@@ -31,15 +36,62 @@ export class DoQuiz extends Component<IDoQuizProps,IDoQuizState> {
         .then(doc => {
             const quiz = doc.data() as IQuiz;
             this.setState({quiz});
+            db.collection("answers").doc(quizId + '_' + this.props.user.uid).get()
+            .then(doc => {
+                if(doc.exists){
+                    const answer = doc.data() as IAnswer;
+                    this.setState({
+                        answer,
+                        doneLoading: true
+                    });
+                } else {
+                    db.collection("answers").doc(quizId + '_' + this.props.user.uid).set({
+                        id: quizId + '_' + this.props.user.uid,
+                        user: this.props.user.uid,
+                        username: this.props.user.email,
+                        displayName: this.props.user.displayName,
+                        quiz: quizId,
+                        created: firebase.firestore.Timestamp.now(),
+                        lastUpdate: firebase.firestore.Timestamp.now()
+                    }).then(_ => {
+                        this.setState({
+                            doneLoading: true
+                        });
+                    });
+                }
+            });
         });
+        
+    }
+
+    onValueChanged(data){
+        const quizId = this.props.match.params.quizId;
+        db.collection("answers").doc(quizId + '_' + this.props.user.uid).update({
+            data: data
+        });
+    }
+
+    onComplete(sender){
+        const quizId = this.props.match.params.quizId;
+        db.collection("answers").doc(quizId + '_' + this.props.user.uid).set({
+            isFinished: true,
+            lastUpdate: firebase.firestore.Timestamp.now(),
+            correctAnswers: sender.getCorrectedAnswerCount(),
+            incorrectAnswers: sender.getInCorrectedAnswerCount()
+        }, {merge: true}).then(_ => {
+            this.props.history.goBack();
+        });
+        
     }
 
     render() {
         return (
-            this.state.quiz ?
-            <SurveyPage json={this.state.quiz.data} 
-            onValueChanged={(value) => {console.log(value.data)}} 
-            onCompleted={(value) => console.log(value.data)} /> 
+            this.state.doneLoading ?
+            <SurveyPage 
+            json={this.state.quiz?.data} 
+            data={this.state.answer ? this.state.answer.data : null}
+            onValueChanged={(value) => this.onValueChanged(value.data)} 
+            onComplete={(sender) => this.onComplete(sender)} /> 
             : <Loading />
         )
     }

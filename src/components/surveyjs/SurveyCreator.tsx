@@ -6,10 +6,10 @@ import "./BeforeSurvey.css";
 import "survey-react/modern.css";
 import "survey-creator/survey-creator.css";
 import "./AfterSurvey.css";
-
+import {v4 as uuid} from "uuid"; 
 import IQuiz from '../../models/quiz.model';
 import Loading from '../layout/Loading';
-import { db } from '../../firebase/firebase';
+import { db, storage } from '../../firebase/firebase';
 
 const mainColor = "#27405f";
 const mainHoverColor = "#d4823a";
@@ -59,6 +59,7 @@ const options = {
         "boolean",
         "html",
         "image",
+        "file"
     ],
     pageEditMode: "single",
     // showTitlesInExpressions: true,
@@ -83,14 +84,6 @@ SurveyKo
     .Serializer
     .findProperty("itemvalue", "text")
     .visible = false;
-SurveyKo
-    .Serializer.addProperty("question", {
-      name: "score:number",
-    })
-SurveyKo
-    .Serializer.addProperty("itemvalue", {
-      name: "score:number",
-    });
 // Make the detail editor for itemvalue invisible, hide Edit button
 SurveyJSCreator
     .SurveyQuestionEditorDefinition
@@ -118,7 +111,7 @@ function showTheProperty(className, propertyName, visibleIndex?) {
         .Serializer
         .findProperty(className, propertyName)
     if (!property) {
-        console.log(propertyName + ' not found');
+        console.log(propertyName + ' not found for ' + className );
         return;
     }
     property.visibleIndex = visibleIndex;
@@ -131,7 +124,6 @@ showTheProperty("question", "title");
 showTheProperty("question", "description");
 showTheProperty("question", "visible");
 showTheProperty("question", "isRequired");
-showTheProperty("question", "score");
 showTheProperty("checkbox", "choices");
 showTheProperty("checkbox", "hasOther");
 showTheProperty("checkbox", "hasSelectAll");
@@ -149,13 +141,14 @@ showTheProperty("dropdown", "hasOther");
 showTheProperty("dropdown", "hasSelectAll");
 showTheProperty("dropdown", "hasNone");
 showTheProperty("text", "inputType");
-showTheProperty("text", "placeHolder");
 showTheProperty("comment", "placeHolder");
 showTheProperty("comment", "rows");
 showTheProperty("image", "imageLink");
 showTheProperty("image", "imageWidth");
 showTheProperty("image", "imageHeight");
-showTheProperty("html", "html")
+showTheProperty("html", "html");
+showTheProperty("question", "correctAnswer");
+showTheProperty("file", "allowMultiple");
 
 interface ISurveyCreatorProps {
     quiz: IQuiz | undefined,
@@ -217,6 +210,33 @@ class SurveyCreator extends Component<ISurveyCreatorProps> {
             });
     
     this.surveyCreator.saveSurveyFunc =this.saveMySurvey;
+
+    this.surveyCreator.onModified.add(function(sender, options){
+        if(options.name === 'imageLink' 
+            && options.newValue !== options.oldValue
+            && !options.newValue.includes('https://')){
+            
+            let extension : string = '';
+            // do something like this
+            var lowerCase = options.newValue.toLowerCase();
+            if (lowerCase.indexOf("png") !== -1) extension = "png"
+            else if (lowerCase.indexOf("jpg") !== -1 || lowerCase.indexOf("jpeg") !== -1)
+                extension = "jpg"
+            else extension = "tiff";
+            const filename = uuid() + '.' + extension;
+            const storageRef = storage.ref().child('@uploads/'+filename);
+            const indexOfComma = options.newValue.indexOf(',') + 1;
+            const base64String = options.newValue.substring(indexOfComma);
+            storageRef
+              .putString(base64String, 'base64')
+              .then(_ => {
+                  storageRef.getDownloadURL().then(url => {
+                        console.log(url);
+                        options.target.imageLink = url;
+                    })
+              });
+        }
+    })
 
     this.surveyCreator.render("surveyCreatorContainer");
 
