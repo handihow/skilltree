@@ -5,6 +5,7 @@ import IQuiz from '../../models/quiz.model';
 import { toast } from 'react-toastify';
 import { connect } from "react-redux";
 import SurveyCreator from "../surveyjs/SurveyCreator";
+import QuizTabs from './QuizTabs';
 
 type TParams =  { quizId: string, builder: string };
 
@@ -46,10 +47,13 @@ export class Quiz extends Component<IQuizProps,IQuizState> {
         return (
             this.state.toEditor ?
             <Redirect to={'/quizzes'} /> :
+            <React.Fragment>
+            <QuizTabs currentTab={this.props.match.params.builder} quizId={this.state.quiz?.id || ''}/>
             <SurveyCreator quiz={this.state.quiz}
                 builder={this.props.match.params.builder}
                 dotest={() => this.props.history.push("/quizzes/"+this.state.quiz?.id+"/test")}
                 goback={() => this.props.history.push("/quizzes")}/>
+            </React.Fragment>
         )
     }
 }

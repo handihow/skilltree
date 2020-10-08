@@ -8,6 +8,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { RouteComponentProps } from 'react-router-dom';
 import Loading from '../layout/Loading';
 import SurveyPage from "../surveyjs/Survey";
+import SurveyAnalytics from "../surveyjs/SurveyAnalytics";
+import SurveyTabulator from '../surveyjs/SurveyTabulator';
 
 type TParams =  { quizId: string };
 
@@ -39,11 +41,12 @@ class QuizResults extends Component<IQuizResultsProps, IQuizResultsState> {
 
     componentDidMount() {
       const quizId = this.props.match.params.quizId;
+      console.log(quizId);
         db.collection("quizzes").doc(quizId).get()
         .then(doc => {
             const quiz = doc.data() as IQuiz;
             this.setState({quiz});
-            db.collection("answers").where("quiz", "==", quizId).get()
+            db.collection("answers").where("quiz", "==", quizId).orderBy("displayName", "asc").get()
             .then(docs => {
             	if(!docs.empty){
             		const answers : IAnswer[] = [];
@@ -79,12 +82,18 @@ class QuizResults extends Component<IQuizResultsProps, IQuizResultsState> {
 			});
 		}
 	}
-    render() {
+  onValueChanged(data){
+        const quizId = this.props.match.params.quizId;
+        db.collection("answers").doc(quizId + '_' + this.state.answers[this.state.activeAnswerIndex].user).update({
+            feedback: data
+        });
+    }
+  render() {
         const header = "Quiz Results"
         
           return (
           	this.state.doneLoading ?
-            <section className="section has-background-white-ter" style={{minHeight: "100vh"}}>
+            <section className="section has-background-white-ter" style={{'minHeight': '100vh'}}>
             <div className="container">
               <div className="level is-mobile">
                 <div className="level-left">
@@ -96,11 +105,14 @@ class QuizResults extends Component<IQuizResultsProps, IQuizResultsState> {
               <div className="tabs">
 	          <ul>
 	              <li className={this.state.activeTab ==='individual' ? "is-active" : undefined}>
-	                  <a href="# " onClick={() => this.changeActiveTab('individual')}>Individual records</a>
+	                  <a href="# " onClick={() => this.changeActiveTab('individual')}>Submission records</a>
 	              </li>
 	              <li className={this.state.activeTab ==='charts' ? "is-active" : undefined}>
-	                  <a href="# " onClick={() => this.changeActiveTab('charts')}>Overview charts</a>
+	                  <a href="# " onClick={() => this.changeActiveTab('charts')}>Submission charts</a>
 	              </li>
+                <li className={this.state.activeTab ==='feedback' ? "is-active" : undefined}>
+                    <a href="# " onClick={() => this.changeActiveTab('feedback')}>Feedback table</a>
+                </li>
 	          </ul>
 	          </div>
 	          {this.state.answers.length === 0 && 
@@ -113,8 +125,10 @@ class QuizResults extends Component<IQuizResultsProps, IQuizResultsState> {
 		        </div>
 		        </article>}
 		       {this.state.activeTab === 'individual' && this.state.answers.length > 0  && 
-		   		<article>
-		   			<div className="buttons has-addons is-centered">
+		   		<React.Fragment>
+           <div className="level">
+           <div className="level-left">
+		   			<div className="buttons has-addons">
 					  <button className="button" onClick={() => this.changeActiveAnswerIndex(-1)}><span className="icon">
 		                <FontAwesomeIcon icon='backward' />
 		              </span></button>
@@ -125,21 +139,44 @@ class QuizResults extends Component<IQuizResultsProps, IQuizResultsState> {
 		                <FontAwesomeIcon icon='forward' />
 		              </span></button>
   					</div>
-  					<div className="has-text-centered">
+            </div>
+            <div className="level-right">
 						<h4 className="title is-4 has-text-primary">
 			              <span className="icon">
 			                <FontAwesomeIcon icon='user' />
 			              </span>
 			              <span className="ml-5">{this.state.answers[this.state.activeAnswerIndex].displayName}</span>
 			            </h4>
-			            <h6 className="subtitle is-6">{this.state.answers[this.state.activeAnswerIndex].username}</h6>
-		            </div>
+		         </div>
+             </div>
+             <div className="columns">
+             <div className="column is-three-fifths">
   					<SurveyPage 
   			            json={this.state.quiz?.data} 
   			            data={this.state.answers[this.state.activeAnswerIndex].data}
-  			            viewmode={true} /> 
-  		   		</article>}
-
+  			            viewmode={true}
+                    providingFeedback={false} /> 
+              </div>
+              <div className="column box">
+              <SurveyPage 
+                    json={this.state.quiz?.feedback} 
+                    data={this.state.answers[this.state.activeAnswerIndex].feedback}
+                    onValueChanged={(value) => this.onValueChanged(value.data)} 
+                    providingFeedback={true}/> 
+               </div>
+               </div>
+  		   		</React.Fragment>}
+             {this.state.activeTab === 'charts' && this.state.answers.length > 0  && 
+               <SurveyAnalytics json={this.state.quiz?.data} 
+               data={this.state.answers.map(a => a.data)} />}
+             {this.state.activeTab === 'feedback' && this.state.answers.length > 0  && 
+               <SurveyTabulator json={this.state.quiz?.feedback} 
+               data={this.state.answers.map(a => {
+                  return {
+                    displayName: a.displayName,
+                    ...a.feedback
+                  }
+               })} />}
             </div> 
             </section>
             : <Loading />    

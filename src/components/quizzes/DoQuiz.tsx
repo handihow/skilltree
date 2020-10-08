@@ -97,13 +97,18 @@ export class DoQuiz extends Component<IDoQuizProps,IDoQuizState> {
     render() {
         return (
             this.state.doneLoading ?
+            <section className="section">
+            <div className="container">
             <SurveyPage 
             json={this.state.quiz?.data} 
             data={this.state.answer ? this.state.answer.data : null}
             onValueChanged={(value) => this.onValueChanged(value.data)} 
             onComplete={(sender) => this.onComplete(sender)}
             onFinishPreview={() => this.onFinishPreview()}
-            isQuizOwner={this.state.quiz?.user === this.props.user.uid} /> 
+            isQuizOwner={this.state.quiz?.user === this.props.user.uid}
+            providingFeedback={false} /> 
+            </div>
+            </section>
             : <Loading />
         )
     }

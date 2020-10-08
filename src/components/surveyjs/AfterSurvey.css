@@ -52,3 +52,18 @@
 .sv-root-modern .sv-file__choose-btn--disabled{
 	background-color: unset !important;
 }
+
+.sv-body__page{
+	margin-top: unset;
+}
+
+@media only screen and (min-width: 1000px){
+	.sv-body__page{
+		margin-right: unset;
+		margin-left: unset;
+	}
+}
+
+.sa-question__title {
+	font-family: 'Nunito' !important;
+}

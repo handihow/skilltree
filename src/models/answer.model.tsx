@@ -10,4 +10,6 @@ export default interface IAnswer {
     isFinished?: boolean;
     correctAnswers?: number;
     incorrectAnswers?: number;
+    feedback?: any;
+    hasFeedback?: boolean;
 }

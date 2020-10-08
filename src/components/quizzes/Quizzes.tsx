@@ -66,24 +66,7 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
           username: this.props.user.email,
           created: firebase.firestore.Timestamp.now(),
           lastUpdate: firebase.firestore.Timestamp.now(),
-          feedback: `
-          {
-           "pages": [
-            {
-             "name": "page1",
-             "title": "Feedback",
-             "elements": [
-              {
-               "type": "comment",
-               "name": "question1",
-               "title": "Comment"
-              }
-             ]
-            }
-           ],
-           "showQuestionNumbers": "off"
-          }
-          `
+          feedback: '{ "pages": [  {   "name": "page1",   "elements": [    {     "type": "rating",     "name": "question2",     "title": "Rating",     "rateValues": [      {       "value": 1,       "text": "Insufficient"      },      2,      3,      4,      {       "value": 5,       "text": "Excellent"      }     ]    },    {     "type": "comment",     "name": "question1",     "title": "Comment"    }   ],   "title": "Feedback"  } ], "showQuestionNumbers": "off"}'
         };
         db.collection('quizzes').doc(newQuiz.id).set(newQuiz)
         .then(_ => {

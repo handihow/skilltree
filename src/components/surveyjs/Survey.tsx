@@ -36,17 +36,20 @@ interface ISurveyProps {
     onFinishPreview?: Function,
     isQuizOwner?: boolean
     viewmode?: boolean;
+    providingFeedback: boolean;
 }
 
 interface ISurveyState {
     doneLoading?: boolean;
+    customCss?: any;
 }
 
 class SurveyPage extends Component<ISurveyProps, ISurveyState> {
     constructor(props: ISurveyProps){
         super(props);
         this.state = {
-            doneLoading: false
+            doneLoading: false,
+            customCss: undefined
         }
     }
 
@@ -73,7 +76,6 @@ class SurveyPage extends Component<ISurveyProps, ISurveyState> {
                       })
                 });
             }
-            console.log(urls);
             options.callback("success", options.files.map((f,i) => {
                 return {
                     file: f,
@@ -90,16 +92,31 @@ class SurveyPage extends Component<ISurveyProps, ISurveyState> {
             .onAfterRenderQuestion
             .add(function (survey, options) {
                 if(options.question.correctAnswer){
-                    const span = document.createElement("span");
-                    const isCorrect = options.question.isAnswerCorrect();
-                    span.innerHTML = isCorrect ? "Correct" : "Incorrect";
-                    span.className = isCorrect ? "ml-3 has-text-success is-size-6" : "ml-3 has-text-danger is-size-6";
-                    const header = options
-                        .htmlElement
-                        .querySelector("h5");
-                    header.appendChild(span);
+                    try{
+                        const header = options.htmlElement.getElementsByClassName("sv-question__header")[0];
+                        const div = document.createElement("div");
+                        const isCorrect = options.question.isAnswerCorrect();
+                        div.innerHTML = isCorrect ? "Correct" : "Incorrect";
+                        div.className = isCorrect ? "has-background-success has-text-white has-text-centered" : "has-background-danger has-text-white has-text-centered";
+                        // // header.classList.add("has-background-success")
+                        header.appendChild(div);
+
+                    } catch(e){
+                        console.log(e)
+                    }
+
+                    
                 }
             });
+        }
+        if(this.props.providingFeedback){
+            this.setState({
+                customCss: {
+                    "navigation": {
+                        "complete": "is-hidden"
+                    }
+                }
+            })
         }
         this.setState({
             doneLoading: true
@@ -109,8 +126,7 @@ class SurveyPage extends Component<ISurveyProps, ISurveyState> {
     render() {
           return (
                 this.state.doneLoading ?
-                <section className="section">
-                <div className="container">
+                <React.Fragment>
                 {this.props.isQuizOwner && <article className="message is-info">
                   <div className="message-header">
                     Preview your quiz
@@ -125,9 +141,9 @@ class SurveyPage extends Component<ISurveyProps, ISurveyState> {
                     model={this.model}
                     onComplete={this.props.onComplete}
                     onValueChanged={this.props.onValueChanged}
-                  />
-                </div>
-                </section> :
+                    css={this.state.customCss}
+                  /> 
+                  </React.Fragment> :
                 <Loading />
       );
     }
