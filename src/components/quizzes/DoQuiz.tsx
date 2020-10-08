@@ -7,6 +7,7 @@ import { connect } from "react-redux";
 import SurveyPage from "../surveyjs/Survey";
 import Loading from '../layout/Loading';
 import firebase from 'firebase/app';
+import { toast } from 'react-toastify';
 
 type TParams =  { quizId: string };
 
@@ -35,6 +36,11 @@ export class DoQuiz extends Component<IDoQuizProps,IDoQuizState> {
         db.collection("quizzes").doc(quizId).get()
         .then(doc => {
             const quiz = doc.data() as IQuiz;
+            if(!quiz.data){
+                toast('There are no questions in this quiz');
+                this.props.history.goBack();
+                return;
+            }
             this.setState({quiz});
             db.collection("answers").doc(quizId + '_' + this.props.user.uid).get()
             .then(doc => {
@@ -84,6 +90,10 @@ export class DoQuiz extends Component<IDoQuizProps,IDoQuizState> {
         
     }
 
+    onFinishPreview(){
+        this.props.history.goBack();
+    }
+
     render() {
         return (
             this.state.doneLoading ?
@@ -91,7 +101,9 @@ export class DoQuiz extends Component<IDoQuizProps,IDoQuizState> {
             json={this.state.quiz?.data} 
             data={this.state.answer ? this.state.answer.data : null}
             onValueChanged={(value) => this.onValueChanged(value.data)} 
-            onComplete={(sender) => this.onComplete(sender)} /> 
+            onComplete={(sender) => this.onComplete(sender)}
+            onFinishPreview={() => this.onFinishPreview()}
+            isQuizOwner={this.state.quiz?.user === this.props.user.uid} /> 
             : <Loading />
         )
     }

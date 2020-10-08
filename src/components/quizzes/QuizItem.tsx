@@ -94,8 +94,12 @@ export class QuizItem extends Component<IQuizItemProps, IQuizItemState> {
                             <FontAwesomeIcon icon='copy' /></a>
                     </div>}
                     {this.props.user.uid === this.props.quiz.user &&
-                        <Link to={"/quizzes/"+id+"/builder"} className="level-item" data-tooltip="Quiz editor">
+                        <Link to={"/quizzes/"+id+"/builder/quiz"} className="level-item" data-tooltip="Quiz editor">
                     <span className="icon is-small"><FontAwesomeIcon icon='edit' /></span>
+                    </Link>}
+                    {this.props.user.uid === this.props.quiz.user &&
+                        <Link to={"/quizzes/"+id+"/builder/feedback"} className="level-item" data-tooltip="Feedback editor">
+                    <span className="icon is-small"><FontAwesomeIcon icon='comments' /></span>
                     </Link>}
                     <Link to={"/quizzes/"+id+"/test"} className="level-item" data-tooltip="Do the quiz">
                     <span className="icon is-small"><FontAwesomeIcon icon='external-link-alt' /></span>

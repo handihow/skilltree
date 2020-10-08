@@ -130,16 +130,11 @@ showTheProperty("checkbox", "hasSelectAll");
 showTheProperty("checkbox", "hasNone");
 showTheProperty("imagepicker", "choices");
 showTheProperty("imagepicker", "hasOther");
-showTheProperty("imagepicker", "hasSelectAll");
-showTheProperty("imagepicker", "hasNone");
 showTheProperty("radiogroup", "choices");
 showTheProperty("radiogroup", "hasOther");
-showTheProperty("radiogroup", "hasSelectAll");
-showTheProperty("radiogroup", "hasNone");
 showTheProperty("dropdown", "choices");
 showTheProperty("dropdown", "hasOther");
 showTheProperty("dropdown", "hasSelectAll");
-showTheProperty("dropdown", "hasNone");
 showTheProperty("text", "inputType");
 showTheProperty("comment", "placeHolder");
 showTheProperty("comment", "rows");
@@ -151,12 +146,15 @@ showTheProperty("question", "correctAnswer");
 showTheProperty("file", "allowMultiple");
 
 interface ISurveyCreatorProps {
-    quiz: IQuiz | undefined,
-    dotest: Function,
-    goback: Function
+    quiz: IQuiz | undefined;
+    dotest: Function;
+    goback: Function;
+    builder: string;
 }
 
+
 class SurveyCreator extends Component<ISurveyCreatorProps> {
+  
   surveyCreator;
   componentDidUpdate() {
     if(!this.props.quiz){
@@ -192,14 +190,16 @@ class SurveyCreator extends Component<ISurveyCreatorProps> {
         .add(function (sender, options) {
             options.editorOptions.showTextView = false;
         });
-    this.surveyCreator
+    if(this.props.builder === 'quiz'){
+        this.surveyCreator
             .toolbarItems
             .push({
                 id: "do-test",
                 visible: true,
-                title: "Test",
+                title: "Preview Quiz",
                 action: this.props.dotest
             });
+    }
     this.surveyCreator
             .toolbarItems
             .push({
@@ -240,8 +240,10 @@ class SurveyCreator extends Component<ISurveyCreatorProps> {
 
     this.surveyCreator.render("surveyCreatorContainer");
 
-    if(this.props.quiz.data){
+    if(this.props.quiz.data && this.props.builder === 'quiz'){
         this.surveyCreator.text = this.props.quiz.data;
+    } else if(this.props.quiz.feedback && this.props.builder === 'feedback'){
+        this.surveyCreator.text = this.props.quiz.feedback;
     }
   }
   render() {
@@ -254,9 +256,12 @@ class SurveyCreator extends Component<ISurveyCreatorProps> {
   saveMySurvey = () => {
       if(!this.props.quiz){
           return
+      } else if(this.props.builder === 'quiz'){
+          db.collection("quizzes").doc(this.props.quiz.id).update({data: this.surveyCreator.text})
+      } else if(this.props.builder === 'feedback'){
+          db.collection("quizzes").doc(this.props.quiz.id).update({feedback: this.surveyCreator.text})
       }
-      db.collection("quizzes").doc(this.props.quiz.id).update({data: this.surveyCreator.text})
-  };
+  }
 }
 
 export default SurveyCreator;

@@ -44,3 +44,11 @@
 	background-color: #27405f !important;
 	border-color: #27405f !important;
 }
+
+.svd_container.sv_modern_css .svd-control {
+	padding: 12px;
+}
+
+.sv-root-modern .sv-file__choose-btn--disabled{
+	background-color: unset !important;
+}

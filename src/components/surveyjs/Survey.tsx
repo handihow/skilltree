@@ -31,8 +31,11 @@ Survey.StylesManager.applyTheme("modern");
 interface ISurveyProps {
     json: any,
     data: any,
-    onValueChanged: Function,
-    onComplete: Function
+    onValueChanged?: Function,
+    onComplete?: Function,
+    onFinishPreview?: Function,
+    isQuizOwner?: boolean
+    viewmode?: boolean;
 }
 
 interface ISurveyState {
@@ -81,6 +84,23 @@ class SurveyPage extends Component<ISurveyProps, ISurveyState> {
         if(this.props.data){
             this.model.data = this.props.data;
         }
+        if(this.props.viewmode){
+            this.model.mode = 'display';
+            this.model
+            .onAfterRenderQuestion
+            .add(function (survey, options) {
+                if(options.question.correctAnswer){
+                    const span = document.createElement("span");
+                    const isCorrect = options.question.isAnswerCorrect();
+                    span.innerHTML = isCorrect ? "Correct" : "Incorrect";
+                    span.className = isCorrect ? "ml-3 has-text-success is-size-6" : "ml-3 has-text-danger is-size-6";
+                    const header = options
+                        .htmlElement
+                        .querySelector("h5");
+                    header.appendChild(span);
+                }
+            });
+        }
         this.setState({
             doneLoading: true
         });
@@ -91,6 +111,16 @@ class SurveyPage extends Component<ISurveyProps, ISurveyState> {
                 this.state.doneLoading ?
                 <section className="section">
                 <div className="container">
+                {this.props.isQuizOwner && <article className="message is-info">
+                  <div className="message-header">
+                    Preview your quiz
+                    <button className="delete" onClick={() => this.props.onFinishPreview ?
+                         this.props.onFinishPreview() : () => {}}></button>
+                  </div>
+                  <div className="message-body">
+                    Close or complete the quiz to finish previewing and return to the quiz builder. Your answers will be stored.
+                  </div>
+                </article>}
                 <Survey.Survey
                     model={this.model}
                     onComplete={this.props.onComplete}

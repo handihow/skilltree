@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { connect } from "react-redux";
 import SurveyCreator from "../surveyjs/SurveyCreator";
 
-type TParams =  { quizId: string };
+type TParams =  { quizId: string, builder: string };
 
 interface IQuizProps extends RouteComponentProps<TParams>{
     user: any;
@@ -22,7 +22,7 @@ export class Quiz extends Component<IQuizProps,IQuizState> {
     constructor(props: IQuizProps){
         super(props);
         this.state = {
-            toEditor: false
+            toEditor: false,
         }
     }
 
@@ -46,7 +46,8 @@ export class Quiz extends Component<IQuizProps,IQuizState> {
         return (
             this.state.toEditor ?
             <Redirect to={'/quizzes'} /> :
-            <SurveyCreator quiz={this.state.quiz} 
+            <SurveyCreator quiz={this.state.quiz}
+                builder={this.props.match.params.builder}
                 dotest={() => this.props.history.push("/quizzes/"+this.state.quiz?.id+"/test")}
                 goback={() => this.props.history.push("/quizzes")}/>
         )

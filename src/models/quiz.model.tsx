@@ -4,6 +4,7 @@ export default interface IQuiz {
     username?: string; //refers to user email
     title: string;
     data?: any;
+    feedback: any;
     created?: any;
     lastUpdate?: any;
     canCopy?: boolean;
