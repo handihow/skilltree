@@ -9,6 +9,8 @@ import { connect } from "react-redux";
 import { toast } from 'react-toastify';
 import firebase from 'firebase/app';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Redirect } from 'react-router-dom';
+
 
 interface IQuizzesProps {
   isAuthenticated: boolean;
@@ -22,6 +24,8 @@ interface IQuizzesState {
   unsubscribeOwned?: any;
   isAddingOrEditing: boolean;
   isActive: boolean;
+  toBuilder: boolean;
+  quizId: string;
 }
 
 
@@ -32,7 +36,9 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
           quizzes: [],
           isEditingTitle: false,
           isAddingOrEditing: false,
-          isActive: false
+          isActive: false,
+          toBuilder: false,
+          quizId: ''
         }
       }
 
@@ -59,18 +65,24 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
         this.setState({
           isAddingOrEditing: false
         });
+        const quizId = uuid();
+        const standardFeedback = '{ "pages": [  {   "name": "page1",   "elements": [    {     "type": "boolean",     "name": "question1",     "title": "Completed"    },    {     "type": "comment",     "name": "question2",     "title": "Comment"    }   ],   "title": "Feedback"  } ], "showQuestionNumbers": "off"}';
         const newQuiz : IQuiz = {
-          id: uuid(), 
+          id: quizId, 
           title, 
           user: this.props.user.uid,
           username: this.props.user.email,
           created: firebase.firestore.Timestamp.now(),
           lastUpdate: firebase.firestore.Timestamp.now(),
-          feedback: '{ "pages": [  {   "name": "page1",   "elements": [    {     "type": "rating",     "name": "question2",     "title": "Rating",     "rateValues": [      {       "value": 1,       "text": "Insufficient"      },      2,      3,      4,      {       "value": 5,       "text": "Excellent"      }     ]    },    {     "type": "comment",     "name": "question1",     "title": "Comment"    }   ],   "title": "Feedback"  } ], "showQuestionNumbers": "off"}'
+          feedback: this.props.user.standardFeedback ? this.props.user.standardFeedback : standardFeedback
         };
         db.collection('quizzes').doc(newQuiz.id).set(newQuiz)
         .then(_ => {
             toast('Successfully added quiz ' + title);
+            this.setState({
+              toBuilder: true,
+              quizId
+            })
         })
         .catch(error => {
             toast(error.message);
@@ -120,8 +132,9 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
 
     render() {
         const header = "Quizzes"
-        
           return (
+            this.state.toBuilder ?
+            <Redirect to={'/quizzes/' + this.state.quizId + '/builder/quiz'} /> :
             <section className="section has-background-white-ter" style={{minHeight: "100vh"}}>
             <div className="container">
               <div className="level is-mobile">

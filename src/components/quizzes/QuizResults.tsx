@@ -24,6 +24,7 @@ interface IQuizResultsState {
   activeTab: string;
   doneLoading: boolean;
   activeAnswerIndex: number;
+  unsubscribeQuizzes?: any;
 }
 
 
@@ -46,32 +47,46 @@ class QuizResults extends Component<IQuizResultsProps, IQuizResultsState> {
         .then(doc => {
             const quiz = doc.data() as IQuiz;
             this.setState({quiz});
-            db.collection("answers").where("quiz", "==", quizId).orderBy("displayName", "asc").get()
-            .then(docs => {
-            	if(!docs.empty){
-            		const answers : IAnswer[] = [];
-            		docs.forEach(doc => {
-            			const answer = doc.data() as IAnswer;
-            			answers.push(answer);
-            		});
-            		this.setState({
-            			answers: answers,
-            			doneLoading: true
-            		});
-            	} else {
-            		this.setState({
-            			doneLoading: true
-            		})
-            	}
-            })
+            this.getRecords();
         });
     } 
-    changeActiveTab = (tab: string) => {
+  componentWillUnmount() {
+        if(this.state.unsubscribeQuizzes){
+          this.state.unsubscribeQuizzes();
+        }
+    }
+
+  getRecords(){
+    const quizId = this.props.match.params.quizId;
+    const unsubscribeQuizzes = db.collection("answers").where("quiz", "==", quizId).orderBy("displayName", "asc")
+    .onSnapshot(docs => {
+      if(!docs.empty){
+        const answers : IAnswer[] = [];
+        docs.forEach(doc => {
+          const answer = doc.data() as IAnswer;
+          answers.push(answer);
+        });
+        this.setState({
+          answers: answers,
+          doneLoading: true
+        });
+        console.log('got answers')
+      } else {
+        this.setState({
+          doneLoading: true
+        })
+      }
+    });
+    this.setState({
+      unsubscribeQuizzes: unsubscribeQuizzes
+    })
+  }
+  changeActiveTab = async (tab: string) => {
 	    this.setState({
 	        activeTab: tab
 	    });
 	  }
-	changeActiveAnswerIndex = (change: number) => {
+	changeActiveAnswerIndex = async (change: number) => {
 		if(this.state.activeAnswerIndex === 0 && change === -1){
 			return;
 		} else if(this.state.activeAnswerIndex === this.state.answers.length - 1 && change === 1){
@@ -93,7 +108,7 @@ class QuizResults extends Component<IQuizResultsProps, IQuizResultsState> {
         
           return (
           	this.state.doneLoading ?
-            <section className="section has-background-white-ter" style={{'minHeight': '100vh'}}>
+            <section className="section" style={{'minHeight': '100vh'}}>
             <div className="container">
               <div className="level is-mobile">
                 <div className="level-left">

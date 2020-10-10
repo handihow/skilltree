@@ -55,12 +55,6 @@ class SurveyPage extends Component<ISurveyProps, ISurveyState> {
 
     model;
     componentDidMount() {
-        if(!this.props.json){
-            this.setState({
-                doneLoading: false
-            });
-            return;
-        }
         this.model = new Survey.Model(this.props.json);
         this.model.onUploadFiles.add(async function(survey, options) {
             const urls : string[] = [];

@@ -7,6 +7,7 @@ import { connect } from "react-redux";
 import {v4 as uuid} from "uuid"; 
 import { toast } from 'react-toastify';
 import firebase from 'firebase/app'
+import {quizImage} from '../compositions/StandardData';
 
 interface IQuizItemProps {
     quiz: IQuiz;
@@ -26,7 +27,7 @@ export class QuizItem extends Component<IQuizItemProps, IQuizItemState> {
     constructor(props: IQuizItemProps){
         super(props);
         this.state = {
-            thumbnail: 'https://via.placeholder.com/128x128.png?text=Quiz',
+            thumbnail: quizImage,
             progress: 0
         };
     }

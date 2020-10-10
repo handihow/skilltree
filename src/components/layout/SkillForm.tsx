@@ -5,14 +5,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import LinkCard from './LinkCard';
 import ISkill from '../../models/skill.model';
 import ISkilltree from '../../models/skilltree.model';
-
+import IQuiz from '../../models/quiz.model';
 import YouTubeForm from './YouTubeForm';
 import LinkFileUploader from './LinkFileUploader';
 import LinkForm from './LinkForm';
+import LinkQuiz from './LinkQuiz';
 import ILink from '../../models/link.model';
 import { db } from '../../firebase/firebase';
 import RichTextEditor from 'react-rte';
-import {toolbarConfig} from '../compositions/StandardData';
+import {toolbarConfig, quizImage} from '../compositions/StandardData';
 
 interface ISkillFormProps {
     isEditing: boolean;
@@ -29,6 +30,7 @@ interface ISkillFormState{
     isShowFileModal?: boolean;
     isShowYouTubeModal?: boolean;
     isShowLinkModal?: boolean;
+    isShowQuizModal?: boolean;
     description: any;
     title: string;
     optional: boolean;
@@ -38,6 +40,7 @@ interface ISkillFormState{
     links: ILink[];
     moreOptions: boolean;
     hasUpdatedParent: boolean;
+    hasQuiz: boolean;
 }
 
 export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
@@ -56,7 +59,8 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
             parent: this.props.parentId,
             links: this.props.skill?.links && this.props.skill.links.length > 0  ? this.props.skill.links : [],
             moreOptions: false,
-            hasUpdatedParent: false
+            hasUpdatedParent: false,
+            hasQuiz: this.props.skill?.hasQuiz || false
         };
     }
 
@@ -75,6 +79,12 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
     toggleFileModal = () => {
         this.setState({
             isShowFileModal: !this.state.isShowFileModal
+        })
+    }
+
+    toggleQuizModal = () => {
+        this.setState({
+            isShowQuizModal: !this.state.isShowQuizModal
         })
     }
 
@@ -168,10 +178,59 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
         }
     }
 
+
     deleteLink = (id: string) => {
+        const linkIndex = this.state.links.findIndex(l => l.id === id);
+        const isQuizLink = linkIndex > -1 ? this.state.links[linkIndex].isQuizLink : false;
+        if(isQuizLink){
+            this.removeQuiz();
+        }
         this.setState({
             links:[...this.state.links.filter(l => l.id !== id)] 
         })
+    }
+
+    addQuiz = (quiz: IQuiz) => {
+        if(this.props.skill?.path){
+            db.doc(this.props.skill.path).update({
+                hasQuiz: true,
+                quizId: quiz.id,
+                icon: quizImage,
+                quizTitle: quiz.title
+            }).then(_ => {
+                const link : ILink = {
+                    imageUrl: quizImage,
+                    id: this.props.skill.quizId || '',
+                    iconName: 'poll-h',
+                    iconPrefix: 'fas',
+                    reference: '/quizzes/' + this.props.skill.quizId + '/test',
+                    title: this.props.skill.quizTitle || 'Quiz',
+                    description: 'This skill has a quiz! You can do the quiz by clicking on the title.',
+                    isQuizLink: true
+                }
+                this.addLink(link);
+                this.setState({
+                    hasQuiz: true
+                })
+            });
+        }
+    }
+
+    removeQuiz = () => {
+        if(this.props.skill?.path){
+            db.doc(this.props.skill.path).update({
+                hasQuiz: false,
+                icon: null,
+                quizId: '',
+                quizTitle: ''
+            })
+            .then(_ => {
+                this.setState({
+                    hasQuiz: false
+                })
+                toast('Quiz was unlinked from this skill. You can still find it in your list of Quizzes.')
+            });
+        }
     }
 
     sortTitles = (a: string, b: string) => {
@@ -320,18 +379,24 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                             <FontAwesomeIcon icon={['fab', 'youtube-square']} />
                         </span>
                     </button>
-                    <button className="button" data-tooltip="Add file"
+                    <button className="button has-tooltip-right" data-tooltip="Add file"
                         onClick={this.toggleFileModal} type="button">
                         <span className="icon is-small">
                             <FontAwesomeIcon icon={'file'} />
                         </span>
                     </button>
-                    <button className="button" data-tooltip="Add link"
+                    <button className="button has-tooltip-right" data-tooltip="Add link"
                         onClick={this.toggleLinkModal} type="button">
                         <span className="icon is-small">
                             <FontAwesomeIcon icon={'link'} />
                         </span>
                     </button>
+                    {!this.state.hasQuiz && <button className="button has-tooltip-right" data-tooltip="Add quiz"
+                        onClick={this.toggleQuizModal} type="button">
+                        <span className="icon is-small">
+                            <FontAwesomeIcon icon={'poll-h'} />
+                        </span>
+                    </button>}
                 </div>
                 <div className="buttons is-right">
                 <button className="button" type="button" onClick={this.toggleOptions}>
@@ -358,6 +423,9 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
             <LinkForm isShowLinkModal={this.state.isShowLinkModal ? this.state.isShowLinkModal : false}
                 toggleLinkModal={this.toggleLinkModal}
                 addLink={this.addLink} />
+            <LinkQuiz isShowLinkQuizModal={this.state.isShowQuizModal ? this.state.isShowQuizModal : false}
+                toggleLinkQuizModal={this.toggleQuizModal}
+                addQuiz={this.addQuiz} />
             </React.Fragment>        
         )
     }

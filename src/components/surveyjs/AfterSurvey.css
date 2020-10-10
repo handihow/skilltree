@@ -45,6 +45,10 @@
 	border-color: #27405f !important;
 }
 
+.sv-root-modern .sv-boolean__switch {
+	background-color: #27405f !important;
+}
+
 .svd_container.sv_modern_css .svd-control {
 	padding: 12px;
 }
@@ -65,5 +69,9 @@
 }
 
 .sa-question__title {
+	font-family: 'Nunito' !important;
+}
+
+.sa-table {
 	font-family: 'Nunito' !important;
 }

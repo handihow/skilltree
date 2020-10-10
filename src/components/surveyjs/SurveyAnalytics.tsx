@@ -33,7 +33,7 @@ export default class SurveyAnalytics extends Component<ISurveyAnalyticsProps> {
     const questionElements = document.getElementsByClassName("sa-question");
     for(let i = 0, all = questionElements.length; i < all; i++){   
          questionElements[i].classList.add('box');
-         questionElements[i].classList.add('has-background-link');
+         questionElements[i].classList.add('is-paddingless');
      }
   }
   render() {

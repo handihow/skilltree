@@ -38,6 +38,9 @@ export class DoQuiz extends Component<IDoQuizProps,IDoQuizState> {
             const quiz = doc.data() as IQuiz;
             if(!quiz.data){
                 toast('There are no questions in this quiz');
+                this.setState({
+                    doneLoading: true
+                });
                 this.props.history.goBack();
                 return;
             }

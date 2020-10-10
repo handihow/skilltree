@@ -52,7 +52,7 @@ export class Quiz extends Component<IQuizProps,IQuizState> {
             <SurveyCreator quiz={this.state.quiz}
                 builder={this.props.match.params.builder}
                 dotest={() => this.props.history.push("/quizzes/"+this.state.quiz?.id+"/test")}
-                goback={() => this.props.history.push("/quizzes")}/>
+                goback={() => this.props.history.goBack()}/>
             </React.Fragment>
         )
     }

@@ -3,6 +3,7 @@ import { Tabulator } from "survey-analytics/survey.analytics.tabulator.js";
 import * as Survey from "survey-react";
 import "survey-analytics/survey.analytics.tabulator.css";
 import "tabulator-tables/dist/css/tabulator.min.css";
+import "./AfterSurvey.css";
 
 interface ISurveyTabulatorProps {
     json: any,
@@ -19,8 +20,7 @@ export default class SurveyAnalyticsTabulator extends Component<ISurveyTabulator
     this.visPanel = new Tabulator(survey, this.props.data, 
     	{
     		allowDynamicLayout: false, 
-    		haveCommercialLicense: true,
-    		showEntries: 25
+    		haveCommercialLicense: true
     	});
     this.visPanel.render(document.getElementById("summaryContainer"));
   }

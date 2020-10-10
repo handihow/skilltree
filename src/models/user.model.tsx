@@ -4,4 +4,7 @@ export default interface IUser {
     displayName: string;
     photoURL?: string;
     emailVerified: boolean;
+    standardFeedback?: string;
+    isTeacher?: boolean;
+    isStudent?: boolean;
 }
