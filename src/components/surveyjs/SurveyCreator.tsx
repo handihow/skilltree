@@ -10,6 +10,7 @@ import {v4 as uuid} from "uuid";
 import IQuiz from '../../models/quiz.model';
 import Loading from '../layout/Loading';
 import { db, storage } from '../../firebase/firebase';
+import { toast } from 'react-toastify';
 
 const mainColor = "#27405f";
 const mainHoverColor = "#d4823a";
@@ -150,6 +151,7 @@ interface ISurveyCreatorProps {
     dotest: Function;
     goback: Function;
     builder: string;
+    userId: string;
 }
 
 
@@ -199,13 +201,22 @@ class SurveyCreator extends Component<ISurveyCreatorProps> {
                 title: "Preview Quiz",
                 action: this.props.dotest
             });
+    } else if(this.props.builder === 'feedback'){
+        this.surveyCreator
+            .toolbarItems
+            .push({
+                id: "do-test",
+                visible: true,
+                title: "Set as default",
+                action: this.setDefault
+            });
     }
     this.surveyCreator
             .toolbarItems
             .push({
                 id: "go-back",
                 visible: true,
-                title: "Done",
+                title: "Back",
                 action: this.props.goback
             });
     
@@ -245,6 +256,13 @@ class SurveyCreator extends Component<ISurveyCreatorProps> {
     } else if(this.props.quiz.feedback && this.props.builder === 'feedback'){
         this.surveyCreator.text = this.props.quiz.feedback;
     }
+  }
+  setDefault = () => {
+      db.collection("users").doc(this.props.userId).update({
+          standardFeedback: this.surveyCreator.text
+      }).then(_ => {
+          toast('Successfully set the current feedback form to your default feedback')
+      })
   }
   render() {
     return (

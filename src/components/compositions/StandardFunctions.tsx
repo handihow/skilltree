@@ -19,7 +19,9 @@ const filterChildren = (skill, skills) => {
                 content: <SkillContent 
                     description={rawChild.description} 
                     links={rawChild.links ? rawChild.links : []}
-                    optional={rawChild.optional ? true : false}/>,
+                    optional={rawChild.optional ? true : false}
+                    hasQuiz={rawChild.hasQuiz ? true : false}
+                    quizId={rawChild.quizId || ''}/>,
                 direction: rawChild.direction ? rawChild.direction : 'top'
             },
             children: filterChildren(rawChild, skills),
@@ -41,7 +43,9 @@ export const skillArrayToSkillTree = (skills) => {
                     content: <SkillContent 
                         description={skill.description} 
                         links={skill.links ? skill.links : []} 
-                        optional={skill.optional ? true : false}/>,
+                        optional={skill.optional ? true : false}
+                        hasQuiz={skill.hasQuiz ? true : false}
+                        quizId={skill.quizId || ''}/>,
                     direction: skill.direction ? skill.direction : 'top'
                 },
                 children: filterChildren(skill, skills),
@@ -63,7 +67,9 @@ const addToSkillArray = (arr, child, parent) => {
             content: <SkillContent 
                         description={child.tooltip.description} 
                         links={child.tooltip.links} 
-                        optional={child.optional ? true : false}/>,
+                        optional={child.optional ? true : false}
+                        hasQuiz={child.hasQuiz ? true : false}
+                        quizId={child.quizId || ''}/>,
             description: child.tooltip.description,
             links: child.tooltip.links,
         },

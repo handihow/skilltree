@@ -51,6 +51,7 @@ export class Quiz extends Component<IQuizProps,IQuizState> {
             <QuizTabs currentTab={this.props.match.params.builder} quizId={this.state.quiz?.id || ''}/>
             <SurveyCreator quiz={this.state.quiz}
                 builder={this.props.match.params.builder}
+                userId={this.props.user.uid}
                 dotest={() => this.props.history.push("/quizzes/"+this.state.quiz?.id+"/test")}
                 goback={() => this.props.history.goBack()}/>
             </React.Fragment>

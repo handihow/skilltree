@@ -29,6 +29,8 @@ import Quizzes from './components/quizzes/Quizzes';
 import QuizBuilder from './components/quizzes/QuizBuilder';
 import DoQuiz from './components/quizzes/DoQuiz';
 import QuizResults from './components/quizzes/QuizResults';
+import QuizResult from './components/quizzes/QuizResult';
+import JoinQuiz from './components/quizzes/JoinQuiz';
 
 import CompositionAddStudents from './components/compositions/CompositionAddStudents';
 
@@ -174,6 +176,18 @@ function App(props) {
       <ProtectedRoute 
         path="/quizzes/:quizId/results"
         component={QuizResults}
+        isAuthenticated={isAuthenticated}
+        isVerifying={isVerifying}
+      />
+      <ProtectedRoute 
+        path="/quizzes/:quizId/result"
+        component={QuizResult}
+        isAuthenticated={isAuthenticated}
+        isVerifying={isVerifying}
+      />
+      <ProtectedRoute 
+        path="/quizzes/:quizId/join"
+        component={JoinQuiz}
         isAuthenticated={isAuthenticated}
         isVerifying={isVerifying}
       />

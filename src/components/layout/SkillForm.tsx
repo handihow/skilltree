@@ -14,6 +14,7 @@ import ILink from '../../models/link.model';
 import { db } from '../../firebase/firebase';
 import RichTextEditor from 'react-rte';
 import {toolbarConfig, quizImage} from '../compositions/StandardData';
+import firebase from 'firebase/app';
 
 interface ISkillFormProps {
     isEditing: boolean;
@@ -41,6 +42,7 @@ interface ISkillFormState{
     moreOptions: boolean;
     hasUpdatedParent: boolean;
     hasQuiz: boolean;
+    quizId: string;
 }
 
 export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
@@ -60,7 +62,8 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
             links: this.props.skill?.links && this.props.skill.links.length > 0  ? this.props.skill.links : [],
             moreOptions: false,
             hasUpdatedParent: false,
-            hasQuiz: this.props.skill?.hasQuiz || false
+            hasQuiz: this.props.skill?.hasQuiz || false,
+            quizId: this.props.skill?.quizId || '',
         };
     }
 
@@ -142,7 +145,7 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
             hasError = true;
         } else if(this.state.links && this.state.links.length > 0){
             this.state.links.forEach((link, index) => {
-                if(isEmpty(link.title) || isEmpty(link.iconName) || !isURL(link.reference)){
+                if(isEmpty(link.title) || isEmpty(link.iconName) || (!isURL(link.reference)&&!link.isQuizLink)){
                     toast.error('Link number ' + (index + 1) + ' does not have title or icon, or does not contain a valid URL');
                     hasError = true;
                 }
@@ -198,19 +201,9 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                 icon: quizImage,
                 quizTitle: quiz.title
             }).then(_ => {
-                const link : ILink = {
-                    imageUrl: quizImage,
-                    id: this.props.skill.quizId || '',
-                    iconName: 'poll-h',
-                    iconPrefix: 'fas',
-                    reference: '/quizzes/' + this.props.skill.quizId + '/test',
-                    title: this.props.skill.quizTitle || 'Quiz',
-                    description: 'This skill has a quiz! You can do the quiz by clicking on the title.',
-                    isQuizLink: true
-                }
-                this.addLink(link);
                 this.setState({
-                    hasQuiz: true
+                    hasQuiz: true,
+                    quizId: quiz.id,
                 })
             });
         }
@@ -220,13 +213,14 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
         if(this.props.skill?.path){
             db.doc(this.props.skill.path).update({
                 hasQuiz: false,
-                icon: null,
-                quizId: '',
-                quizTitle: ''
+                icon: firebase.firestore.FieldValue.delete(),
+                quizId: firebase.firestore.FieldValue.delete(),
+                quizTitle: firebase.firestore.FieldValue.delete()
             })
             .then(_ => {
                 this.setState({
-                    hasQuiz: false
+                    hasQuiz: false,
+                    quizId: ''
                 })
                 toast('Quiz was unlinked from this skill. You can still find it in your list of Quizzes.')
             });
@@ -406,13 +400,22 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                 </div>
             </form>
             <hr></hr>
-            {this.state.links.length > 0 && 
-                <ul style={{listStyleType: 'none', marginTop: '10px'}}>
-                    {this.state.links.map((link, index)=> (
-                        <LinkCard link={link} key={index} deleteLink={this.deleteLink}/>
-                    ))}
-                </ul>
-            }
+            <ul style={{listStyleType: 'none', marginTop: '10px'}}>
+                {this.state.hasQuiz && 
+                <LinkCard link={{
+                    imageUrl: quizImage,
+                    id: this.state.quizId,
+                    iconName: 'poll-h',
+                    iconPrefix: 'fas',
+                    reference: '/quizzes/' + this.state.quizId + '/results',
+                    title: this.props.skill.quizTitle || 'Quiz',
+                    description: 'This skill has a quiz! You can check the quiz results by clicking on the title.',
+                    isQuizLink: true
+                }} deleteLink={this.removeQuiz}/>}
+                {this.state.links.length > 0 && this.state.links.map((link, index)=> (
+                    <LinkCard link={link} key={index} deleteLink={this.deleteLink}/>
+                ))}
+            </ul>
             </div>
             <YouTubeForm toggleYouTubeModal={this.toggleYouTubeModal} 
                 isShowYouTubeModal={this.state.isShowYouTubeModal ? this.state.isShowYouTubeModal : false}

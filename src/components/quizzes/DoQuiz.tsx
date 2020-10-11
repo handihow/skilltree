@@ -44,11 +44,20 @@ export class DoQuiz extends Component<IDoQuizProps,IDoQuizState> {
                 this.props.history.goBack();
                 return;
             }
+            if(quiz.user !== this.props.user.uid){
+                db.collection("quizzes").doc(quizId).update({
+                    sharedUsers: firebase.firestore.FieldValue.arrayUnion(this.props.user.uid)
+                });
+            }
             this.setState({quiz});
             db.collection("answers").doc(quizId + '_' + this.props.user.uid).get()
             .then(doc => {
                 if(doc.exists){
                     const answer = doc.data() as IAnswer;
+                    if(answer.isFinished){
+                        this.props.history.push('/quizzes/'+quizId+'/result');
+                        return;
+                    }
                     this.setState({
                         answer,
                         doneLoading: true

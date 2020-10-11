@@ -183,7 +183,7 @@ class QuizResults extends Component<IQuizResultsProps, IQuizResultsState> {
   		   		</React.Fragment>}
              {this.state.activeTab === 'charts' && this.state.answers.length > 0  && 
                <SurveyAnalytics json={this.state.quiz?.data} 
-               data={this.state.answers.map(a => a.data)} />}
+               data={this.state.answers.filter(a => a.isFinished).map(a => a.data)} />}
              {this.state.activeTab === 'feedback' && this.state.answers.length > 0  && 
                <SurveyTabulator json={this.state.quiz?.feedback} 
                data={this.state.answers.map(a => {

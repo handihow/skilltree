@@ -207,8 +207,8 @@ export class CompositionAddStudents extends Component<RouteComponentProps<TParam
             const currentComponent = this;
             const toastId = uuid();
             toast.info('Adding student list in progress... please wait', {
-            toastId: toastId,
-            autoClose: 60000
+                toastId: toastId,
+                autoClose: 60000
             });
             const addStudentList = functions.httpsCallable('addStudentList');
             addStudentList({
@@ -218,24 +218,25 @@ export class CompositionAddStudents extends Component<RouteComponentProps<TParam
                 compositionId: this.props.match.params.compositionId
             })
             .then(function(result) {
-            if(result.data.error){
-                toast.update(toastId, {
-                    render: result.data.error,
-                    type: toast.TYPE.ERROR,
-                    autoClose: 5000
-                });
-                currentComponent.setState({
-                    showWarning: false
-                })
-            } else {
-                toast.update(toastId, {
-                render: 'Student list added',
-                autoClose: 3000
-                });
-                currentComponent.setState({
-                    toMonitor: true
-                })
-            }
+                console.log(result);
+                if(result.data.error){
+                    toast.update(toastId, {
+                        render: result.data.error,
+                        type: toast.TYPE.ERROR,
+                        autoClose: 5000
+                    });
+                    currentComponent.setState({
+                        showWarning: false
+                    })
+                } else {
+                    toast.update(toastId, {
+                    render: 'Student list added',
+                    autoClose: 3000
+                    });
+                    currentComponent.setState({
+                        toMonitor: true
+                    })
+                }
             })
             .catch(function(error) {
             toast.update(toastId, {

@@ -6,6 +6,7 @@ import { db } from '../../firebase/firebase';
 import firebase from 'firebase/app';
 import {v4 as uuid} from "uuid"; 
 import { connect } from "react-redux";
+import IUser from '../../models/user.model';
 
 interface ILinkQuizProps {
     isShowLinkQuizModal: boolean;
@@ -68,9 +69,16 @@ export class LinkQuiz extends Component<ILinkQuizProps, ILinkQuizState> {
         this.closeModal()
     }
 
-    addQuiz = () => {
+    addQuiz = async () => {
         const quizId = uuid();
-        const standardFeedback = '{ "pages": [  {   "name": "page1",   "elements": [    {     "type": "boolean",     "name": "question1",     "title": "Completed"    },    {     "type": "comment",     "name": "question2",     "title": "Comment"    }   ],   "title": "Feedback"  } ], "showQuestionNumbers": "off"}';
+        let standardFeedback = '{ "pages": [  {   "name": "page1",   "elements": [    {     "type": "boolean",     "name": "question1",     "title": "Completed"    },    {     "type": "comment",     "name": "question2",     "title": "Comment"    }   ],   "title": "Feedback"  } ], "showQuestionNumbers": "off"}';
+        const userSnap = await db.collection("users").doc(this.props.user.uid).get();
+        if(userSnap.exists){
+          const userData = userSnap.data() as IUser;
+          if(userData.standardFeedback){
+            standardFeedback = userData.standardFeedback;
+          }
+        }
         const newQuiz : IQuiz = {
           id: quizId, 
           title: this.state.quizName, 
@@ -78,7 +86,7 @@ export class LinkQuiz extends Component<ILinkQuizProps, ILinkQuizState> {
           username: this.props.user.email,
           created: firebase.firestore.Timestamp.now(),
           lastUpdate: firebase.firestore.Timestamp.now(),
-          feedback: this.props.user.standardFeedback ? this.props.user.standardFeedback : standardFeedback
+          feedback: standardFeedback
         };
         db.collection('quizzes').doc(newQuiz.id).set(newQuiz)
         .then(_ => {

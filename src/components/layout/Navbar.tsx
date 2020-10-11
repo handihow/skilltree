@@ -55,7 +55,7 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                     </a>
                 </div>
                 <div className={this.state.isActive ? "navbar-menu is-active" : "navbar-menu"}>
-                <div className="navbar-end">
+                <div className="navbar-start">
                 
                     
                 <div className="navbar-item">
@@ -63,19 +63,28 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                         {isAuthenticated ?
                         <Link to="/" className="button is-primary is-rounded is-medium">
                             <span className="icon has-tooltip-bottom" data-tooltip="Skilltrees">
-                              <FontAwesomeIcon icon='home' />
+                              <FontAwesomeIcon icon='sitemap' />
                             </span>
+                            <span>Skilltrees</span>
                         </Link> :
                         <Link to="/about" className="button is-primary is-rounded is-medium">
                             <span className="icon has-tooltip-bottom" data-tooltip="About">
                               <FontAwesomeIcon icon='info' />
                             </span>
+                            <span>About</span>
                         </Link> }
                         {isAuthenticated && <Link to="/quizzes" className="button is-primary is-rounded is-medium">
                             <span className="icon has-tooltip-bottom" data-tooltip="Quizzes">
                               <FontAwesomeIcon icon='poll-h' />
                             </span>
+                            <span>Quizzes</span>
                         </Link>}
+                    </div>
+                   </div>
+                </div>
+                <div className="navbar-end">
+                <div className="navbar-item">
+                    <div className="buttons">
                         <Link to="/support" className="button is-primary is-rounded is-medium">
                             <span className="icon has-tooltip-bottom" data-tooltip="Support">
                               <FontAwesomeIcon icon='question-circle' />
@@ -96,6 +105,7 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                                 <span className="icon has-tooltip-bottom" data-tooltip="Login">
                                   <FontAwesomeIcon icon='sign-in-alt' />
                                 </span>
+                                <span>Log In</span>
                             </Link>}
                         </div>
                     </div>  

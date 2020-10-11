@@ -4,6 +4,7 @@ import AddQuiz from './AddQuiz';
 import Header from '../layout/Header';
 import { db } from '../../firebase/firebase';
 import IQuiz from '../../models/quiz.model';
+import IUser from '../../models/user.model';
 import {v4 as uuid} from "uuid"; 
 import { connect } from "react-redux";
 import { toast } from 'react-toastify';
@@ -19,13 +20,16 @@ interface IQuizzesProps {
 
 interface IQuizzesState {
   quizzes: IQuiz[];
+  sharedQuizzes: IQuiz[];
   isEditingTitle: boolean;
   currentQuiz?: IQuiz;
   unsubscribeOwned?: any;
+  unsubscribeShared?: any;
   isAddingOrEditing: boolean;
   isActive: boolean;
   toBuilder: boolean;
   quizId: string;
+  activeTab: string;
 }
 
 
@@ -34,11 +38,13 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
         super(props)
         this.state = {
           quizzes: [],
+          sharedQuizzes: [],
           isEditingTitle: false,
           isAddingOrEditing: false,
           isActive: false,
           toBuilder: false,
-          quizId: ''
+          quizId: '',
+          activeTab: 'owned',
         }
       }
 
@@ -53,20 +59,47 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
             unsubscribeOwned: unsubscribeOwned 
           });
         });
+
+      const unsubscribeShared = db.collection("quizzes")
+        .where('sharedUsers', 'array-contains', this.props.user.uid)
+        .orderBy('lastUpdate', "desc")
+        .onSnapshot(querySnapshot => {
+          const sharedQuizzes = querySnapshot.docs.map(doc => doc.data() as IQuiz);
+          this.setState({ 
+            sharedQuizzes: sharedQuizzes,
+            unsubscribeShared: unsubscribeShared 
+          });
+        });
     } 
 
     componentWillUnmount() {
         if(this.state.unsubscribeOwned){
           this.state.unsubscribeOwned();
         }
+        if(this.state.unsubscribeShared){
+          this.state.unsubscribeShared();
+        }
     }
 
-    addQuiz = (title, data) => {
+    changeActiveTab = (tab: string) => {
+      this.setState({
+          activeTab: tab
+      });
+    }
+
+    addQuiz = async (title, data) => {
         this.setState({
           isAddingOrEditing: false
         });
         const quizId = uuid();
-        const standardFeedback = '{ "pages": [  {   "name": "page1",   "elements": [    {     "type": "boolean",     "name": "question1",     "title": "Completed"    },    {     "type": "comment",     "name": "question2",     "title": "Comment"    }   ],   "title": "Feedback"  } ], "showQuestionNumbers": "off"}';
+        let standardFeedback = '{ "pages": [  {   "name": "page1",   "elements": [    {     "type": "boolean",     "name": "question1",     "title": "Completed"    },    {     "type": "comment",     "name": "question2",     "title": "Comment"    }   ],   "title": "Feedback"  } ], "showQuestionNumbers": "off"}';
+        const userSnap = await db.collection("users").doc(this.props.user.uid).get();
+        if(userSnap.exists){
+          const userData = userSnap.data() as IUser;
+          if(userData.standardFeedback){
+            standardFeedback = userData.standardFeedback;
+          }
+        }
         const newQuiz : IQuiz = {
           id: quizId, 
           title, 
@@ -74,7 +107,7 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
           username: this.props.user.email,
           created: firebase.firestore.Timestamp.now(),
           lastUpdate: firebase.firestore.Timestamp.now(),
-          feedback: this.props.user.standardFeedback ? this.props.user.standardFeedback : standardFeedback
+          feedback: standardFeedback
         };
         db.collection('quizzes').doc(newQuiz.id).set(newQuiz)
         .then(_ => {
@@ -151,8 +184,19 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
                   </button>
                 </div>
               </div>
+              <div className="tabs">
+              <ul>
+                  <li className={this.state.activeTab ==='owned' ? "is-active" : undefined}>
+                      <a href="# " onClick={() => this.changeActiveTab('owned')}>Your Quizzes</a>
+                  </li>
+                  <li className={this.state.activeTab ==='shared' ? "is-active" : undefined}>
+                      <a href="# " onClick={() => this.changeActiveTab('shared')}>Shared Quizzes</a>
+                  </li>
+              </ul>
+              </div>
 
-            {this.state.quizzes.length === 0 ? 
+              {((this.state.quizzes.length === 0 && this.state.activeTab==='owned') || 
+              (this.state.sharedQuizzes.length === 0 && this.state.activeTab === 'shared')) && 
                 <article className="message is-primary">
                 <div className="message-header">No Quizzes yet.. </div>
                 <div className="message-body">
@@ -161,10 +205,19 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
                     </div>
                 </div>
                 </article>
-                : this.state.quizzes?.map((quiz) => (
+              }
+            {this.state.activeTab === 'owned' && 
+                 this.state.quizzes?.map((quiz) => (
                     <QuizItem key={quiz.id} quiz={quiz} 
                     editQuizTitle={this.toggleIsAddingOrEditing}
                     deleteQuiz={this.toggleIsActive}
+                     />
+                ))}
+            {this.state.activeTab === 'shared' && 
+                 this.state.sharedQuizzes?.map((quiz) => (
+                    <QuizItem key={quiz.id} quiz={quiz} 
+                    editQuizTitle={() => {}}
+                    deleteQuiz={() => {}}
                      />
                 ))}
             </div>

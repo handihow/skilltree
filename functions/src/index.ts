@@ -182,7 +182,6 @@ exports.secret = functions.https.onCall((data, context) => {
     const displayNames : string[] = data.displayNames || [];
     const passwords : string[] = data.passwords || [];
     const compositionId : string = data.compositionId || '';
-
     if(emailAddresses.length !== displayNames.length){
       return {
           error: 'Number of email addresses does not match the number of full names'
@@ -195,28 +194,21 @@ exports.secret = functions.https.onCall((data, context) => {
       let user: admin.auth.UserRecord;
       try{
         user = await admin.auth().getUserByEmail(email);
-        //user record already exists
+        await addCompositionToResults(user, compositionId);
+        await addUserToCompositionSharedUsers(user, compositionId);
       } catch(err){
-        //user record needs to be created
-        user = await admin.auth().createUser({
-          email: email,
-          displayName: displayNames[index],
-          password: passwords[index]
-        });
-      }
-      try{
-        await db.collection('results').doc(user.uid).set({
-          user: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL ? user.photoURL : '',
-          compositions: admin.firestore.FieldValue.arrayUnion(compositionId),
-          progress: {
-                [compositionId]: 0 
-            }
-        }, {merge: true})
-      } catch(err){
-        errorMessages.push(err.message);
+        try{
+          //user record needs to be created
+          user = await admin.auth().createUser({
+            email: email,
+            displayName: displayNames[index],
+            password: passwords[index]
+          });
+          await addCompositionToResults(user, compositionId);
+          await addUserToCompositionSharedUsers(user, compositionId);
+        } catch(err){
+          errorMessages.push(err.message);
+        }
       }
     }
 
@@ -226,4 +218,25 @@ exports.secret = functions.https.onCall((data, context) => {
     }
 
   })
+
+  const addCompositionToResults = (user: admin.auth.UserRecord, compositionId: string) => {
+    return db.collection('results').doc(user.uid).set({
+      user: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL ? user.photoURL : '',
+      compositions: admin.firestore.FieldValue.arrayUnion(compositionId),
+      progress: {
+            [compositionId]: 0 
+        }
+    }, {merge: true});
+  }
+
+  const addUserToCompositionSharedUsers = (user: admin.auth.UserRecord, compositionId: string) => {
+    return db.collection('compositions').doc(compositionId).update({
+      sharedUsers: admin.firestore.FieldValue.arrayUnion(user.uid)
+    })
+  }
+
+  
   

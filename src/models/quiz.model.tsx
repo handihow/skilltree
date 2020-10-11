@@ -8,4 +8,5 @@ export default interface IQuiz {
     created?: any;
     lastUpdate?: any;
     canCopy?: boolean;
+    sharedUsers?: string[];
 }

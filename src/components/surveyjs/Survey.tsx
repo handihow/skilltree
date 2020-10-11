@@ -77,9 +77,7 @@ class SurveyPage extends Component<ISurveyProps, ISurveyState> {
                 }
             }));  
         });
-        if(this.props.data){
-            this.model.data = this.props.data;
-        }
+        this.model.data = this.props.data;
         if(this.props.viewmode){
             this.model.mode = 'display';
             this.model
@@ -117,6 +115,9 @@ class SurveyPage extends Component<ISurveyProps, ISurveyState> {
         });
     }
 
+    componentDidUpdate(){
+        this.model.data = this.props.data;
+    }
     render() {
           return (
                 this.state.doneLoading ?

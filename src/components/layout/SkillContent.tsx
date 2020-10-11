@@ -1,6 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import renderHTML from 'react-render-html';
+import { NavLink } from 'react-router-dom';
 
 export default function SkillContent(props) {
     return (
@@ -19,6 +20,11 @@ export default function SkillContent(props) {
                     </li>
                 ))}
             </ul>
+            {props.hasQuiz && 
+                <div className="buttons" style={{marginTop:'10px'}}>
+                <NavLink to={"/quizzes/"+props.quizId+"/test"} className="button is-primary is-inverted">
+                    View Quiz</NavLink>
+                </div>}
         </React.Fragment>
     )
 }
