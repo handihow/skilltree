@@ -15,6 +15,7 @@ import Footer from './components/layout/Footer';
 import Profile from './components/pages/Profile';
 import EditProfile from "./components/pages/EditProfile";
 import DeleteProfile from "./components/pages/DeleteProfile";
+import Editor from './components/editor/Editor';
 import Composition from './components/compositions/Composition';
 import CompositionViewer from './components/compositions/CompositionViewer';
 import CompositionBackground from './components/compositions/CompositionBackground';
@@ -83,6 +84,13 @@ function App(props) {
         exact
         path="/profile/delete"
         component={DeleteProfile}
+        isAuthenticated={isAuthenticated}
+        isVerifying={isVerifying}
+      />
+      <ProtectedRoute 
+        path="/editor/:compositionId"
+        exact
+        component={Editor}
         isAuthenticated={isAuthenticated}
         isVerifying={isVerifying}
       />

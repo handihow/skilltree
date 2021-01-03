@@ -160,7 +160,7 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
                 <div className="content">
                 <p>
                     <Link to={this.props.user.uid === this.props.composition.user 
-                              ? "/compositions/"+id :
+                              ? "/editor/"+id :
                               "compositions/"+id+"/viewer"} data-tooltip="To skilltree editor" style={{color: "black"}}> 
                     <strong>{title}</strong> 
                     </Link><small style={{marginLeft: "10px"}}>{username}</small>
@@ -178,7 +178,7 @@ export class CompositionItem extends Component<ICompositionItemProps, ICompositi
                             <FontAwesomeIcon icon='copy' /></a>
                     </div>}
                     {this.props.user.uid === this.props.composition.user &&
-                        <Link to={"/compositions/"+id} className="level-item" data-tooltip="Skilltree editor">
+                        <Link to={"/editor/"+id} className="level-item" data-tooltip="Skilltree editor">
                     <span className="icon is-small"><FontAwesomeIcon icon='edit' /></span>
                     </Link>}
                     <Link to={"/compositions/"+id+"/viewer"} className="level-item" data-tooltip="View skilltree">
