@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { db, googleFontAPIKey } from '../../firebase/firebase';
-import CompositionMenu from '../layout/CompositionMenu';
+import EditorMenu from '../editor/layout/EditorMenu';
 import { Redirect, Link, RouteComponentProps } from 'react-router-dom';
 import { SketchPicker } from 'react-color';
 import SelectFieldWithColumn from '../layout/SelectFieldWithColumn';
@@ -228,7 +228,7 @@ export class CompositionTheme extends Component<RouteComponentProps<TParams>, IC
                 <Redirect to={`/compositions/${this.props.match.params.compositionId}`} /> :
                 this.state.doneLoading && <div className="columns is-mobile">
                     <div className="column is-2">
-                        <CompositionMenu id={this.props.match.params.compositionId} />
+                        <EditorMenu id={this.props.match.params.compositionId} hideDraggables={true} />
                     </div>
                     <div className="column" style={{ marginTop: "30px", marginRight: "10px" }}>
                         <div className="level is-mobile">

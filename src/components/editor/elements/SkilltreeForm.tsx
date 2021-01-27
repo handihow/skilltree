@@ -1,72 +1,82 @@
 import React, { Component } from 'react'
 import {v4 as uuid} from "uuid"; 
-import ISkilltree from '../../models/skilltree.model';
+import ISkilltree from '../../../models/skilltree.model';
+import {updateSkilltree} from '../services/SkillTreeServices';
 
 interface ISkilltreeFormProps {
-    skilltree: any;
+    skilltree?: ISkilltree;
     isEditing: boolean;
-    updateSkilltree: Function;
     closeModal: Function;
+    deleteSkilltree: Function;
     order: number;
+    compositionId: string;
 }
 
 interface ISkilltreeFormState {
-    doneLoading: boolean;
-    skilltree?: ISkilltree;
+    title: string;
+    description: string;
     moreOptions: boolean;
+    root: string;
+    collapsible: boolean;
 }
 
 export class SkilltreeForm extends Component<ISkilltreeFormProps,ISkilltreeFormState> {
     constructor(props: ISkilltreeFormProps){
         super(props);
         this.state = {
-            doneLoading: false,
-            moreOptions: false
+            title: '',
+            description: '',
+            root: '',
+            moreOptions: false,
+            collapsible: true
         }
     }
 
     componentDidMount(){
         if(this.props.isEditing){
             this.setState({
-                skilltree: this.props.skilltree,
-                doneLoading: true
-            })
-        } else {
-            this.setState({
-                skilltree: {
-                    collapsible: true,
-                    description: '',
-                    title: '',
-                    id: uuid(),
-                    order: this.props.order
-                },
-                doneLoading: true
+                title: this.props.skilltree?.title || '',
+                description: this.props.skilltree?.description || '',
+                collapsible: this.props.skilltree?.collapsible ? true : false
             })
         }
     }
 
-    handleChange = ({ target }) => {
-        let newValue;
-        if(target.type === 'checkbox'){
-            newValue = target.checked 
-        } else if(target.type === 'number' && target.value){
-            newValue = parseInt(target.value)
-        } else {
-            newValue = target.value
-        }
-        if(this.state.skilltree){
-            this.setState({
-                skilltree: {
-                    ...this.state.skilltree,
-                    [target.name]: newValue
-                }
-            });
-        }
+    handleTitleChange = ({ target }) => {
+        this.setState({
+            title: target.value
+        })
+    }
+
+    handleDescriptionChange = ({ target }) => {
+        this.setState({
+            description: target.value
+        })
+    }
+
+    handleCollapsibleChange = ({ target }) => {
+        this.setState({
+            collapsible: target.checked ? true : false
+        })
+    }
+
+    handleRootSkillTitleChange = ({ target }) => {
+        this.setState({
+            root: target.value
+        });
+        console.log(target.value);
     };
 
     onSubmit = (e: any) => {
         e.preventDefault();
-        this.props.updateSkilltree(this.state.skilltree);
+        const skilltree : ISkilltree = {
+            id: this.props.skilltree?.id || uuid(),
+            title: this.state.title,
+            description: this.state.description,
+            collapsible: this.state.collapsible,
+            order: this.props.skilltree?.order || this.props.order
+        }
+        updateSkilltree(skilltree, this.props.compositionId, this.props.isEditing ? true : false, this.state.root);
     }
 
     toggleOptions = () => {
@@ -91,8 +101,8 @@ export class SkilltreeForm extends Component<ISkilltreeFormProps,ISkilltreeFormS
                         <div className="control">
                             <input className="input" 
                             name="title" type="text" placeholder="title" required 
-                            onChange={this.handleChange}
-                            value={this.state.doneLoading && this.state.skilltree ? this.state.skilltree.title : ''} />
+                            onChange={this.handleTitleChange}
+                            value={this.state.title} />
                         </div>
                     </div>
                     <div className="field">
@@ -100,31 +110,32 @@ export class SkilltreeForm extends Component<ISkilltreeFormProps,ISkilltreeFormS
                         <div className="control">
                             <input className="input" 
                             name="description" type="text" placeholder="description" required 
-                            onChange={this.handleChange}
-                            value={this.state.doneLoading && this.state.skilltree ? this.state.skilltree.description : ''} />
+                            onChange={this.handleDescriptionChange}
+                            value={this.state.description} />
                         </div>
                     </div>
                     {this.state.moreOptions && <div className="columns">
                         <div className="column is-narrow">
                         <div className="field">
                         <label className="checkbox" htmlFor="collapsible">
-                            <input type="checkbox" name="collapsible" onChange={this.handleChange}
-                            checked={this.state.doneLoading && this.state.skilltree ? this.state.skilltree.collapsible : true} />
+                            <input type="checkbox" name="collapsible" onChange={this.handleCollapsibleChange}
+                            checked={this.state.collapsible} />
                             <span style={{marginLeft: "10px"}}>Collapsible</span>
                         </label>
                         </div>
                         </div>
-                        <div className="column is-narrow">
+                        {!this.props.isEditing && <div className="column">
                             <div className="field">
-                            <label className="label" htmlFor="order">Order</label>
+                            <label className="label" htmlFor="root">Root skill</label>
                             <div className="control">
                                 <input className="input" 
-                                name="order" type="number" required 
-                                onChange={this.handleChange}
-                                value={this.state.doneLoading && this.state.skilltree ? this.state.skilltree.order : 0} />
+                                placeholder="Enter the title of the root skill in this skilltree"
+                                name="root" type="text" 
+                                onChange={this.handleRootSkillTitleChange}
+                                value={this.state.root} />
                             </div>
                         </div>
-                        </div>
+                        </div>}
                     </div>}
                 </section>
                 <footer className="modal-card-foot">
@@ -132,7 +143,12 @@ export class SkilltreeForm extends Component<ISkilltreeFormProps,ISkilltreeFormS
                 <button className="button" type="button" onClick={this.toggleOptions}>
                     {this.state.moreOptions ? 'Less options' : 'More options'}
                 </button>
-                <button className="button" type="button" onClick={() =>this.props.closeModal()}>Cancel</button>
+                {!this.props.isEditing && 
+                <button className="button is-danger" type="button" onClick={() =>this.props.closeModal()}>
+                    Cancel</button>}
+                {this.props.isEditing &&
+                <button className="button is-danger" type="button" onClick={() =>this.props.deleteSkilltree()}>
+                    Delete</button>}
                 </footer>
                 </form>
             </div>

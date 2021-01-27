@@ -5,7 +5,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import {v4 as uuid} from "uuid"; 
 import firebase from 'firebase/app';
 
-import SkilltreeForm from '../layout/SkilltreeForm';
+// import SkilltreeForm from '../layout/SkilltreeForm';
 import CompositionMenu from '../layout/CompositionMenu';
 import SkilltreeCard from '../layout/SkilltreeCard';
 import {toast} from 'react-toastify';
@@ -83,9 +83,6 @@ export class CompositionSkilltrees extends Component<RouteComponentProps<TParams
 
     addSkilltree = () => {
         //maximum number of skill trees is 2 unless the unlimited feature is paid
-        if(this.state.skilltrees.length === 2 && !this.state.hasUnlockedUnlimitedSkilltrees){
-            return toast.error('You cannot have more than 2 skilltrees. You can pay $1,- to unlock unlimited skilltrees feature.');
-        }
         this.setState({
             showEditor: true,
             isEditing: false
@@ -203,12 +200,12 @@ export class CompositionSkilltrees extends Component<RouteComponentProps<TParams
                         </div>
                     </div>
                 </div>
-                {this.state.showEditor && <SkilltreeForm 
+                {/* {this.state.showEditor && <SkilltreeForm 
                 isEditing={this.state.isEditing} 
                 skilltree={this.state.currentSkilltree} 
                 updateSkilltree={this.updateSkilltree}
                 closeModal={this.closeModal}
-                order={this.state.skilltrees.length}/>}
+                order={this.state.skilltrees.length}/>} */}
                 </React.Fragment>
                 
         )

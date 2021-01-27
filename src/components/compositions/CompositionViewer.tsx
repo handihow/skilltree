@@ -122,7 +122,10 @@ export class CompositionViewer extends Component<ICompositionViewerProps,ICompos
                                                     height:"calc(100vh - 3.5rem)",
                                                     padding: '0px'
                                                 }
-                                                : undefined}>
+                                                : {
+                                                    backgroundColor: 'hsl(0, 0%, 48%)',
+                                                    height:"calc(100vh - 3.5rem)"
+                                                }}>
                     <div style={{maxHeight:'100%',overflow:'auto'}}>
                     {this.state.skilltrees && this.state.skilltrees.length > 0 && this.state.composition && <CompositionDisplay
                     showController={true}

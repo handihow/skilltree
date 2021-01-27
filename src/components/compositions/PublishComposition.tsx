@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import CompositionMenu from '../layout/CompositionMenu'
+import EditorMenu from '../editor/layout/EditorMenu'
 import { RouteComponentProps } from 'react-router';
 import { db } from '../../firebase/firebase';
 import IComposition from '../../models/composition.model';
@@ -70,7 +70,7 @@ export class PublishComposition extends Component<RouteComponentProps<TParams>, 
         return (
             <div className="columns is-mobile" style={{height:"95vh"}}>
                 <div className="column is-2">
-                    <CompositionMenu id={compositionId} />
+                    <EditorMenu id={compositionId} hideDraggables={true} />
                 </div>
                 <div className="column" style={{marginTop: "30px"}}>
                         <Header header='Publish' icon="share"></Header>

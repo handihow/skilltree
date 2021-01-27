@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import ISkilltree from '../../models/skilltree.model';
-import IUser from '../../models/user.model';
+import ISkilltree from '../../../models/skilltree.model';
+// import IUser from '../../models/user.model';
 import {
     SkillTreeGroup,
     SkillTree,
@@ -10,12 +10,12 @@ import {
     SavedDataType
   } from 'beautiful-skill-tree';
 import { ContextStorage } from 'beautiful-skill-tree/dist/models';
-import { db } from '../../firebase/firebase';
+import { db } from '../../../firebase/firebase';
 import { connect } from "react-redux";
-import firebase from "firebase/app";
-import { toast } from 'react-toastify';
-import IComposition from '../../models/composition.model';
-import './CompositionDisplay.css';
+// import firebase from "firebase/app";
+// import { toast } from 'react-toastify';
+import IComposition from '../../../models/composition.model';
+import '../../layout/CompositionDisplay.css';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 
 interface IEditorDisplayProps {
@@ -25,6 +25,7 @@ interface IEditorDisplayProps {
     user: any;
     title: string;
     monitoredUserId?: string;
+    editSkilltree: Function;
 }
 
 interface IEditorDisplayState {
@@ -44,6 +45,7 @@ class EditorDisplay extends Component<IEditorDisplayProps, IEditorDisplayState> 
             doneLoading: false
         };
         this.handleSave = this.handleSave.bind(this);
+        
         this.progress = React.createRef()
     }
 
@@ -105,95 +107,95 @@ class EditorDisplay extends Component<IEditorDisplayProps, IEditorDisplayState> 
         treeId: string,
         skills: SavedDataType,
     ) {
-        const monitoredUserId = typeof this.props.monitoredUserId === 'undefined' ? this.props.user.uid : 
-                this.props.monitoredUserId;
-        if(this.props.user && this.props.user.uid && treeId && this.state.doneLoading){
-            if(this.props.user.uid !== this.props.composition.user && !this.props.composition.loggedInUsersCanEdit){
-                toast.info(
-                    'Please ask your instructor to update the completion status of this skill. Changes will not be saved.',
-                    { toastId: 'cannotduplicatethistoast'});
-            } else {
-                db.collection('results')
-                .doc(monitoredUserId)
-                .collection('skilltrees')
-                .doc(treeId)
-                .set({
-                    skills, 
-                    id: treeId,
-                    compositionId: this.props.composition.id
-                })
-                .then( _ => {
-                    const compositionId: string = this.props.composition.id || '';
-                    db.collection('users').doc(monitoredUserId).get()
-                    .then((snap) => {
-                        const user = snap.data() as IUser;
-                        db.collection('results').doc(monitoredUserId).set({
-                            user: monitoredUserId,
-                            email: user.email,
-                            displayName: user.displayName,
-                            photoURL: user.photoURL ? user.photoURL : '',
-                            compositions: firebase.firestore.FieldValue.arrayUnion(this.props.composition.id),
-                            progress: {
-                                 [compositionId]: 
-                                 parseInt(this.progress.current?.textContent ? this.progress.current?.textContent : '0') 
-                             }
-                         }, {merge: true})
-                         .catch(err => {
-                             toast.error(err.message);
-                         });
-                    })
-                })
-                .catch(err => {
-                    toast.error(err.message);
-                })
-            } 
-        } else if (this.state.doneLoading){
-            //not logged in
-            storage.setItem(`skills-${treeId}`, JSON.stringify(skills));
-        }
+        console.log('handling save');
+        // const monitoredUserId = typeof this.props.monitoredUserId === 'undefined' ? this.props.user.uid : 
+        //         this.props.monitoredUserId;
+        // if(this.props.user && this.props.user.uid && treeId && this.state.doneLoading){
+        //     if(this.props.user.uid !== this.props.composition.user && !this.props.composition.loggedInUsersCanEdit){
+        //         toast.info(
+        //             'Please ask your instructor to update the completion status of this skill. Changes will not be saved.',
+        //             { toastId: 'cannotduplicatethistoast'});
+        //     } else {
+        //         db.collection('results')
+        //         .doc(monitoredUserId)
+        //         .collection('skilltrees')
+        //         .doc(treeId)
+        //         .set({
+        //             skills, 
+        //             id: treeId,
+        //             compositionId: this.props.composition.id
+        //         })
+        //         .then( _ => {
+        //             const compositionId: string = this.props.composition.id || '';
+        //             db.collection('users').doc(monitoredUserId).get()
+        //             .then((snap) => {
+        //                 const user = snap.data() as IUser;
+        //                 db.collection('results').doc(monitoredUserId).set({
+        //                     user: monitoredUserId,
+        //                     email: user.email,
+        //                     displayName: user.displayName,
+        //                     photoURL: user.photoURL ? user.photoURL : '',
+        //                     compositions: firebase.firestore.FieldValue.arrayUnion(this.props.composition.id),
+        //                     progress: {
+        //                          [compositionId]: 
+        //                          parseInt(this.progress.current?.textContent ? this.progress.current?.textContent : '0') 
+        //                      }
+        //                  }, {merge: true})
+        //                  .catch(err => {
+        //                      toast.error(err.message);
+        //                  });
+        //             })
+        //         })
+        //         .catch(err => {
+        //             toast.error(err.message);
+        //         })
+        //     } 
+        // } else if (this.state.doneLoading){
+        //     //not logged in
+        //     storage.setItem(`skills-${treeId}`, JSON.stringify(skills));
+        // }
     }
 
     render(){
         return (
             this.state.data ? 
             <SkillProvider>
-            <Droppable droppableId="skilltrees">
-            {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef}>
+            <Droppable droppableId={"EDITOR-" + this.props.composition.id}>
+            {(provided, snapshot) => (
+                <div {...provided.droppableProps} ref={provided.innerRef}
+                style={{ backgroundColor: snapshot.isDraggingOver ? '#d4823a' : 'unset' }}>
                 <SkillTreeGroup theme={this.props.theme}>
                 {(treeData: SkillGroupDataType) => (
-                    <React.Fragment>
+                    <div className="is-flex is-flex-direction-column">
                       {this.state.doneLoading && this.props.skilltrees.map((skilltree, index) => {
                         return (
-                        <Draggable key={skilltree.id} draggableId={skilltree.id} index={index}>
+                        <Draggable key={skilltree.id} draggableId={'skilltree-' + skilltree.id} index={index} type="SKILLTREE">
                         {(provided) =>(
                         <div
                             ref={provided.innerRef} 
                             {...provided.draggableProps} 
                             {...provided.dragHandleProps}
+                            onDoubleClick={() => this.props.editSkilltree(skilltree)}
                         >
-                        <Droppable droppableId="skills">
-                         {(provided) => (
-                            <div {...provided.droppableProps} ref={provided.innerRef}> 
                             <SkillTree
                                 key={skilltree.id}
                                 treeId={skilltree.id}
                                 title={skilltree.title}
                                 data={skilltree.data}
-                                collapsible={skilltree.collapsible}
-                                description={skilltree.description}
+                                collapsible={false}
+                                description="Double click to edit or delete skilltree"
                                 handleSave={this.handleSave}
                                 savedData={this.state.data ? this.state.data[index] : {}}
                             />
-                            </div>
-                        )}
-                        </Droppable>
-                        </div>)}</Draggable>
+                            {provided.placeholder}
+                        </div>
+                        )}</Draggable>
                       )})}
-                    </React.Fragment>
+                    </div>
                 )}
                 </SkillTreeGroup>
-                {provided.placeholder}</div>
+                {provided.placeholder}
+                </div>
             )}
             </Droppable>
             </SkillProvider> : null

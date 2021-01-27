@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { db } from '../../firebase/firebase';
 import ImageThumb1 from '../layout/ImageThumb1';
-import CompositionMenu from '../layout/CompositionMenu';
+import EditorMenu from '../editor/layout/EditorMenu';
 import { Redirect, Link } from 'react-router-dom';
 import ImageUploader from '../layout/ImageUploader';
 import features from '../payments/Features';
@@ -85,7 +85,7 @@ export class CompositionBackground extends Component<RouteComponentProps<TParams
             <Redirect to={`/compositions/${compositionId}`}/> :
             <div className="columns is-mobile">
                 <div className="column is-2" style={{marginBottom: "10px"}}>
-                    <CompositionMenu id={compositionId} />
+                    <EditorMenu id={compositionId} hideDraggables={true} />
                 </div>
                 <div className="column" style={{marginTop: "30px", marginRight: "10px"}}>
                     <div className="level is-mobile">

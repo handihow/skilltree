@@ -62,10 +62,10 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                     <div className="buttons">
                         {isAuthenticated ?
                         <Link to="/" className="button is-primary is-rounded is-medium">
-                            <span className="icon has-tooltip-bottom" data-tooltip="Skilltrees">
-                              <FontAwesomeIcon icon='sitemap' />
+                            <span className="icon has-tooltip-bottom" data-tooltip="SkillTrees">
+                                <img src="/Skilltree_icon_white.svg" alt=""></img>
                             </span>
-                            <span>Skilltrees</span>
+                            <span>SkillTrees</span>
                         </Link> :
                         <Link to="/about" className="button is-primary is-rounded is-medium">
                             <span className="icon has-tooltip-bottom" data-tooltip="About">
@@ -75,7 +75,7 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                         </Link> }
                         {isAuthenticated && <Link to="/quizzes" className="button is-primary is-rounded is-medium">
                             <span className="icon has-tooltip-bottom" data-tooltip="Quizzes">
-                              <FontAwesomeIcon icon='poll-h' />
+                              <img src="/Skilltree_icons_Q_A white.svg" alt=""></img>
                             </span>
                             <span>Quizzes</span>
                         </Link>}

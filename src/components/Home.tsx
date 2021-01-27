@@ -249,7 +249,7 @@ class Home extends Component<IHomeProps, IHomeState> {
         <div className="container">
           <div className="level is-mobile">
             <div className="level-left">
-            <Header header={header} icon='sitemap'/>
+            <Header header={header}/>
             
             </div>
             <div className="level-right">

@@ -4,16 +4,18 @@ import { IconName } from '@fortawesome/fontawesome-svg-core';
 
 interface IHeaderProps {
     header: string;
-    icon: string;
+    icon?: string;
 }
 
 export default function Header(props: IHeaderProps) {
     return (
         <header>
             <h1 className="title has-text-primary">
+              {props.icon &&
               <span className="icon">
                 <FontAwesomeIcon icon={props.icon as IconName} />
               </span>
+              }
               <span className="ml-5">{props.header}</span>
               
            </h1>
