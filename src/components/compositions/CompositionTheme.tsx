@@ -6,7 +6,7 @@ import { Redirect, Link, RouteComponentProps } from 'react-router-dom';
 import { SketchPicker } from 'react-color';
 import SelectFieldWithColumn from '../layout/SelectFieldWithColumn';
 import CompositionDisplay from '../layout/CompositionDisplay';
-import {standardSkilltree, allColors, gradients} from './StandardData';
+import {standardSkilltree, allColors, gradients} from '../../services/StandardData';
 import features from '../payments/Features';
 import { toast } from 'react-toastify';
 import firebase from 'firebase/app';

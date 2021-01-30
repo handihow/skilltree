@@ -6,7 +6,7 @@ import { db, functions } from '../firebase/firebase';
 import {v4 as uuid} from "uuid"; 
 import { connect } from "react-redux";
 import { toast } from 'react-toastify';
-import { standardChildSkills, standardRootSkill } from "./compositions/StandardData";
+import { standardChildSkills, standardRootSkill } from "../services/StandardData";
 import IComposition from '../models/composition.model';
 import firebase from 'firebase/app';
 import { Redirect } from "react-router-dom";

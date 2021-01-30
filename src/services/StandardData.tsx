@@ -1,5 +1,5 @@
-import ISkill from '../../models/skill.model';
-import ISkilltree from '../../models/skilltree.model';
+import ISkill from '../models/skill.model';
+import ISkilltree from '../models/skilltree.model';
 import {v4 as uuid} from "uuid"; 
 
 export const standardTheme  = {

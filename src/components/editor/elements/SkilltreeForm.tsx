@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import {v4 as uuid} from "uuid"; 
 import ISkilltree from '../../../models/skilltree.model';
-import {updateSkilltree} from '../services/SkillTreeServices';
 
 interface ISkilltreeFormProps {
     skilltree?: ISkilltree;
     isEditing: boolean;
     closeModal: Function;
+    updateSkilltree: Function;
     deleteSkilltree: Function;
     order: number;
     compositionId: string;
@@ -64,7 +64,6 @@ export class SkilltreeForm extends Component<ISkilltreeFormProps,ISkilltreeFormS
         this.setState({
             root: target.value
         });
-        console.log(target.value);
     };
 
     onSubmit = (e: any) => {
@@ -76,7 +75,7 @@ export class SkilltreeForm extends Component<ISkilltreeFormProps,ISkilltreeFormS
             collapsible: this.state.collapsible,
             order: this.props.skilltree?.order || this.props.order
         }
-        updateSkilltree(skilltree, this.props.compositionId, this.props.isEditing ? true : false, this.state.root);
+        this.props.updateSkilltree(skilltree, this.state.root);
     }
 
     toggleOptions = () => {
@@ -114,6 +113,18 @@ export class SkilltreeForm extends Component<ISkilltreeFormProps,ISkilltreeFormS
                             value={this.state.description} />
                         </div>
                     </div>
+                    {!this.props.isEditing && 
+                        <div className="field">
+                        <label className="label" htmlFor="root">Root skill</label>
+                        <div className="control">
+                            <input className="input" 
+                            placeholder="Enter the title of the root skill in this skilltree"
+                            name="root" type="text" 
+                            required
+                            onChange={this.handleRootSkillTitleChange}
+                            value={this.state.root} />
+                        </div>
+                    </div>}
                     {this.state.moreOptions && <div className="columns">
                         <div className="column is-narrow">
                         <div className="field">
@@ -124,18 +135,6 @@ export class SkilltreeForm extends Component<ISkilltreeFormProps,ISkilltreeFormS
                         </label>
                         </div>
                         </div>
-                        {!this.props.isEditing && <div className="column">
-                            <div className="field">
-                            <label className="label" htmlFor="root">Root skill</label>
-                            <div className="control">
-                                <input className="input" 
-                                placeholder="Enter the title of the root skill in this skilltree"
-                                name="root" type="text" 
-                                onChange={this.handleRootSkillTitleChange}
-                                value={this.state.root} />
-                            </div>
-                        </div>
-                        </div>}
                     </div>}
                 </section>
                 <footer className="modal-card-foot">

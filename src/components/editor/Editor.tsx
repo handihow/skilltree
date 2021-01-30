@@ -5,7 +5,7 @@ import EditorMenu from './layout/EditorMenu';
 import EditorNavbar from './layout/EditorNavbar';
 import WarningModal from './elements/WarningModal';
 import Loading from '../layout/Loading';
-import { skillArrayToSkillTree } from '../compositions/StandardFunctions';
+import { skillArrayToSkillTree } from '../../services/StandardFunctions';
 import { RouteComponentProps, Redirect } from 'react-router-dom';
 import ISkilltree from '../../models/skilltree.model';
 import IComposition from '../../models/composition.model';
@@ -14,8 +14,8 @@ import { toast } from 'react-toastify';
 import { connect } from "react-redux";
 import { SkilltreeForm } from './elements/SkilltreeForm';
 import { DragDropContext } from 'react-beautiful-dnd';
-import {getComposition} from './services/CompositionServices';
-import {deleteSkilltree} from './services/SkillTreeServices';
+import {getComposition, updateCompositionTitle} from '../../services/CompositionServices';
+import {updateSkilltree, deleteSkilltree} from '../../services/SkillTreeServices';
 
 type TParams = { compositionId: string };
 
@@ -29,8 +29,11 @@ interface IEditorState {
     hasBackgroundImage: boolean;
     backgroundImage?: string;
     skilltrees?: ISkilltree[];
+    skills?: ISkill[];
+    processedSkilltrees?: ISkilltree[];
     toEditor: boolean;
-    unsubscribe?: any;
+    subSkilltrees?: any;
+    subSkills?: any;
     showSkilltreeForm: boolean;
     isEditingSkilltree: boolean;
     currentSkilltree?: ISkilltree;
@@ -38,6 +41,7 @@ interface IEditorState {
     warningMessage?: string;
     confirmedWarningFunction: Function;
     numberOfSkills: number;
+    enableDropSkilltrees: boolean;
 }
 
 export class Editor extends Component<IEditorProps, IEditorState> {
@@ -50,90 +54,140 @@ export class Editor extends Component<IEditorProps, IEditorState> {
             isEditingSkilltree: false,
             showWarningMessage: false,
             numberOfSkills: 0,
-            confirmedWarningFunction: (event) => { console.log(event) }
+            confirmedWarningFunction: (event) => { console.log(event) },
+            enableDropSkilltrees: false
         }
         this.handleOnDragStart = this.handleOnDragStart.bind(this);
         this.handleOnDragEnd = this.handleOnDragEnd.bind(this);
         this.closeSkilltreeModal = this.closeSkilltreeModal.bind(this);
         this.editSkilltree = this.editSkilltree.bind(this);
         this.prepareDeleteSkilltree = this.prepareDeleteSkilltree.bind(this);
+        this.updateSkilltree = this.updateSkilltree.bind(this);
+        this.deleteSkilltree = this.deleteSkilltree.bind(this);
         this.toggleShowWarningMessage = this.toggleShowWarningMessage.bind(this);
+        this.changeCompositionTitle = this.changeCompositionTitle.bind(this);
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         const compositionId = this.props.match.params.compositionId;
-        getComposition(compositionId)
-        .then(composition => {
-            if(!composition){
-                toast.error('Could not find composition');
-                return
-            } else if (this.props.user.uid !== composition.user) {
-                toast.error('You are not the owner of this skilltree. You cannot view in editor mode.');
-                this.setState({
-                    toEditor: true
-                })
-            } else {
-                const unsubscribe = db.collection("compositions").doc(compositionId)
-                    .collection("skilltrees").orderBy('order').onSnapshot(async querySnapshot => {
-                        console.log('updating skilltrees');
-                        const skilltrees = querySnapshot.docs.map(doc => doc.data() as ISkilltree);
-                        db.collectionGroup('skills').where('composition', '==', compositionId).orderBy('order').get()
-                            .then((querySnapshot) => {
-                                console.log('new querysnapshot');
-                                const skills: ISkill[] = [];
-                                querySnapshot.docs.forEach((doc) => {
-                                    const skill: ISkill = {
-                                        parent: doc.ref.path.split('/'),
-                                        path: doc.ref.path,
-                                        ...doc.data() as ISkill
-                                    }
-                                    skills.push(skill);
-                                });
-                                console.log(skills);
-                                skilltrees.forEach((skilltree) => {
-                                    skilltree.data = skillArrayToSkillTree(skills.filter((s: ISkill) => s.skilltree === skilltree.id));
-                                    console.log(skilltree.data);
-                                });
-                                if (composition?.hasBackgroundImage) {
-                                    //fetch the background image
-                                    const storageRef = storage.ref();
-                                    const imageRef = storageRef.child(composition.backgroundImage || '');
-                                    imageRef.getDownloadURL()
-                                        .then(url => {
-                                            this.setState({
-                                                hasBackgroundImage: true,
-                                                backgroundImage: url,
-                                            });
-                                        });
-                                } 
-                                this.setState({
-                                    composition,
-                                    unsubscribe,
-                                    skilltrees: skilltrees,
-                                    numberOfSkills: skills.length,
-                                    currentSkilltree: undefined,
-                                    isEditingSkilltree: false,
-                                    showWarningMessage: false,
-                                    showSkilltreeForm: false,
-                                    warningMessage: undefined,
-                                    confirmedWarningFunction: (event) => {}
-                                });
-                            })
+        const composition = await getComposition(compositionId);
+        if(!composition || this.props.user.uid !== composition.user){
+            toast.error('Composition not found or you are not the owner of this skilltree.');
+            this.setState({
+                toEditor: true
+            })
+            return;
+        }
+        this.setCompositionBackground(composition);
+        this.subscribeSkillChanges();
+    }
+
+    setCompositionBackground(composition: IComposition){
+        if (composition.hasBackgroundImage) {
+            //fetch the background image
+            const storageRef = storage.ref();
+            const imageRef = storageRef.child(composition.backgroundImage || '');
+            imageRef.getDownloadURL()
+                .then(url => {
+                    this.setState({
+                        hasBackgroundImage: true,
+                        backgroundImage: url,
+                        composition: composition
                     });
+                });
+        } else {
+            this.setState({
+                hasBackgroundImage: false,
+                composition: composition
+            })
+        }  
+    }
+
+    subscribeSkillChanges(){
+        const subSkills =
+        db.collectionGroup('skills').where('composition', '==', this.props.match.params.compositionId).orderBy('order').onSnapshot((querySnapshot) => {
+            const skills: ISkill[] = [];
+            querySnapshot.docs.forEach((doc) => {
+                const skill: ISkill = {
+                    parent: doc.ref.path.split('/'),
+                    path: doc.ref.path,
+                    ...doc.data() as ISkill
+                }
+                skills.push(skill);
+            });
+            this.setState({
+                skills: skills,
+                numberOfSkills: skills.length
+            });
+            this.processSkilltreeData(true);
+        });
+        this.setState({
+            subSkills: subSkills
+        });
+        this.subscribeSkilltreeChanges();
+    }
+
+    subscribeSkilltreeChanges(){
+        const subST = 
+        db.collection("compositions").doc(this.props.match.params.compositionId)
+        .collection("skilltrees").orderBy('order').onSnapshot(async querySnapshot => {
+            const skilltrees = querySnapshot.docs.map(doc => {
+                return {data: [], ...doc.data() as ISkilltree}
+            });
+            this.setState({
+                skilltrees
+            });
+            this.processSkilltreeData(!this.state.processedSkilltrees || 
+                this.state.skilltrees?.length === this.state.processedSkilltrees.length ? true : false);
+        });
+        this.setState({
+            subSkilltrees: subST
+        });
+    }
+
+    processSkilltreeData(proceed: boolean){
+        if(!proceed) return;
+        const skilltrees : ISkilltree[] = this.state.skilltrees || [];
+        const skills : ISkill[] = this.state.skills || [];
+        if(skilltrees.length === 0 || skills.length === 0) return;
+        skilltrees.forEach((skilltree) => {
+            skilltree.data = skillArrayToSkillTree(skills.filter((s: ISkill) => s.skilltree === skilltree.id), false);
+        });
+        this.setState({
+            processedSkilltrees: skilltrees
+        });
+    }
+
+    changeCompositionTitle(event){
+        const title = event.value || '';
+        updateCompositionTitle(this.props.match.params.compositionId, title);
+        this.setState({
+            composition: {
+                ...this.state.composition,
+                title
             }
         });
-                
-
     }
 
     componentWillUnmount() {
-        if (this.state.unsubscribe) {
-            this.state.unsubscribe();
-        }
+        this.state.subSkills();
+        this.state.subSkilltrees();
     }
 
     handleOnDragStart(result) {
         console.log(result);
+        if(result.source.droppableId.startsWith('EDITOR') && result.draggableId.startsWith('skilltree')) {
+            console.log('moving skilltree')
+            this.setState({
+                enableDropSkilltrees: true
+            })
+        } else if (result.source.droppableId === 'MENU' && result.draggableId === 'skilltree') {
+            console.log('creating skilltree');
+            this.setState({
+                enableDropSkilltrees: true
+            })
+        }
+        
     }
 
     toggleShowWarningMessage() {
@@ -192,19 +246,36 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         });
     }
 
+    updateSkilltree(skilltree: ISkilltree, rootSkillTitle: string){
+        if(!this.state.composition?.id) return;
+        updateSkilltree(skilltree, this.state.composition.id, this.state.isEditingSkilltree ? true : false, rootSkillTitle)
+        .then(_ => {
+            this.closeSkilltreeModal();
+        })
+    }
+
+    deleteSkilltree(){
+        if(!this.state.composition?.id || !this.state.currentSkilltree) return;
+        deleteSkilltree(this.state.composition?.id, this.state.currentSkilltree)
+        .then(_ => {
+            this.toggleShowWarningMessage();
+            this.closeSkilltreeModal();
+        });
+    }
+
     prepareDeleteSkilltree() {
         this.setState({
             showSkilltreeForm: false,
             showWarningMessage: true,
             warningMessage: 'You are about to delete the SkillTree ' + this.state.currentSkilltree?.title + ' including all related skills. You cannot undo this. Are you sure?',
-            confirmedWarningFunction: () => deleteSkilltree(this.state.composition?.id, this.state.currentSkilltree)
+            confirmedWarningFunction: () => this.deleteSkilltree()
         });
     }
 
     render() {
         const editorDisplayStyles: React.CSSProperties = {
             position: 'relative',
-            height: "calc(100vh - 3.5rem)",
+            height: "calc(100vh - 5rem - 30px)",
             padding: '0px',
             marginTop: '0.75rem',
             backgroundColor: !this.state.hasBackgroundImage ? 'hsl(0, 0%, 48%)' : 'unset',
@@ -214,10 +285,13 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         return (
             this.state.toEditor ?
                 <Redirect to={'/'} /> :
-                !this.state.skilltrees || this.state.skilltrees.length === 0 ?
+                !this.state.processedSkilltrees || this.state.processedSkilltrees.length === 0 ?
                     <Loading /> :
                     <React.Fragment>
-                        <EditorNavbar numberOfSkills={this.state.numberOfSkills} id={this.state.composition?.id}></EditorNavbar>
+                        <EditorNavbar numberOfSkills={this.state.numberOfSkills} 
+                        id={this.state.composition?.id}
+                        composition={this.state.composition}
+                        changeCompositionTitle={this.changeCompositionTitle}></EditorNavbar>
                         <DragDropContext onDragEnd={this.handleOnDragEnd} onDragStart={this.handleOnDragStart}>
                             <div className="columns is-mobile mb-0 mt-0">
 
@@ -232,9 +306,10 @@ export class Editor extends Component<IEditorProps, IEditorState> {
 
                                         <EditorDisplay
                                             theme={this.state.composition.theme}
-                                            skilltrees={this.state.skilltrees || []}
+                                            skilltrees={this.state.processedSkilltrees || []}
                                             composition={this.state.composition}
                                             title={this.state.composition?.title || ''}
+                                            isDropDisabledSkilltrees={!this.state.enableDropSkilltrees}
                                             editSkilltree={this.editSkilltree} />}
                                 </div>
                             </div>
@@ -244,9 +319,10 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                             isEditing={this.state.isEditingSkilltree}
                             skilltree={this.state.currentSkilltree}
                             closeModal={this.closeSkilltreeModal}
+                            updateSkilltree={this.updateSkilltree}
                             deleteSkilltree={this.prepareDeleteSkilltree}
                             compositionId={this.props.match.params.compositionId}
-                            order={this.state.skilltrees.length} />}
+                            order={this.state.processedSkilltrees.length} />}
                         {this.state.showWarningMessage && <WarningModal
                             toggleShowWarningMessage={this.toggleShowWarningMessage}
                             warningMessage={this.state.warningMessage}

@@ -1,15 +1,14 @@
-import { db, functions } from '../../../firebase/firebase';
+import { db, functions } from '../firebase/firebase';
 import { toast } from 'react-toastify';
-import ISkilltree from '../../../models/skilltree.model';
-import firebase from 'firebase/app';
+import ISkilltree from '../models/skilltree.model';
 import { v4 as uuid } from "uuid";
-import { standardRootSkill } from "../../compositions/StandardData";
+import { standardRootSkill } from "./StandardData";
+import {updateCompositionTimestamp} from './CompositionServices';
 
-export const updateSkilltree = (skilltree?: ISkilltree, compositionId?: string, isEditingSkilltree?: boolean, rootSkillTitle?: string) => {
-    if(!compositionId || !skilltree) {
-        toast.error('Composition ID or Skilltree are missing');
-        return;
-    }
+export const updateSkilltree = (skilltree: ISkilltree, 
+    compositionId: string, 
+    isEditingSkilltree: boolean, 
+    rootSkillTitle: string) : Promise<any> => {
     let rootSkill = {...standardRootSkill};
     if(rootSkillTitle){
         rootSkill.title = rootSkillTitle
@@ -18,7 +17,7 @@ export const updateSkilltree = (skilltree?: ISkilltree, compositionId?: string, 
         console.log('adding skilltree')
         skilltree.composition = compositionId;
     }
-    db.collection('compositions')
+    return db.collection('compositions')
         .doc(compositionId)
         .collection('skilltrees')
         .doc(skilltree.id).set(skilltree, { merge: true })
@@ -35,7 +34,6 @@ export const updateSkilltree = (skilltree?: ISkilltree, compositionId?: string, 
                     .collection('skills').doc(newRootSkill.id).set(newRootSkill)
                     .then(_ => {
                         toast.info("Skilltree successfully created");
-
                     });
             } else {
                 toast.info("Skilltree successfully updated");
@@ -47,15 +45,14 @@ export const updateSkilltree = (skilltree?: ISkilltree, compositionId?: string, 
         })
 }
 
-export const deleteSkilltree = (compositionId?: string, skilltree?: ISkilltree) => {
-    if(!compositionId || !skilltree) return;
+export const deleteSkilltree = (compositionId: string, skilltree: ISkilltree) => {
     const toastId = uuid();
     toast.info('Deleting skilltree all related child skills is in progress... please wait', {
         toastId: toastId
     })
     const skilltreePath = `compositions/${compositionId}/skilltrees/${skilltree?.id}`;
     const deleteFirestorePathRecursively = functions.httpsCallable('deleteFirestorePathRecursively');
-    deleteFirestorePathRecursively({
+    return deleteFirestorePathRecursively({
         collection: 'Skilltree',
         path: skilltreePath
     }).then(function (result) {
@@ -77,8 +74,3 @@ export const deleteSkilltree = (compositionId?: string, skilltree?: ISkilltree) 
     });
 }
 
-const updateCompositionTimestamp = (compositionId) => {
-    db.collection('compositions').doc(compositionId).update({
-        lastUpdate: firebase.firestore.Timestamp.now()
-    })
-}

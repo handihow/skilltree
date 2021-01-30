@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import {v4 as uuid} from "uuid"; 
 import { toast } from 'react-toastify';
 import firebase from 'firebase/app'
-import {quizImage} from '../compositions/StandardData';
+import {quizImage} from '../../services/StandardData';
 
 interface IQuizItemProps {
     quiz: IQuiz;

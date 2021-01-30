@@ -4,24 +4,30 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 export default function EditorNavbar(props) {
     return (
-        <nav className="level has-background-grey-lighter mb-0 p-3">
+        <nav className="level has-background-grey-lighter mb-0 p-3 is-mobile">
             <div className="level-left">
+                <div className="level-item is-hidden-mobile">
+                <div className="field is-horizontal">
+                    <div className="field-label is-normal">
+                        <label className="label">Title</label>
+                    </div>
+                    <div className="field-body">
+                        <p className="control" style={{width: '250px'}}>
+                        <input className="input" type="text" 
+                            value={props.composition?.title || ''} onChange={({target}) => props.changeCompositionTitle(target)}></input>
+                        </p>
+                    </div>
+                </div>
+                </div>
+                <div className="level-item">
+                    <div className="icon" data-tooltip="Copy SkillTree">
+                        <FontAwesomeIcon icon="copy"/>
+                    </div>
+                </div>
                 <div className="level-item">
                     <p className="subtitle is-5">
                         <strong>{props.numberOfSkills}</strong> skills</p>
-            </div>
-            <div className="level-item">
-            <div className="field has-addons">
-                <p className="control">
-                <input className="input" type="text" placeholder="Change the title"></input>
-                </p>
-                <p className="control">
-                <button className="button">
-                    Save
-                </button>
-                </p>
-            </div>
-            </div>
+                </div>
         </div>
         <div className="level-right">
             <div className="level-item">

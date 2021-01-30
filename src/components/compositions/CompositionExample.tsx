@@ -3,7 +3,7 @@ import ISkilltree from '../../models/skilltree.model';
 import IComposition from '../../models/composition.model';
 import ISkill from '../../models/skill.model';
 import { db, storage } from '../../firebase/firebase';
-import {skillArrayToSkillTree} from './StandardFunctions';
+import {skillArrayToSkillTree} from '../../services/StandardFunctions';
 import CompositionDisplay from '../layout/CompositionDisplay';
 
 interface ICompositionExampleProps {
@@ -46,7 +46,7 @@ export class CompositionExample extends Component<ICompositionExampleProps, ICom
                         skills.push(skill);
                     });
                     skilltrees.forEach((skilltree) => {
-                        skilltree.data = skillArrayToSkillTree(skills.filter((s:ISkill) => s.skilltree===skilltree.id));
+                        skilltree.data = skillArrayToSkillTree(skills.filter((s:ISkill) => s.skilltree===skilltree.id), true);
                     });
                     if(composition?.hasBackgroundImage){
                         //fetch the background image

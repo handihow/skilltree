@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Treebeard, decorators } from 'react-treebeard';
-import {treebeardTheme} from '../compositions/StandardData';
+import {treebeardTheme} from '../../services/StandardData';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const CustomHeader = ({ node, style, prefix }) =>

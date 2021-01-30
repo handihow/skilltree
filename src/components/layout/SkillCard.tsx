@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { linkIcons } from '../compositions/StandardData';
+import { linkIcons } from '../../services/StandardData';
 import ISkill from '../../models/skill.model';
 
 interface ISkillCardProps {

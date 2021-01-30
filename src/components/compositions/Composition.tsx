@@ -3,7 +3,7 @@ import { db, storage } from '../../firebase/firebase';
 import CompositionDisplay from '../layout/CompositionDisplay';
 import CompositionMenu from '../layout/CompositionMenu';
 import Loading from '../layout/Loading';
-import {skillArrayToSkillTree} from './StandardFunctions';
+import {skillArrayToSkillTree} from '../../services/StandardFunctions';
 import { RouteComponentProps, Redirect } from 'react-router-dom';
 import ISkilltree from '../../models/skilltree.model';
 import IComposition from '../../models/composition.model';
@@ -62,7 +62,7 @@ export class Composition extends Component<ICompositionProps,ICompositionState> 
                             skills.push(skill);
                         });
                         skilltrees.forEach((skilltree) => {
-                            skilltree.data = skillArrayToSkillTree(skills.filter((s:ISkill) => s.skilltree===skilltree.id));
+                            skilltree.data = skillArrayToSkillTree(skills.filter((s:ISkill) => s.skilltree===skilltree.id), true);
                         });
                         if(composition?.hasBackgroundImage){
                             //fetch the background image

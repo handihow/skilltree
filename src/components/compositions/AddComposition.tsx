@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {standardData, standardTheme} from './StandardData';
+import {standardData, standardTheme} from '../../services/StandardData';
 import IComposition from '../../models/composition.model';
 
 interface IAddCompositionProps {

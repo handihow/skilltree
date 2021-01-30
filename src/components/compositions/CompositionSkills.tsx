@@ -8,12 +8,12 @@ import SkillForm from '../layout/SkillForm';
 import CompositionMenu from '../layout/CompositionMenu';
 import {toast} from 'react-toastify';
 import features from '../payments/Features';
-import {skillArrayToSkillTree} from './StandardFunctions';
+import {skillArrayToSkillTree} from '../../services/StandardFunctions';
 import TreeView from '../layout/TreeView';
 import ISkill from '../../models/skill.model';
 import ISkilltree from '../../models/skilltree.model';
 import { RouteComponentProps } from 'react-router-dom';
-import { standardEmptySkill } from './StandardData';
+import { standardEmptySkill } from '../../services/StandardData';
 import Header from '../layout/Header';
 
 interface ICompositionSkillsState{
@@ -83,7 +83,7 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
                     const filteredSkills = skills.filter(s => s.skilltree===skilltree.id);
                     skilltree.name = skilltree.title;
                     skilltree.isSkill = false;
-                    skilltree.children = skillArrayToSkillTree(filteredSkills);
+                    skilltree.children = skillArrayToSkillTree(filteredSkills, true);
                     skilltree.decorators = {
                         addSkill: () => this.addSkill(undefined,skilltree)
                     };

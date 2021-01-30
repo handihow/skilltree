@@ -13,7 +13,7 @@ import LinkQuiz from './LinkQuiz';
 import ILink from '../../models/link.model';
 import { db } from '../../firebase/firebase';
 import RichTextEditor from 'react-rte';
-import {toolbarConfig, quizImage} from '../compositions/StandardData';
+import {toolbarConfig, quizImage} from '../../services/StandardData';
 import firebase from 'firebase/app';
 
 interface ISkillFormProps {
