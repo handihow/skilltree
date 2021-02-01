@@ -4,7 +4,7 @@ import { db, functions } from '../../firebase/firebase';
 import firebase from 'firebase/app';
 
 import {v4 as uuid} from "uuid"; 
-import SkillForm from '../layout/SkillForm';
+// import SkillForm from '../layout/SkillForm';
 import CompositionMenu from '../layout/CompositionMenu';
 import {toast} from 'react-toastify';
 import features from '../payments/Features';
@@ -404,7 +404,7 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
                         </div>
                     </div>
                     <div className={this.state.showEditor ? "column is-6" : "column is-1"}>
-                    {this.state.showEditor && <SkillForm 
+                    {/* {this.state.showEditor && <SkillForm 
                     isEditing={this.state.isEditing} 
                     skill={this.state.currentSkill ? this.state.currentSkill : {id: uuid(), ...standardEmptySkill}} 
                     updateSkill={this.updateSkill}
@@ -416,7 +416,7 @@ export class CompositionSkills extends Component<RouteComponentProps<TParams>, I
                             this.state.parentSkilltree.id : ''}
                     skills={this.state.skills}
                     skilltrees={this.state.skilltrees}
-                    />}
+                    />} */}
                     </div>
                 </div>
                 <div className={`modal ${this.state.showWarning ? "is-active" : ""}`}>

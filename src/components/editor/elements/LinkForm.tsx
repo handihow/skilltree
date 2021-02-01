@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import ILink from '../../models/link.model';
+import ILink from '../../../models/link.model';
 import { toast } from 'react-toastify';
 import {v4 as uuid} from "uuid"; 
 import urlMetadata from 'url-metadata';

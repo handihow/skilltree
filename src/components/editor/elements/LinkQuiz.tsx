@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import IQuiz from '../../models/quiz.model';
+import IQuiz from '../../../models/quiz.model';
 import { toast } from 'react-toastify';
 import { Redirect } from 'react-router-dom';
-import { db } from '../../firebase/firebase';
+import { db } from '../../../firebase/firebase';
 import firebase from 'firebase/app';
 import {v4 as uuid} from "uuid"; 
 import { connect } from "react-redux";
-import IUser from '../../models/user.model';
+import IUser from '../../../models/user.model';
 
 interface ILinkQuizProps {
     isShowLinkQuizModal: boolean;

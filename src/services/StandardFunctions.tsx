@@ -30,9 +30,8 @@ const constructSkill = (skill: ISkill, skills: ISkill[], isViewing: boolean) => 
     } else {
         constructedSkill = {
             expanded: true,
-            title: skill.title,
             children: filterChildren(skill, skills, isViewing),
-            id: skill.id
+            ...skill
         }
     }
     return constructedSkill;    

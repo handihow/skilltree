@@ -7,7 +7,6 @@ interface ISkilltreeFormProps {
     isEditing: boolean;
     closeModal: Function;
     updateSkilltree: Function;
-    deleteSkilltree: Function;
     order: number;
     compositionId: string;
 }
@@ -67,6 +66,7 @@ export class SkilltreeForm extends Component<ISkilltreeFormProps,ISkilltreeFormS
     };
 
     onSubmit = (e: any) => {
+        console.log('submitting form');
         e.preventDefault();
         const skilltree : ISkilltree = {
             id: this.props.skilltree?.id || uuid(),
@@ -142,12 +142,9 @@ export class SkilltreeForm extends Component<ISkilltreeFormProps,ISkilltreeFormS
                 <button className="button" type="button" onClick={this.toggleOptions}>
                     {this.state.moreOptions ? 'Less options' : 'More options'}
                 </button>
-                {!this.props.isEditing && 
                 <button className="button is-danger" type="button" onClick={() =>this.props.closeModal()}>
-                    Cancel</button>}
-                {this.props.isEditing &&
-                <button className="button is-danger" type="button" onClick={() =>this.props.deleteSkilltree()}>
-                    Delete</button>}
+                    Cancel
+                </button>
                 </footer>
                 </form>
             </div>

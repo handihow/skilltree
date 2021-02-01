@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import youtubeSearch from "youtube-search";
-import {youtubeAPIKey} from '../../firebase/firebase'; 
+import {youtubeAPIKey} from '../../../firebase/firebase'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { toast } from 'react-toastify';
-import ILink from '../../models/link.model';
+import ILink from '../../../models/link.model';
 import {v4 as uuid} from "uuid"; 
-import LinkCard from './LinkCard';
+import LinkCard from '../../layout/LinkCard';
 
 const opts: youtubeSearch.YouTubeSearchOptions = {
   maxResults: 10,

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import FileUploader from "react-firebase-file-uploader";
-import { storage } from '../../firebase/firebase';
-import ILink from '../../models/link.model';
+import { storage } from '../../../firebase/firebase';
+import ILink from '../../../models/link.model';
 import { toast } from 'react-toastify';
 import {v4 as uuid} from "uuid"; 
 

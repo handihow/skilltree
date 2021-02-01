@@ -18,7 +18,11 @@ interface IEditorDisplayProps {
     title: string;
     monitoredUserId?: string;
     editSkilltree: Function;
+    deleteSkilltree: Function;
+    editSkill: Function;
+    deleteSkill: Function;
     isDropDisabledSkilltrees: boolean;
+    isDropDisabledSkills: boolean;
 }
 
 interface IEditorDisplayState {
@@ -68,18 +72,66 @@ class EditorDisplay extends Component<IEditorDisplayProps, IEditorDisplayState> 
                             ref={provided.innerRef} 
                             {...provided.draggableProps} 
                             {...provided.dragHandleProps}
-                            onDoubleClick={() => this.props.editSkilltree(skilltree)}
                         >
-                            <div className="box m-3" style={{width: 500}}>
-                                <div className="title is-3">{skilltree.title}</div>
+                            <div className="box m-3" style={{width: 500, backgroundColor: 'rgba(75, 74, 74, 0.6)'}}>
+                                <div className="level">
+                                    <div className="level-left">
+                                        <div className="title is-3 has-text-primary-light">{skilltree.title}</div>
+                                    </div>
+                                    <div className="level-right">
+                                        <div className="buttons">
+                                            <button className="button is-medium" onClick={() => this.props.editSkilltree(skilltree)}>
+                                                <span className="icon is-medium">
+                                                   <FontAwesomeIcon icon="edit"></FontAwesomeIcon>
+                                                </span>
+                                            </button>
+                                            <button className="button is-medium" onClick={() => this.props.deleteSkilltree(skilltree)}>
+                                                <span className="icon is-medium">
+                                                   <FontAwesomeIcon icon="trash"></FontAwesomeIcon>
+                                                </span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div className="content">
                                 <div style={{ height: 500 }} 
                                     onMouseEnter={() => this.setState({isDragDisabledSkilltrees: true})}
                                     onMouseLeave={() => this.setState({isDragDisabledSkilltrees: false})}>
                                     <SortableTree
+                                    getNodeKey={({ node }) => node.id}
                                     treeData={skilltree.data}
                                     onChange={treeData => console.log(treeData)}
                                     onMoveNode={(_treeData, node) => console.log(node)}
+                                    generateNodeProps={({ node, path }) => ({
+                                        title: (
+                                            <Droppable droppableId={"SKILL-" + node.id} isDropDisabled={this.props.isDropDisabledSkills}>
+                                                {(provided, snapshot) => (
+                                                    <div className={`p-3 ${snapshot.isDraggingOver ? 'has-background-info-light' : ''}`} 
+                                                    {...provided.droppableProps} ref={provided.innerRef}>
+                                                        <div className="level" style={{width: '220px'}}>
+                                                            <div className="level-left">
+                                                                <div className="title is-6">{node.title}</div>
+                                                            </div>
+                                                            <div className="level-right">
+                                                                <div className="buttons">
+                                                                    <button className="button is-small" onClick={() => this.props.editSkill(node)}>
+                                                                        <span className="icon is-small">
+                                                                        <FontAwesomeIcon icon="edit"></FontAwesomeIcon>
+                                                                        </span>
+                                                                    </button>
+                                                                    <button className="button is-small" onClick={() => this.props.deleteSkill(node)}>
+                                                                        <span className="icon is-small">
+                                                                        <FontAwesomeIcon icon="trash"></FontAwesomeIcon>
+                                                                        </span>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {provided.placeholder}
+                                                    </div>
+                                            )}</Droppable>
+                                        ),
+                                    })}
                                     />
                                 </div>
                             </div>
