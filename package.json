@@ -13,7 +13,7 @@
     "@types/react-redux": "^7.1.9",
     "@types/react-router": "^5.1.8",
     "@types/youtube": "0.0.39",
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "beautiful-skill-tree": "^1.7.1",
     "bulma": "^0.9.1",
     "bulma-divider": "^0.2.0",
