@@ -6,9 +6,8 @@ import { connect } from "react-redux";
 // import { toast } from 'react-toastify';
 import IComposition from '../../../models/composition.model';
 import '../../layout/CompositionDisplay.css';
-import { Droppable, Draggable } from 'react-beautiful-dnd';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import SortableTree from 'react-sortable-tree';
+import { Droppable } from 'react-beautiful-dnd';
+import SkillTreeEditor  from '../elements/SkillTreeEditor';
 
 interface IEditorDisplayProps {
     theme: any;
@@ -19,10 +18,12 @@ interface IEditorDisplayProps {
     monitoredUserId?: string;
     editSkilltree: Function;
     deleteSkilltree: Function;
-    editSkill: Function;
-    deleteSkill: Function;
     isDropDisabledSkilltrees: boolean;
     isDropDisabledSkills: boolean;
+    isAddingRootSkill: boolean;
+    isAddingSiblingSkill: boolean;
+    isAddingChildSkill: boolean;
+    dropTargetSkillId: string;
 }
 
 interface IEditorDisplayState {
@@ -43,12 +44,6 @@ class EditorDisplay extends Component<IEditorDisplayProps, IEditorDisplayState> 
         }
     }
 
-    componentDidMount(){
-    }
-
-    componentWillUnmount(){
-
-    }
 
     updateQueryValue = (e : React.FormEvent<HTMLInputElement>) => {
         this.setState({
@@ -59,87 +54,26 @@ class EditorDisplay extends Component<IEditorDisplayProps, IEditorDisplayState> 
 
     render(){
         return (
-            <Droppable droppableId={"EDITOR-" + this.props.composition.id} direction="horizontal" isDropDisabled={this.props.isDropDisabledSkilltrees}>
+            <Droppable droppableId={"EDITOR-" + this.props.composition.id} isDropDisabled={this.props.isDropDisabledSkilltrees}>
             {(provided, snapshot) => (
                 <div {...provided.droppableProps} ref={provided.innerRef}
-                style={{ backgroundColor: snapshot.isDraggingOver ? '#d4823a' : 'unset', height: "calc(100vh - 5rem - 30px)" }}>
-                    <div className="is-flex is-flex-direction-row">
+                style={{ backgroundColor: snapshot.isDraggingOver ? '#d4823a' : 'unset' }}>
+                    <div className="is-flex is-flex-direction-row is-flex-wrap-wrap is-justify-content-space-evenly">
                       {this.props.skilltrees.map((skilltree, index) => {
                         return (
-                        <Draggable isDragDisabled={this.state.isDragDisabledSkilltrees} key={skilltree.id} draggableId={'skilltree-' + skilltree.id} index={index} type="SKILLTREE">
-                        {(provided) =>(
-                        <div
-                            ref={provided.innerRef} 
-                            {...provided.draggableProps} 
-                            {...provided.dragHandleProps}
-                        >
-                            <div className="box m-3" style={{width: 500, backgroundColor: 'rgba(75, 74, 74, 0.6)'}}>
-                                <div className="level">
-                                    <div className="level-left">
-                                        <div className="title is-3 has-text-primary-light">{skilltree.title}</div>
-                                    </div>
-                                    <div className="level-right">
-                                        <div className="buttons">
-                                            <button className="button is-medium" onClick={() => this.props.editSkilltree(skilltree)}>
-                                                <span className="icon is-medium">
-                                                   <FontAwesomeIcon icon="edit"></FontAwesomeIcon>
-                                                </span>
-                                            </button>
-                                            <button className="button is-medium" onClick={() => this.props.deleteSkilltree(skilltree)}>
-                                                <span className="icon is-medium">
-                                                   <FontAwesomeIcon icon="trash"></FontAwesomeIcon>
-                                                </span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="content">
-                                <div style={{ height: 500 }} 
-                                    onMouseEnter={() => this.setState({isDragDisabledSkilltrees: true})}
-                                    onMouseLeave={() => this.setState({isDragDisabledSkilltrees: false})}>
-                                    <SortableTree
-                                    getNodeKey={({ node }) => node.id}
-                                    treeData={skilltree.data}
-                                    onChange={treeData => console.log(treeData)}
-                                    onMoveNode={(_treeData, node) => console.log(node)}
-                                    generateNodeProps={({ node, path }) => ({
-                                        title: (
-                                            <Droppable droppableId={"SKILL-" + node.id} isDropDisabled={this.props.isDropDisabledSkills}>
-                                                {(provided, snapshot) => (
-                                                    <div className={`p-3 ${snapshot.isDraggingOver ? 'has-background-info-light' : ''}`} 
-                                                    {...provided.droppableProps} ref={provided.innerRef}>
-                                                        <div className="level" style={{width: '220px'}}>
-                                                            <div className="level-left">
-                                                                <div className="title is-6">{node.title}</div>
-                                                            </div>
-                                                            <div className="level-right">
-                                                                <div className="buttons">
-                                                                    <button className="button is-small" onClick={() => this.props.editSkill(node)}>
-                                                                        <span className="icon is-small">
-                                                                        <FontAwesomeIcon icon="edit"></FontAwesomeIcon>
-                                                                        </span>
-                                                                    </button>
-                                                                    <button className="button is-small" onClick={() => this.props.deleteSkill(node)}>
-                                                                        <span className="icon is-small">
-                                                                        <FontAwesomeIcon icon="trash"></FontAwesomeIcon>
-                                                                        </span>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        {provided.placeholder}
-                                                    </div>
-                                            )}</Droppable>
-                                        ),
-                                    })}
-                                    />
-                                </div>
-                            </div>
-                            </div>
-                            {provided.placeholder}
-                        </div>
-                        )}</Draggable>
-                      )})}
+                        <SkillTreeEditor
+                            key={skilltree.id}
+                            skilltree={skilltree}
+                            index={index}
+                            editSkilltree={this.props.editSkilltree}
+                            deleteSkilltree={this.props.deleteSkilltree}
+                            isDropDisabledSkills={this.props.isDropDisabledSkills}
+                            isAddingRootSkill={this.props.isAddingRootSkill}
+                            isAddingSiblingSkill={this.props.isAddingSiblingSkill}
+                            isAddingChildSkill={this.props.isAddingChildSkill}
+                            dropTargetSkillId={this.props.dropTargetSkillId}
+                        ></SkillTreeEditor>
+                        )})}
                     </div>
                 {provided.placeholder}
                 </div>

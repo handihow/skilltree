@@ -5,21 +5,15 @@ import EditorMenu from './layout/EditorMenu';
 import EditorNavbar from './layout/EditorNavbar';
 import WarningModal from './elements/WarningModal';
 import Loading from '../layout/Loading';
-import { skillArrayToSkillTree } from '../../services/StandardFunctions';
 import { RouteComponentProps, Redirect } from 'react-router-dom';
 import ISkilltree from '../../models/skilltree.model';
 import IComposition from '../../models/composition.model';
-import ISkill from '../../models/skill.model';
 import { toast } from 'react-toastify';
 import { connect } from "react-redux";
 import { SkilltreeForm } from './elements/SkilltreeForm';
 import { DragDropContext } from 'react-beautiful-dnd';
 import {getComposition, updateCompositionTitle} from '../../services/CompositionServices';
-import {standardEmptySkill} from '../../services/StandardData';
 import {updateSkilltree, deleteSkilltree} from '../../services/SkillTreeServices';
-import {updateSkill, deleteSkill} from '../../services/SkillServices';
-import SkillForm from './elements/SkillForm';
-import { v4 as uuid } from "uuid";
 
 type TParams = { compositionId: string };
 
@@ -33,25 +27,21 @@ interface IEditorState {
     hasBackgroundImage: boolean;
     backgroundImage?: string;
     skilltrees?: ISkilltree[];
-    skills?: ISkill[];
-    processedSkilltrees?: ISkilltree[];
     toEditor: boolean;
-    subSkilltrees?: any;
-    subSkills?: any;
+    unsubscribe?: any;
     showSkilltreeForm: boolean;
     isEditingSkilltree: boolean;
-    isEditingSkill: boolean;
     currentSkilltree?: ISkilltree;
-    currentSkill?: ISkill;
-    currentParentSkill?: ISkill;
-    isAddingRootSkill: boolean;
     showWarningMessage: boolean;
     warningMessage?: string;
     confirmedWarningFunction: Function;
     numberOfSkills: number;
     enableDropSkilltrees: boolean;
     enableDropSkills: boolean;
-    showSkillForm: boolean;
+    isAddingRootSkill: boolean;
+    isAddingSiblingSkill: boolean;
+    isAddingChildSkill: boolean;
+    dropTargetSkillId: string;
 }
 
 export class Editor extends Component<IEditorProps, IEditorState> {
@@ -62,24 +52,21 @@ export class Editor extends Component<IEditorProps, IEditorState> {
             toEditor: false,
             showSkilltreeForm: false,
             isEditingSkilltree: false,
-            isEditingSkill: false,
-            isAddingRootSkill: false,
             showWarningMessage: false,
             numberOfSkills: 0,
             confirmedWarningFunction: (event) => { console.log(event) },
             enableDropSkilltrees: false,
             enableDropSkills: true,
-            showSkillForm: false
+            isAddingRootSkill: false,
+            isAddingSiblingSkill: false,
+            isAddingChildSkill: false,
+            dropTargetSkillId: ''
         }
         this.handleOnDragStart = this.handleOnDragStart.bind(this);
         this.handleOnDragEnd = this.handleOnDragEnd.bind(this);
         this.closeSkilltreeModal = this.closeSkilltreeModal.bind(this);
-        this.closeSkillFormModal = this.closeSkillFormModal.bind(this);
-        this.editSkilltree = this.editSkilltree.bind(this);
-        this.editSkill = this.editSkill.bind(this);
-        this.updateSkill = this.updateSkill.bind(this);
+        this.editSkilltree = this.editSkilltree.bind(this); 
         this.prepareDeleteSkilltree = this.prepareDeleteSkilltree.bind(this);
-        this.prepareDeleteSkill = this.prepareDeleteSkill.bind(this);
         this.updateSkilltree = this.updateSkilltree.bind(this);
         this.deleteSkilltree = this.deleteSkilltree.bind(this);
         this.toggleShowWarningMessage = this.toggleShowWarningMessage.bind(this);
@@ -97,7 +84,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
             return;
         }
         this.setCompositionBackground(composition);
-        this.subscribeSkillChanges();
+        this.subscribeSkilltreeChanges();
     }
 
     setCompositionBackground(composition: IComposition){
@@ -121,58 +108,21 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         }  
     }
 
-    subscribeSkillChanges(){
-        const subSkills =
-        db.collectionGroup('skills').where('composition', '==', this.props.match.params.compositionId).orderBy('order').onSnapshot((querySnapshot) => {
-            const skills: ISkill[] = [];
-            querySnapshot.docs.forEach((doc) => {
-                const skill: ISkill = {
-                    parent: doc.ref.path.split('/'),
-                    path: doc.ref.path,
-                    ...doc.data() as ISkill
-                }
-                skills.push(skill);
-            });
-            this.setState({
-                skills: skills,
-                numberOfSkills: skills.length
-            });
-            this.processSkilltreeData(true);
-        });
-        this.setState({
-            subSkills: subSkills
-        });
-        this.subscribeSkilltreeChanges();
-    }
+    
 
     subscribeSkilltreeChanges(){
-        const subST = 
+        const unsubscribe = 
         db.collection("compositions").doc(this.props.match.params.compositionId)
         .collection("skilltrees").orderBy('order').onSnapshot(async querySnapshot => {
             const skilltrees = querySnapshot.docs.map(doc => {
-                return {data: [], ...doc.data() as ISkilltree}
+                return {path: doc.ref.path, ...doc.data() as ISkilltree}
             });
             this.setState({
                 skilltrees
             });
-            this.processSkilltreeData(!this.state.processedSkilltrees || 
-                this.state.skilltrees?.length === this.state.processedSkilltrees.length ? true : false);
         });
         this.setState({
-            subSkilltrees: subST
-        });
-    }
-
-    processSkilltreeData(proceed: boolean){
-        if(!proceed) return;
-        const skilltrees : ISkilltree[] = this.state.skilltrees || [];
-        const skills : ISkill[] = this.state.skills || [];
-        if(skilltrees.length === 0 || skills.length === 0) return;
-        skilltrees.forEach((skilltree) => {
-            skilltree.data = skillArrayToSkillTree(skills.filter((s: ISkill) => s.skilltree === skilltree.id), false);
-        });
-        this.setState({
-            processedSkilltrees: skilltrees
+            unsubscribe
         });
     }
 
@@ -188,8 +138,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
     }
 
     componentWillUnmount() {
-        this.state.subSkills();
-        this.state.subSkilltrees();
+        this.state.unsubscribe();
     }
 
     handleOnDragStart(result) {
@@ -201,7 +150,6 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                 enableDropSkills: false
             })
         }
-        
     }
 
     toggleShowWarningMessage() {
@@ -215,17 +163,6 @@ export class Editor extends Component<IEditorProps, IEditorState> {
             currentSkilltree: undefined,
             isEditingSkilltree: false,
             showSkilltreeForm: false
-        });
-    }
-
-    closeSkillFormModal() {
-        this.setState({
-            currentSkill: undefined,
-            currentSkilltree: undefined,
-            currentParentSkill: undefined,
-            isEditingSkill: false,
-            showSkillForm: false,
-            isAddingRootSkill: false,
         });
     }
 
@@ -265,9 +202,11 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         });
         batch.commit();
     }
-   
+
+    
 
     editSkilltree(skilltree: ISkilltree) {
+        console.log(skilltree);
         this.setState({
             showSkilltreeForm: true,
             currentSkilltree: skilltree,
@@ -275,47 +214,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         });
     }
 
-    // addSkill = (skill: ISkill, type: string) => {
-    //     if(!this.state.skilltrees) return;
-    //     let isAddingRootSkill = false;
-    //     const parentId = skill.parent[skill.parent.length - 3];
-    //     const parentSkilltreeIndex = this.state.skilltrees.findIndex(st => st.id === skill.);
-    //     switch (type) {
-    //         case 'root':
-    //             isAddingRootSkill = true;
-    //             break;
-    //         case 'sibling':
-    //             break;
-    //         case 'child':
-    //             break;
-    //         default:
-    //             break;
-    //     }
-    //     //add a child to an existing skill
-    //     this.setState({
-    //         showSkillForm: true,
-    //         currentSkill: {id: uuid(),...standardEmptySkill},
-    //         isEditingSkill: false,
-    //         parentSkill: skill,
-    //         parentSkilltree: skilltree,
-    //         isAddingRootSkill: isAddingRootSkill
-    //     });
-    // }
-
-    editSkill(skill: ISkill){
-        if(!skill.parent || !this.state.skills || !this.state.skilltrees) return;
-        const parentId = skill.parent[skill.parent.length - 3];
-        const parentSkillIndex = this.state.skills.findIndex(s => s.id === parentId);
-        const parentSkilltreeIndex = this.state.skilltrees.findIndex(st => st.id === skill.skilltree);
-        if(parentSkilltreeIndex === -1) return;
-        this.setState({
-            showSkillForm: true,
-            currentSkill: skill,
-            isEditingSkill: true,
-            currentParentSkill: parentSkillIndex > -1 ? this.state.skills[parentSkillIndex] : undefined,
-            currentSkilltree: this.state.skilltrees[parentSkilltreeIndex]
-        });
-    }
+    
 
     async updateSkilltree(skilltree: ISkilltree, rootSkillTitle: string){
         if(!this.state.composition?.id) return;
@@ -323,23 +222,12 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         this.closeSkilltreeModal();
     }
 
-    async updateSkill(skill: ISkill){
-        if(!this.state.currentSkilltree) return;
-        await updateSkill(skill, this.state.currentSkilltree, this.state.currentParentSkill, this.state.isAddingRootSkill, this.state.isEditingSkill)
-        this.closeSkillFormModal();
-    }
-
+   
     async deleteSkilltree(){
         if(!this.state.composition?.id || !this.state.currentSkilltree) return;
         await deleteSkilltree(this.state.composition?.id, this.state.currentSkilltree)
         this.toggleShowWarningMessage();
         this.closeSkilltreeModal();
-    }
-
-    async deleteSkill(){
-        if(!this.state.currentSkill) return;
-        await deleteSkill(this.state.currentSkill);
-        this.closeSkillFormModal();
     }
 
     prepareDeleteSkilltree(skilltree: ISkilltree) {
@@ -349,16 +237,6 @@ export class Editor extends Component<IEditorProps, IEditorState> {
             showWarningMessage: true,
             warningMessage: 'You are about to delete the SkillTree ' + skilltree?.title + ' including all related skills. You cannot undo this. Are you sure?',
             confirmedWarningFunction: () => this.deleteSkilltree()
-        });
-    }
-
-    prepareDeleteSkill(skill: ISkill) {
-        this.setState({
-            currentSkill: skill,
-            showSkillForm: false,
-            showWarningMessage: true,
-            warningMessage: 'You are about to delete the Skill ' + skill?.title + ' including all related child skills. You cannot undo this. Are you sure?',
-            confirmedWarningFunction: () => this.deleteSkill()
         });
     }
 
@@ -375,7 +253,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         return (
             this.state.toEditor ?
                 <Redirect to={'/'} /> :
-                !this.state.processedSkilltrees || this.state.processedSkilltrees.length === 0 ?
+                !this.state.skilltrees || this.state.skilltrees.length === 0 ?
                     <Loading /> :
                     <React.Fragment>
                         <EditorNavbar numberOfSkills={this.state.numberOfSkills} 
@@ -389,38 +267,36 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                                     <EditorMenu id={this.props.match.params.compositionId} hideDraggables={false} />
                                 </div>
                                 <div className="column pl-0 mt-0" style={{
-                                        overflow: 'auto',
+                                        overflowY: 'auto',
+                                        overflowX: 'hidden',
                                         ...editorDisplayStyles
                                     }}>
                                     {this.state.skilltrees && this.state.skilltrees.length > 0 && this.state.composition &&
 
                                         <EditorDisplay
                                             theme={this.state.composition.theme}
-                                            skilltrees={this.state.processedSkilltrees || []}
+                                            skilltrees={this.state.skilltrees || []}
                                             composition={this.state.composition}
                                             title={this.state.composition?.title || ''}
                                             isDropDisabledSkilltrees={!this.state.enableDropSkilltrees}
                                             isDropDisabledSkills={!this.state.enableDropSkills}
-                                            deleteSkilltree={this.prepareDeleteSkilltree}
                                             editSkilltree={this.editSkilltree}
-                                            deleteSkill={this.prepareDeleteSkill}
-                                            editSkill={this.editSkill} />}
+                                            deleteSkilltree={this.prepareDeleteSkilltree}
+                                            isAddingRootSkill={this.state.isAddingRootSkill}
+                                            isAddingSiblingSkill={this.state.isAddingSiblingSkill}
+                                            isAddingChildSkill={this.state.isAddingChildSkill}
+                                            dropTargetSkillId={this.state.dropTargetSkillId}/>}
                                 </div>
                             </div>
 
                         </DragDropContext>
-                        {this.state.showSkillForm && 
-                            <SkillForm isEditing={this.state.isEditingSkill} updateSkill={this.updateSkill} closeModal={this.closeSkillFormModal}
-                                parent={this.state.currentParentSkill}
-                                skill={this.state.currentSkill ? this.state.currentSkill : {id: uuid(), ...standardEmptySkill}}
-                                skills={[]} skilltrees={[]} />}
                         {this.state.showSkilltreeForm && <SkilltreeForm
                             isEditing={this.state.isEditingSkilltree}
                             skilltree={this.state.currentSkilltree}
                             closeModal={this.closeSkilltreeModal}
                             updateSkilltree={this.updateSkilltree}
                             compositionId={this.props.match.params.compositionId}
-                            order={this.state.processedSkilltrees.length} />}
+                            order={this.state.isEditingSkilltree ? this.state.currentSkilltree?.order || 0 : this.state.skilltrees.length} />}
                         {this.state.showWarningMessage && <WarningModal
                             toggleShowWarningMessage={this.toggleShowWarningMessage}
                             warningMessage={this.state.warningMessage}

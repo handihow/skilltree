@@ -14,9 +14,9 @@ export const updateSkilltree = (skilltree: ISkilltree,
         rootSkill.title = rootSkillTitle
     };
     if (!isEditingSkilltree) {
-        console.log('adding skilltree')
         skilltree.composition = compositionId;
     }
+    console.log(skilltree);
     return db.collection('compositions')
         .doc(compositionId)
         .collection('skilltrees')

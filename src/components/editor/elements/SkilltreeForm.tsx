@@ -7,8 +7,8 @@ interface ISkilltreeFormProps {
     isEditing: boolean;
     closeModal: Function;
     updateSkilltree: Function;
-    order: number;
     compositionId: string;
+    order: number;
 }
 
 interface ISkilltreeFormState {
@@ -66,14 +66,13 @@ export class SkilltreeForm extends Component<ISkilltreeFormProps,ISkilltreeFormS
     };
 
     onSubmit = (e: any) => {
-        console.log('submitting form');
         e.preventDefault();
         const skilltree : ISkilltree = {
             id: this.props.skilltree?.id || uuid(),
             title: this.state.title,
             description: this.state.description,
             collapsible: this.state.collapsible,
-            order: this.props.skilltree?.order || this.props.order
+            order: this.props.order
         }
         this.props.updateSkilltree(skilltree, this.state.root);
     }
