@@ -1,79 +1,58 @@
 import React, { Component } from 'react'
+import { connect } from "react-redux";
+import { showWarningModal, completedAfterWarning } from '../../../actions/ui';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
+
+
 import ISkilltree from '../../../models/skilltree.model';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import SortableTree from 'react-sortable-tree';
 import ISkill from '../../../models/skill.model';
 import { db } from '../../../firebase/firebase';
 import { skillArrayToSkillTree, arraysEqual } from '../../../services/StandardFunctions';
-import SkillForm from './SkillForm';
-import {updateSkill, deleteSkill, moveSkill, reorderSkills } from '../../../services/SkillServices';
-import {standardEmptySkill} from '../../../services/StandardData';
-import { v4 as uuid } from "uuid";
-import WarningModal from './WarningModal';
+import { deleteSkill, moveSkill, reorderSkills } from '../../../services/SkillServices';
+
 
 interface ISkillTreeEditorProps {
     skilltree: ISkilltree;
     index: number;
     editSkilltree: Function;
     deleteSkilltree: Function;
+    editSkill: Function;
+    isDropDisabledSkilltree: boolean;
     isDropDisabledSkills: boolean;
-    isAddingRootSkill: boolean;
-    isAddingSiblingSkill: boolean;
-    isAddingChildSkill: boolean;
-    dropTargetSkillId: string;
+    dispatch: any;
+    hasDismissedWarning: boolean;
 }
 
 interface ISkillTreeEditorState {
     isDragDisabledSkilltrees: boolean;
     data: any;
-    skills?: ISkill[];
-    isEditingSkill: boolean;
     currentSkill?: ISkill;
-    currentParentSkill?: ISkill;
-    showWarningMessage?: boolean;
-    warningMessage?: string;
-    confirmedWarningFunction?: Function;
+    skills?: ISkill[];
     showSkillForm?: boolean;
     unsubscribe?: any;
     isMobile: boolean;
     allowSubscriptionUpdates: boolean;
+    destroyInProgress: boolean;
 }
 
 
-export default class SkillTreeEditor extends Component<ISkillTreeEditorProps, ISkillTreeEditorState> {
+class SkillTreeEditor extends Component<ISkillTreeEditorProps, ISkillTreeEditorState> {
     constructor(props: ISkillTreeEditorProps) {
         super(props);
         this.state = {
             isDragDisabledSkilltrees: false,
-            isEditingSkill: false,
             data: [],
             isMobile: window.innerWidth <= 760,
-            allowSubscriptionUpdates: true
+            allowSubscriptionUpdates: true,
+            destroyInProgress: false
         }
-        this.editSkill = this.editSkill.bind(this);
-        this.updateSkill = this.updateSkill.bind(this);
         this.moveExistingSkill = this.moveExistingSkill.bind(this);
-        this.closeSkillFormModal = this.closeSkillFormModal.bind(this);
         this.prepareDeleteSkill = this.prepareDeleteSkill.bind(this);
-        this.toggleShowWarningMessage = this.toggleShowWarningMessage.bind(this);
     }
 
     componentDidMount(){
-        this.subscribeSkillChanges();
-        window.addEventListener("resize", this.resize.bind(this));
-        this.resize();
-    }
-
-    componentWillUnmount() {
-        this.state.unsubscribe();
-    }
-
-    resize() {
-        this.setState({isMobile: window.innerWidth <= 760});
-    }
-
-    subscribeSkillChanges(){
         const unsubscribe =
         db.collectionGroup('skills').where('skilltree', '==', this.props.skilltree.id).orderBy('order').onSnapshot((querySnapshot) => {
             const skills: ISkill[] = [];
@@ -86,31 +65,29 @@ export default class SkillTreeEditor extends Component<ISkillTreeEditorProps, IS
                 skills.push(skill);
             });
             if(this.state.allowSubscriptionUpdates){
+                const data = skillArrayToSkillTree(skills.filter((s: ISkill) => s.skilltree === this.props.skilltree.id), false);
                 this.setState({
+                    data,
                     skills
                 });
-                this.processSkilltreeData(skills);
             }
         });
         this.setState({
             unsubscribe
         });
+        // window.addEventListener("resize", () => this.setState({isMobile: window.innerWidth <= 760}));
     }
 
-    processSkilltreeData(skills: ISkill[]){
-        const data = skillArrayToSkillTree(skills.filter((s: ISkill) => s.skilltree === this.props.skilltree.id), false);
-        this.setState({
-            data
-        });
+    componentWillUnmount(){
+        this.state.unsubscribe();
+        // window.removeEventListener("resize", () => this.setState({isMobile: window.innerWidth <= 760}));
+        
     }
 
-    closeSkillFormModal() {
-        this.setState({
-            currentSkill: undefined,
-            currentParentSkill: undefined,
-            isEditingSkill: false,
-            showSkillForm: false,
-        });
+    componentDidUpdate(prevProps) {
+        if(this.props.hasDismissedWarning && !this.state.destroyInProgress){
+            this.deleteSkill();
+        }
     }
 
     updateSortableTree(data){
@@ -135,81 +112,33 @@ export default class SkillTreeEditor extends Component<ISkillTreeEditorProps, IS
         }
     }
 
-    // addSkill = (skill: ISkill, type: string) => {
-    //     if(!this.state.skilltrees) return;
-    //     let isAddingRootSkill = false;
-    //     const parentId = skill.parent[skill.parent.length - 3];
-    //     const parentSkilltreeIndex = this.state.skilltrees.findIndex(st => st.id === skill.);
-    //     switch (type) {
-    //         case 'root':
-    //             isAddingRootSkill = true;
-    //             break;
-    //         case 'sibling':
-    //             break;
-    //         case 'child':
-    //             break;
-    //         default:
-    //             break;
-    //     }
-    //     //add a child to an existing skill
-    //     this.setState({
-    //         showSkillForm: true,
-    //         currentSkill: {id: uuid(),...standardEmptySkill},
-    //         isEditingSkill: false,
-    //         parentSkill: skill,
-    //         parentSkilltree: skilltree,
-    //         isAddingRootSkill: isAddingRootSkill
-    //     });
-    // }
-
-    editSkill(skill: ISkill){
-        if(!skill.parent || !this.state.skills) return;
-        const parentId = skill.parent[skill.parent.length - 3];
-        const parentSkillIndex = this.state.skills.findIndex(s => s.id === parentId);
-        this.setState({
-            showSkillForm: true,
-            currentSkill: skill,
-            isEditingSkill: true,
-            currentParentSkill: parentSkillIndex > -1 ? this.state.skills[parentSkillIndex] : undefined,
-        });
-    }
-
-    async updateSkill(skill: ISkill){
-        this.setState({
-            allowSubscriptionUpdates: true
-        });
-        console.log(skill);
-        await updateSkill(skill, this.props.skilltree, this.state.currentParentSkill, this.props.isAddingRootSkill, this.state.isEditingSkill)
-        this.closeSkillFormModal();
-    }
-
+    
     prepareDeleteSkill(skill: ISkill) {
         this.setState({
             currentSkill: skill,
-            showSkillForm: false,
-            showWarningMessage: true,
             allowSubscriptionUpdates: true,
-            warningMessage: 'You are about to delete the Skill ' + skill?.title + ' including all related child skills. You cannot undo this. Are you sure?',
-            confirmedWarningFunction: () => this.deleteSkill()
         });
+        const { dispatch } = this.props;
+        dispatch(showWarningModal('You are about to delete the Skill ' + skill?.title + ' including all related child skills. You cannot undo this. Are you sure?'))
     }
 
     async deleteSkill(){
         if(!this.state.currentSkill) return;
-        await deleteSkill(this.state.currentSkill?.path || '', this.props.skilltree?.composition || '');
-        this.toggleShowWarningMessage();
-        this.closeSkillFormModal();
-    }
-
-    toggleShowWarningMessage() {
         this.setState({
-            showWarningMessage: !this.state.showWarningMessage
+            destroyInProgress: true
+        })
+        // console.log('deleting skill');
+        await deleteSkill(this.state.currentSkill?.path || '', this.props.skilltree?.composition || '');
+        const { dispatch } = this.props;
+        dispatch(completedAfterWarning());
+        this.setState({
+            destroyInProgress: false
         })
     }
 
     render() {
         return (
-            <React.Fragment>
+
             <Draggable isDragDisabled={this.state.isDragDisabledSkilltrees} key={this.props.skilltree.id} draggableId={'skilltree-' + this.props.skilltree.id} index={this.props.index} type="SKILLTREE">
                 {(provided) => (
                     <div
@@ -217,7 +146,11 @@ export default class SkillTreeEditor extends Component<ISkillTreeEditorProps, IS
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                     >
-                        <div className="box m-3" style={{ width:  this.state.isMobile ? 400 : 600, backgroundColor: 'rgba(75, 74, 74, 0.6)' }}>
+                    <Droppable droppableId={"SKILLTREE-" + this.props.skilltree.id} isDropDisabled={this.props.isDropDisabledSkilltree}>
+                    {(provided, snapshot) => (
+                        <div {...provided.droppableProps} ref={provided.innerRef}
+                        >
+                        <div className="box m-3" style={{ width:  this.state.isMobile ? 400 : 600, backgroundColor: snapshot.isDraggingOver ? '#d4823a' : 'rgba(75, 74, 74, 0.6)' }}>
                             <div className="level is-mobile">
                                 <div className="level-left">
                                     <div className="title is-3 has-text-primary-light">{this.props.skilltree.title}</div>
@@ -258,7 +191,7 @@ export default class SkillTreeEditor extends Component<ISkillTreeEditorProps, IS
                                                                 </div>
                                                                 <div className="level-right">
                                                                     <div className="buttons">
-                                                                        <button className="button is-small" onClick={() => this.editSkill(node)}>
+                                                                        <button className="button is-small" onClick={() => this.props.editSkill(node, this.state.skills)}>
                                                                             <span className="icon is-small">
                                                                                 <FontAwesomeIcon icon="edit"></FontAwesomeIcon>
                                                                             </span>
@@ -281,20 +214,22 @@ export default class SkillTreeEditor extends Component<ISkillTreeEditorProps, IS
                             </div>
                         </div>
                         {provided.placeholder}
+                        </div>
+                        )}
+                        </Droppable>
                     </div>
                 )}</Draggable>
-                {this.state.showSkillForm && 
-                    <SkillForm isEditing={this.state.isEditingSkill} updateSkill={this.updateSkill} closeModal={this.closeSkillFormModal}
-                        parent={this.state.currentParentSkill}
-                        skill={this.state.currentSkill ? this.state.currentSkill : {id: uuid(), ...standardEmptySkill}}
-                        skills={[]} skilltrees={[]} />}
-                {this.state.showWarningMessage && <WarningModal
-                            toggleShowWarningMessage={this.toggleShowWarningMessage}
-                            warningMessage={this.state.warningMessage}
-                            confirmedWarningFunction={this.state.confirmedWarningFunction}></WarningModal>}
-                </React.Fragment>
+                
         )
     }
 }
 
+function mapStateToProps(state) {
+    return {
+        hasDismissedWarning: state.ui.hasDismissedWarning
+    }
+};
+
+
+export default (connect(mapStateToProps)(SkillTreeEditor));
 

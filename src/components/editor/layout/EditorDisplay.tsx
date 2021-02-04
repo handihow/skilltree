@@ -18,12 +18,10 @@ interface IEditorDisplayProps {
     monitoredUserId?: string;
     editSkilltree: Function;
     deleteSkilltree: Function;
+    editSkill: Function;
     isDropDisabledSkilltrees: boolean;
+    isDropDisabledSkilltree: boolean;
     isDropDisabledSkills: boolean;
-    isAddingRootSkill: boolean;
-    isAddingSiblingSkill: boolean;
-    isAddingChildSkill: boolean;
-    dropTargetSkillId: string;
 }
 
 interface IEditorDisplayState {
@@ -51,7 +49,6 @@ class EditorDisplay extends Component<IEditorDisplayProps, IEditorDisplayState> 
         })
     }
 
-
     render(){
         return (
             <Droppable droppableId={"EDITOR-" + this.props.composition.id} isDropDisabled={this.props.isDropDisabledSkilltrees}>
@@ -68,10 +65,8 @@ class EditorDisplay extends Component<IEditorDisplayProps, IEditorDisplayState> 
                             editSkilltree={this.props.editSkilltree}
                             deleteSkilltree={this.props.deleteSkilltree}
                             isDropDisabledSkills={this.props.isDropDisabledSkills}
-                            isAddingRootSkill={this.props.isAddingRootSkill}
-                            isAddingSiblingSkill={this.props.isAddingSiblingSkill}
-                            isAddingChildSkill={this.props.isAddingChildSkill}
-                            dropTargetSkillId={this.props.dropTargetSkillId}
+                            editSkill={this.props.editSkill}
+                            isDropDisabledSkilltree={this.props.isDropDisabledSkilltree}
                         ></SkillTreeEditor>
                         )})}
                     </div>

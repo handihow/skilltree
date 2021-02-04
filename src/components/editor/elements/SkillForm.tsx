@@ -212,8 +212,8 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
             <div className="modal-card">
                 <header className="modal-card-head">
                 <p className="modal-card-title">
-                {this.props.isEditing ?  'Editing ' + (this.props.skill.title) 
-                                    : 'Add skill to ' + this.props.parent?.title }    
+                {this.props.isEditing ?  'Editing ' + this.props.skill.title 
+                                    : 'Add skill'}    
                 </p>
                 <button className="delete" aria-label="close" onClick={() =>this.props.closeModal()}></button>
                 </header>

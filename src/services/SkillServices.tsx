@@ -9,16 +9,17 @@ import firebase from 'firebase/app';
 import { getFlatDataFromTree } from 'react-sortable-tree';
 
 export const updateSkill = (updatedSkill: ISkill, parentSkilltree: ISkilltree, parentSkill?: ISkill, 
-                             isAddingRootSkill?: boolean, isEditing?: boolean) => {
-    let path = '';
-    if(isEditing && updatedSkill.path){
-        path = updatedSkill.path;
-    } else if(!isEditing 
-                && !isAddingRootSkill) {
-        path = `${parentSkill?.path}/skills/${updatedSkill.id}`
-    } else if(!isEditing 
-                && isAddingRootSkill) {
+    isAddingRootSkillAtIndex?: number, isEditing?: boolean) => {
+    let path = ''; let order = 0;
+    if(isEditing){
+        path = updatedSkill.path || '';
+        order = updatedSkill.order || 0;
+    } else if(isAddingRootSkillAtIndex && isAddingRootSkillAtIndex > 0) {
         path = `${parentSkilltree?.path}/skills/${updatedSkill.id}`
+        order = isAddingRootSkillAtIndex;
+    } else {
+        path = `${parentSkill?.path}/skills/${updatedSkill.id}`;
+        order = parentSkill?.countChildren || 0;
     }
     let skill : ISkill = {
         id: updatedSkill.id,
@@ -28,33 +29,32 @@ export const updateSkill = (updatedSkill: ISkill, parentSkilltree: ISkilltree, p
         links: updatedSkill.links,
         optional: updatedSkill.optional,
         countChildren: updatedSkill.countChildren,
-        order: updatedSkill.order
+        order: order
     }
     if(!isEditing){
         skill.composition = parentSkilltree?.composition;
         skill.skilltree = parentSkilltree?.id;
-        skill.order = isAddingRootSkill ? parentSkilltree?.countChildren : parentSkill?.countChildren;
     }
     if(path.length === 0) return;
     return db.doc(path).set(skill, {merge: true})
     .then( _ => {
         if(!isEditing && parentSkill?.path) {
             db.doc(parentSkill.path).update({
-                countChildren: parentSkill?.countChildren + 1
+                countChildren: firebase.firestore.FieldValue.increment(1)
             });
-        } else if(!isEditing){
+        }
+        if(!isEditing){
             db.collection('compositions').doc(skill.composition).update({
                 // skillcount: this.state.skills.length,
                 skillcount: firebase.firestore.FieldValue.increment(1),
                 lastUpdate: firebase.firestore.Timestamp.now()
             });
         }
-        toast.info(`${skill.title} updated successfully`);
+        toast.info(`${skill.title} ${isEditing ? 'updated' : 'added'} successfully`);
     })
     .catch(err => {
         toast.error(err.message);
     });
-    
 }
 
 export const deleteSkill = (path: string, compositionId: string) => {
@@ -72,6 +72,7 @@ export const deleteSkill = (path: string, compositionId: string) => {
         if(result.data.error){
             toast.error(result.data.error);
         } else {
+            toast.info(result.data.result);
             db.collection('compositions').doc(compositionId).update({
                 // skillcount: this.state.skills.length,
                 skillcount: firebase.firestore.FieldValue.increment(-1),
@@ -94,9 +95,16 @@ export const reorderSkills = (data: any) => {
     });
 
     const parentSkill = flatSkills[data.nextTreeIndex].parentNode;
+    let parentsChildren;
+    if(parentSkill){
+        parentsChildren = parentSkill.children;
+    } else {
+        //parent is the root
+        parentsChildren = data.treeData;
+    }
    
     //update the order of skills under the new parent
-    parentSkill.children.forEach((child, index) => {
+    parentsChildren.forEach((child, index) => {
         batch.update(db.doc(child.path),{order: index});
     })
     batch.commit();
@@ -204,82 +212,3 @@ const deleteChildSkill = (child: ISkill, previousPath: string,  batch: firebase.
         });
     }
 }
-
-// export const moveSkillToDifferentParent = (skill: ISkill, skills: ISkill[], parentSkill?: ISkill, parentSkilltree?: ISkilltree, countChildren?: number) => {
-//    console.log(skill);
-//    console.log(skills);
-//    console.log(parentSkill);
-//    console.log(parentSkilltree)
-//     const prevPath = skill.path || '';
-//     console.log(prevPath);
-//     const compositionId = skill.composition || '';
-//     //find the skill or the skilltree that is the new parent
-//     let batch = db.batch();
-//     //the new parent is a skill
-//     let newPath = '';
-//     const newID = uuid();
-//     if(parentSkill){
-//         newPath = `${parentSkill.path}/skills/${newID}`;
-//         skill.order = parentSkill.countChildren;
-//     } else if(parentSkilltree){
-//         newPath =  `${parentSkilltree.path}/skills/${newID}`;
-//         skill.order = countChildren;
-//     }
-//     console.log(newPath);
-//     // let documentRef = db.doc(newPath);
-//     // skill.skilltree = parentSkilltree?.id || '';
-//     // skill.composition = parentSkilltree?.composition || '';
-//     // skill.id = newID;
-//     // delete skill.path;
-//     // delete skill.parent;
-//     // batch.set(documentRef, skill);
-//     // if(skill && skill.children && skill.children.length > 0 && skill.path){
-//     //     copyChildSkills(skill.path, newPath, batch, skills);
-//     // }
-//     // batch.commit()
-//     //     .then( _ => {
-//     //         //skill and child skills are copied, now we need to recursively delete the items from the previous location
-//     //         deleteSkill(prevPath, compositionId);
-//     //     }, (err) => {
-//     //         toast.error(err.message);
-//     //     })
-//     //     .catch(err => {
-//     //         toast.error(err.message);
-//     //     })
-// }
-
-
-// const copyChildSkills = (path: string, newPath: string, batch: firebase.firestore.WriteBatch, skills: ISkill[]) => {
-//     let childSkills = skills.filter(s => s.parent && checkIfParent(s.parent,path.split('/')));
-//     childSkills.forEach(child => {
-//         const newID = uuid();
-//         const newChildPath = `${newPath}/skills/${newID}`;
-//         let childDocumentRef = db.doc(newChildPath);
-//         const childPath = child.path || '';
-//         delete child.path;
-//         delete child.name;
-//         delete child.isSkill;
-//         delete child.decorators;
-//         delete child.toggled;
-//         delete child.parent;
-//         child.skilltree = newChildPath.split('/')[3];
-//         child.composition = newChildPath.split('/')[1];
-//         child.id = newID;
-//         batch.set(childDocumentRef, child);
-//         if(child.countChildren > 0){
-//             copyChildSkills(childPath, newChildPath, batch, skills);
-//         }
-//     })
-// }
-
-
-// const checkIfParent = (arr1: string[], arr2: string[]) => {
-//     if(arr1.length !== arr2.length + 2)
-//         return false;
-//     for(var i = arr2.length; i--;) {
-//         if(arr1[i] !== arr2[i])
-//             return false;
-//     }
-
-//     return true;
-// }

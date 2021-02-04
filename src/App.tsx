@@ -2,6 +2,7 @@ import React from "react";
 
 import { Route, Switch } from "react-router-dom";
 import { connect } from "react-redux";
+import WarningModal from './components/layout/WarningModal';
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./components/Home";
@@ -207,6 +208,7 @@ function App(props) {
       </Switch>
       </div>
       <Footer />
+      <WarningModal />
       </React.Fragment>
     );
   }
@@ -215,7 +217,9 @@ function mapStateToProps(state) {
   return {
     isAuthenticated: state.auth.isAuthenticated,
     isVerifying: state.auth.isVerifying,
-    user: state.auth.user
+    user: state.auth.user,
+    showWarningModal: state.showWarningModal,
+    warningMessage: state.warningMessage
   };
 }
 

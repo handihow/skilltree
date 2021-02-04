@@ -9,7 +9,7 @@ import {
     VERIFY_SUCCESS
   } from "../actions/";
   
-  export default (
+const authReducer = (
     state = {
       isLoggingIn: false,
       isLoggingOut: false,
@@ -76,3 +76,5 @@ import {
         return state;
     }
   };
+
+  export default authReducer;

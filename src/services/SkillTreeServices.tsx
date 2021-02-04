@@ -5,6 +5,22 @@ import { v4 as uuid } from "uuid";
 import { standardRootSkill } from "./StandardData";
 import {updateCompositionTimestamp} from './CompositionServices';
 
+export const getNumberOfRootSkills = (skilltree: ISkilltree) => {
+    return db
+    .collection('compositions').doc(skilltree.composition)
+    .collection('skilltrees').doc(skilltree.id)
+    .collection('skills').get()
+    .then(skills => {
+        if(skills.empty){
+            return 0;
+        }
+        return skills.docs.length;
+    })
+    .catch(err => {
+        return 0;
+    })
+}
+
 export const updateSkilltree = (skilltree: ISkilltree, 
     compositionId: string, 
     isEditingSkilltree: boolean, 
@@ -16,7 +32,6 @@ export const updateSkilltree = (skilltree: ISkilltree,
     if (!isEditingSkilltree) {
         skilltree.composition = compositionId;
     }
-    console.log(skilltree);
     return db.collection('compositions')
         .doc(compositionId)
         .collection('skilltrees')
@@ -46,10 +61,6 @@ export const updateSkilltree = (skilltree: ISkilltree,
 }
 
 export const deleteSkilltree = (compositionId: string, skilltree: ISkilltree) => {
-    const toastId = uuid();
-    toast.info('Deleting skilltree all related child skills is in progress... please wait', {
-        toastId: toastId
-    })
     const skilltreePath = `compositions/${compositionId}/skilltrees/${skilltree?.id}`;
     const deleteFirestorePathRecursively = functions.httpsCallable('deleteFirestorePathRecursively');
     return deleteFirestorePathRecursively({
@@ -58,19 +69,12 @@ export const deleteSkilltree = (compositionId: string, skilltree: ISkilltree) =>
     }).then(function (result) {
         updateCompositionTimestamp(compositionId)
         if (result.data.error) {
-            toast.update(toastId, {
-                render: result.data.error,
-            });
+            toast.error(result.data.error);
         } else {
-            toast.update(toastId, {
-                render: 'Skilltree and related child skills deleted successfully'
-            });
+            toast.info('Skilltree and related child skills deleted successfully');
         }
     }).catch(function (error) {
-        toast.update(toastId, {
-            render: error.message,
-            type: toast.TYPE.ERROR
-        });
+        toast.error(error.message);
     });
 }
 
