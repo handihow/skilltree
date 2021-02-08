@@ -79,6 +79,18 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                             </span>
                             <span>Quizzes</span>
                         </Link>}
+                        {isAuthenticated && <Link to="/skills" className="button is-primary is-rounded is-medium">
+                            <span className="icon has-tooltip-bottom" data-tooltip="Skills">
+                                <FontAwesomeIcon icon='th-list' />
+                            </span>
+                            <span>Skills</span>
+                        </Link>}
+                        {isAuthenticated && <Link to="/teams" className="button is-primary is-rounded is-medium">
+                            <span className="icon has-tooltip-bottom" data-tooltip="Teams">
+                                <FontAwesomeIcon icon='users' />
+                            </span>
+                            <span>Teams</span>
+                        </Link>}
                     </div>
                    </div>
                 </div>

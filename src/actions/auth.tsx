@@ -139,14 +139,19 @@ export const verifyAuth = () => dispatch => {
     .onAuthStateChanged(user => {
       if (user !== null) {
         //create or update user record in firestore db
-        db.collection('users').doc(user.uid).set({
+        const signedInUser = {
           uid: user.uid,
           email: user.email,
           displayName: user.displayName,
           photoURL: user.photoURL ? user.photoURL : `https://eu.ui-avatars.com/api/?name=${user.displayName}`,
           emailVerified: user.emailVerified,
-        }, {merge: true});
-        dispatch(receiveLogin(user));
+          hostedDomain: user.email ? user.email.split('@').pop() : null,
+          provider: user?.providerData[0]?.providerId || null,
+          creationTime: user?.metadata?.creationTime || null,
+          lastSignInTime: user?.metadata?.lastSignInTime || null
+        };
+        db.collection('users').doc(user.uid).set(signedInUser, {merge: true});
+        dispatch(receiveLogin(signedInUser));
       }
       dispatch(verifySuccess());
     });

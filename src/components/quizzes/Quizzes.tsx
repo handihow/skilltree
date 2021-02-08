@@ -172,7 +172,7 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
             <div className="container">
               <div className="level is-mobile">
                 <div className="level-left">
-                <Header header={header} icon='poll-h'/>
+                <Header header={header} />
                 
                 </div>
                 <div className="level-right">

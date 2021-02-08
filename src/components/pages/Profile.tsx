@@ -39,8 +39,10 @@ export class Profile extends Component<IProfileProps> {
                 </p>
                 <p><strong>{this.props.user?.uid}</strong></p>
                 <hr></hr>
-                <p>User record created: {this.props.user?.metadata?.creationTime}</p>
-                <p>Last sign in: {this.props.user?.metadata?.lastSignInTime}</p>
+                <p>Hosted domain: {this.props.user?.hostedDomain}</p>
+                <p>Email verified: {this.props.user?.emailVerified ? 'Yes' : 'No'}</p>
+                <p>Record created: {this.props.user?.creationTime}</p>
+                <p>Last sign in: {this.props.user?.lastSignInTime}</p>
                 </div>
             </div>
             <footer className="card-footer">

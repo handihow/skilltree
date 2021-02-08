@@ -5,6 +5,9 @@ export default interface IUser {
     photoURL?: string;
     emailVerified: boolean;
     standardFeedback?: string;
+    hostedDomain?: string;
+    creationTime?: any;
+    lastSignInTime?: any;
     isTeacher?: boolean;
     isStudent?: boolean;
 }

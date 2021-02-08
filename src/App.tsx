@@ -21,8 +21,6 @@ import Composition from './components/compositions/Composition';
 import CompositionViewer from './components/compositions/CompositionViewer';
 import CompositionBackground from './components/compositions/CompositionBackground';
 import CompositionTheme from './components/compositions/CompositionTheme';
-import CompositionSkilltrees from './components/compositions/CompositionSkilltrees';
-import CompositionSkills from './components/compositions/CompositionSkills';
 import PublishComposition from './components/compositions/PublishComposition';
 import ExportComposition from './components/compositions/ExportComposition';
 import Payments from './components/payments/Payments';
@@ -33,6 +31,7 @@ import DoQuiz from './components/quizzes/DoQuiz';
 import QuizResults from './components/quizzes/QuizResults';
 import QuizResult from './components/quizzes/QuizResult';
 import JoinQuiz from './components/quizzes/JoinQuiz';
+import Skills from './components/skills/Skills';
 
 import CompositionAddStudents from './components/compositions/CompositionAddStudents';
 
@@ -63,6 +62,13 @@ function App(props) {
           exact
           path="/quizzes"
           component={Quizzes}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+        />
+        <ProtectedRoute
+          exact
+          path="/skills"
+          component={Skills}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
         />
@@ -110,18 +116,6 @@ function App(props) {
         <ProtectedRoute 
           path="/editor/:compositionId/theme"
           component={CompositionTheme}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute 
-          path="/compositions/:compositionId/skilltrees"
-          component={CompositionSkilltrees}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute 
-          path="/compositions/:compositionId/skills"
-          component={CompositionSkills}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
         />

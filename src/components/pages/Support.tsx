@@ -43,17 +43,7 @@ export default function Support() {
                     is desired if we want to keep maintaining the project and build great new features.
                 </p>
                 <p>
-                    Therefore, we have locked some advanced features when you build skilltrees.
-                    The unlock features will sponsor the project with $1 every time. 
-                    This will help us maintain and improve the project.
-                    You can use the software free of charge without the more advanced features.
-                </p>
-                <p>
-                    All features of SkillTree will be completely free until summer 2020. 
-                    We have provided a credit card number for anyone who wishes to unlock certain features until that time.
-                </p>
-                <p>
-                    You can also support us by
+                    You can support us by
                 <a href="https://www.patreon.com/bePatron?u=32959269" data-patreon-widget-type="become-patron-button" style={{marginLeft:"5px"}}>becoming a Patron!</a><script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
                 </p>
             </div>

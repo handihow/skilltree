@@ -56,7 +56,7 @@ class SurveyPage extends Component<ISurveyProps, ISurveyState> {
     model;
     componentDidMount() {
         this.model = new Survey.Model(this.props.json);
-        this.model.onUploadFiles.add(async function(survey, options) {
+        this.model.onUploadFiles.add(async function(_survey, options) {
             const urls : string[] = [];
             for (let i = 0; i < options.files.length; ++i) {
                 const extension = options.files[i].name.split('.').pop();
@@ -82,7 +82,7 @@ class SurveyPage extends Component<ISurveyProps, ISurveyState> {
             this.model.mode = 'display';
             this.model
             .onAfterRenderQuestion
-            .add(function (survey, options) {
+            .add(function (_survey, options) {
                 if(options.question.correctAnswer){
                     try{
                         const header = options.htmlElement.getElementsByClassName("sv-question__header")[0];

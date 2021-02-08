@@ -8,7 +8,8 @@ import { v4 as uuid } from "uuid";
 import firebase from 'firebase/app';
 import { getFlatDataFromTree } from 'react-sortable-tree';
 
-export const updateSkill = (updatedSkill: ISkill, parentSkilltree: ISkilltree, parentSkill?: ISkill, 
+export const updateSkill = (updatedSkill: ISkill, parentSkilltree: ISkilltree, totalNumberOfSkillsInComposition: number, 
+    parentSkill?: ISkill, 
     isAddingRootSkillAtIndex?: number, isEditing?: boolean) => {
     let path = ''; let order = 0;
     if(isEditing){

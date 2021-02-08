@@ -19,11 +19,6 @@ export default function EditorNavbar(props) {
                     </div>
                 </div>
                 </div>
-                <div className="level-item">
-                    <div className="icon" data-tooltip="Copy SkillTree">
-                        <FontAwesomeIcon icon="copy"/>
-                    </div>
-                </div>
         </div>
         <div className="level-right">
             <div className="level-item">

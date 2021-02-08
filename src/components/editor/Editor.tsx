@@ -281,6 +281,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
             showSkillForm: true,
             currentSkill: skill,
             isEditingSkill: true,
+            numberOfSkills: skills.length,
             currentParentSkill: parentSkillIndex > -1 ? skills[parentSkillIndex] : undefined,
             currentSkilltree: parentSkilltreeIndex > -1 ? this.state.skilltrees[parentSkilltreeIndex] : undefined
         });
@@ -288,7 +289,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
 
     async updateSkill(skill: ISkill){
         if(!this.state.currentSkilltree) return;
-        await updateSkill(skill, this.state.currentSkilltree, this.state.currentParentSkill, this.state.isAddingRootSkillAtIndex, this.state.isEditingSkill)
+        await updateSkill(skill, this.state.currentSkilltree, this.state.numberOfSkills, this.state.currentParentSkill, this.state.isAddingRootSkillAtIndex, this.state.isEditingSkill)
         this.resetDefaultState();
     }
 
