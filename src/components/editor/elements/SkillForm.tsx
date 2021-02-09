@@ -4,7 +4,6 @@ import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import LinkCard from '../../layout/LinkCard';
 import ISkill from '../../../models/skill.model';
-import ISkilltree from '../../../models/skilltree.model';
 import IQuiz from '../../../models/quiz.model';
 import YouTubeForm from './YouTubeForm';
 import LinkFileUploader from './LinkFileUploader';
@@ -20,10 +19,7 @@ interface ISkillFormProps {
     isEditing: boolean;
     updateSkill: Function;
     closeModal: Function;
-    skill: ISkill;
-    skills: ISkill[];
-    skilltrees: ISkilltree[];
-    parent?: ISkill;
+    skill?: ISkill;
 }
 
 interface ISkillFormState{
@@ -212,7 +208,7 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
             <div className="modal-card">
                 <header className="modal-card-head">
                 <p className="modal-card-title">
-                {this.props.isEditing ?  'Editing ' + this.props.skill.title 
+                {this.props.isEditing ?  'Editing ' + this.props.skill?.title 
                                     : 'Add skill'}    
                 </p>
                 <button className="delete" aria-label="close" onClick={() =>this.props.closeModal()}></button>
@@ -318,7 +314,7 @@ export class  SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                     iconName: 'poll-h',
                     iconPrefix: 'fas',
                     reference: '/quizzes/' + this.state.quizId + '/results',
-                    title: this.props.skill.quizTitle || 'Quiz',
+                    title: this.props.skill?.quizTitle || 'Quiz',
                     description: 'This skill has a quiz! You can check the quiz results by clicking on the title.',
                     isQuizLink: true
                 }} deleteLink={this.removeQuiz}/>}

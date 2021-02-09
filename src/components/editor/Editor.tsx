@@ -351,9 +351,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                             order={this.state.isEditingSkilltree ? this.state.currentSkilltree?.order || 0 : this.state.skilltrees.length} />}
                         {this.state.showSkillForm && 
                             <SkillForm isEditing={this.state.isEditingSkill} updateSkill={this.updateSkill} closeModal={this.resetDefaultState}
-                                parent={this.state.currentParentSkill}
-                                skill={this.state.currentSkill ? this.state.currentSkill : {id: uuid(), ...standardEmptySkill}}
-                                skills={[]} skilltrees={[]} />}
+                                skill={this.state.currentSkill ? this.state.currentSkill : {id: uuid(), ...standardEmptySkill}} />}
                     </React.Fragment>
         )
     }

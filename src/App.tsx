@@ -33,6 +33,7 @@ import QuizResult from './components/quizzes/QuizResult';
 import JoinQuiz from './components/quizzes/JoinQuiz';
 import Skills from './components/skills/Skills';
 import SkillsUploader from './components/skills/SkillsUploader';
+import Skill from './components/skills/Skill';
 
 import CompositionAddStudents from './components/compositions/CompositionAddStudents';
 
@@ -77,6 +78,13 @@ function App(props) {
           exact
           path="/skills/upload-csv"
           component={SkillsUploader}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+        />
+        <ProtectedRoute 
+          path="/skills/:skillId"
+          exact
+          component={Skill}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
         />

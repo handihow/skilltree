@@ -439,3 +439,140 @@ export const toolbarConfig = {
 
 export const quizImage = 'https://cdn.pixabay.com/photo/2017/02/11/22/41/quiz-2058888_1280.png';
 
+export const iconImages = [
+  {
+    title: "Visual arts",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon-bv.png?alt=media&token=769bbbec-e96f-4972-aa45-9dad53e3e201",
+    category: 'Education'
+  },
+  {
+    title: "Geography",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_ak.png?alt=media&token=c22b8b22-b623-4819-84fe-cca812130091",
+    category: 'Education'
+  },
+  {
+    title: "Biology",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_bi.png?alt=media&token=e6337e85-5a81-48a7-afdd-7034c19aa5aa",
+    category: 'Education'
+  },
+  {
+    title: "First aid",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_EHBO.png?alt=media&token=c8c98bf2-88c0-44e6-8529-bf6655124b2c",
+    category: 'Education'
+  },
+  {
+    title: "Germany",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_du.png?alt=media&token=33f10fbf-db78-467b-9716-fcd2bf24c56b",
+    category: 'Education'
+  },
+  {
+    title: "Economics",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_ec%20.png?alt=media&token=9604b2fe-5092-491e-ba0f-b30420fe9ca1",
+    category: 'Education'
+  },
+  {
+    title: "England",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_en.png?alt=media&token=71a7ca54-c62f-40d8-9011-b08da9a908a5",
+    category: 'Education'
+  },
+  {
+    title: "Events and sports",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_ev.png?alt=media&token=bd21063e-7793-4e3e-a027-2c708765caf3",
+    category: 'Education'
+  },
+  {
+    title: "France",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_fa.png?alt=media&token=30beb38b-8789-4006-a806-4f4961a711c4",
+    category: 'Education'
+  },
+  {
+    title: "History",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_gs.png?alt=media&token=4ad97f98-79b3-4d4c-b7b7-0046f8a38cc2",
+    category: 'Education'
+  },
+  {
+    title: "ICT",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_ict.png?alt=media&token=33231897-6942-4636-b154-af7acbb28252",
+    category: 'Education'
+  },
+  {
+    title: "Physical education",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_lo.png?alt=media&token=de6b959c-1ea2-4a61-97f9-8e5576d5e649",
+    category: 'Education'
+  },
+  {
+    title: "Career orientation",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_lob.png?alt=media&token=8994d1de-3390-4771-af42-985803650ffa",
+    category: 'Education'
+  },
+  {
+    title: "Mentoring",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_men.png?alt=media&token=f60a97db-3c2e-4da5-8d1a-2ba0ce64320a",
+    category: 'Education'
+  },
+  {
+    title: "Social science",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_mk.png?alt=media&token=10e608fb-3c9f-48bf-be60-45888c402918",
+    category: 'Education'
+  },
+  {
+    title: "Civics",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_ml.png?alt=media&token=e5edc2f3-6e0f-4c54-bb1d-8c26e6df6955",
+    category: 'Education'
+  },
+  {
+    title: "Physics",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_na.png?alt=media&token=ef7b5e88-9ebd-4108-9637-0e98912cc5b2",
+    category: 'Education'
+  },
+  {
+    title: "Science",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_nask.png?alt=media&token=f31b95fc-f754-4edd-8ed5-ed9965e60f1d",
+    category: 'Education'
+  },
+  {
+    title: "Netherlands",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_ne.png?alt=media&token=2276fa86-92fe-4317-90f5-29cdb7c86224",
+    category: 'Education'
+  },
+  {
+    title: "Assignment",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_pws.png?alt=media&token=3068704d-c0e4-43d6-8dcb-2d060dee559f",
+    category: 'Education'
+  },
+  {
+    title: "Calculate",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_rek.png?alt=media&token=c1807ec4-7966-4077-9441-0240cbe61817",
+    category: 'Education'
+  },
+  {
+    title: "Robotics",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_ro.png?alt=media&token=6564d712-2ed8-48cf-b99c-f1e9cda6cc68",
+    category: 'Education'
+  },
+  {
+    title: "Chemistry",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_sk.png?alt=media&token=c1030132-aac7-4c57-ace0-82b06c65b294",
+    category: 'Education'
+  },
+  {
+    title: "Social skills",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_sova.png?alt=media&token=dae0b7e6-b230-43ed-98cf-90ccd94b88ea",
+    category: 'Education'
+  },
+  {
+    title: "Web shop",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_web.png?alt=media&token=29099cce-7033-401f-93c5-36e0bb02ae14",
+    category: 'Education'
+  },
+  {
+    title: "Mathematics",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_wi.png?alt=media&token=6ad8b0db-b2c0-48b9-96f2-9915fdfb78e4",
+    category: 'Education'
+  },
+  {
+    title: "Health",
+    link: "https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/icons%2Ficons_recon_zw.png?alt=media&token=e1cca1f8-cc3f-4067-a68f-f8cd57f4d14a",
+    category: 'Education'
+  }
+]
