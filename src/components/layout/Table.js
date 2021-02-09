@@ -1,5 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, {useMemo} from 'react';
+import { Link } from 'react-router-dom';
+
 import { useTable, useSortBy, useGlobalFilter, useRowSelect } from 'react-table';
 import GlobalFilter from './GlobalFilter';
 import Header from './Header';
@@ -25,8 +27,11 @@ export default function Table({
     data,
     columns,
     header,
-    onEdit,
-    updateData
+    onSelectMultiple,
+    selectMultipleButtonText,
+    updateData,
+    uploadLink,
+    isUploadEnabled
 }) {
     const memorizedData = useMemo(() => data, [data]);
     const memorizedColumns = useMemo(() => columns, [columns]);
@@ -92,13 +97,17 @@ export default function Table({
                 <GlobalFilter globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
               </div>
               <div className="level-item">
-                <button className="button" disabled={selectedFlatRows.length===0} onClick={() => onEdit(selectedFlatRows.map(
+                <button className="button" disabled={selectedFlatRows.length===0} onClick={() => onSelectMultiple(selectedFlatRows.map(
                     d => d.original
-                  ))}>Edit selection</button>
+                  ))}>{selectMultipleButtonText}</button>
+              </div>
+              <div className={`level-item ${isUploadEnabled ? '' : 'is-hidden'}`}>
+                <Link className="button" to={uploadLink ? uploadLink : ''}>Upload</Link>
               </div>
             </div>
         </div>
-        <table className="table is-bordered is-hoverable is-fullwidth" {...getTableProps()}>
+        <div className="table-container">
+        <table className="table is-bordered is-fullwidth" {...getTableProps()}>
           <thead>
             {// Loop over the header rows
             headerGroups.map(headerGroup => (
@@ -146,6 +155,7 @@ export default function Table({
             })}
           </tbody>
         </table>
+        </div>
         </React.Fragment>
       )
      

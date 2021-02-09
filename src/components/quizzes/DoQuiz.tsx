@@ -35,6 +35,11 @@ export class DoQuiz extends Component<IDoQuizProps,IDoQuizState> {
         const quizId = this.props.match.params.quizId;
         db.collection("quizzes").doc(quizId).get()
         .then(doc => {
+            if(!doc.exists) {
+                toast.error('Quiz not found');
+                this.props.history.goBack();
+                return;
+            }
             const quiz = doc.data() as IQuiz;
             if(!quiz.data){
                 toast('There are no questions in this quiz');

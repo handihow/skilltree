@@ -5,8 +5,7 @@ const EditableCell = ({
     value: initialValue,
     row: { index },
     column: { id },
-    updateData, // This is a custom function that we supplied to our table instance
-    inputType
+    updateData // This is a custom function that we supplied to our table instance
   }) => {
     // We need to keep and update the state of the cell normally
     const [value, setValue] = React.useState(initialValue)

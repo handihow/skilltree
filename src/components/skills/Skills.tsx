@@ -7,6 +7,8 @@ import { toast } from 'react-toastify';
 import Loading from '../layout/Loading';
 import Table from '../layout/Table';
 import EditableCell from '../layout/EditableCell';
+import { Link } from 'react-router-dom';
+import { propertyInArrayEqual } from '../../services/StandardFunctions';
 
 interface ISkillsProps {
   isAuthenticated: boolean;
@@ -15,8 +17,11 @@ interface ISkillsProps {
 
 interface ISkillsState {
   skills: ISkill[];
+  selectedSkills: ISkill[];
   currentSkill?: ISkill;
   doneLoading: boolean;
+  showCategoryEditor: boolean;
+  categoryTitle: string;
 }
 
 const columns = [
@@ -29,27 +34,21 @@ const columns = [
         Header: 'Composition',
         accessor: 'composition'
     },
-    {
-        Header: 'Hierarchy',
-        accessor: 'hierarchy'
-    },
-    {
-        Header: 'Links',
-        accessor: 'links',
-        Cell: (props) => {
-            return props.value.map(link => (
-                    <a href="link.reference" className="mr-3">{link.title}</a>
-                    ))
-                
-            
-        }
-    },
+    // {
+    //     Header: 'Hierarchy',
+    //     accessor: 'hierarchy'
+    // },
     {
         Header: 'Category',
         accessor: 'category',
         Cell: EditableCell
     },
-    
+    {
+        Header: "Actions",
+        Cell: (tableInfo) => (
+            <Link to={`/skills/${tableInfo.data[tableInfo.row.index].id}`} className="button">Open</Link>
+        )
+    }
 ]
 
 
@@ -58,7 +57,10 @@ class Skills extends Component<ISkillsProps, ISkillsState> {
         super(props)
         this.state = {
           skills: [],
-          doneLoading: false
+          selectedSkills: [],
+          doneLoading: false,
+          showCategoryEditor: false,
+          categoryTitle: ''
         }
       }
 
@@ -79,7 +81,7 @@ class Skills extends Component<ISkillsProps, ISkillsState> {
                     return composition
                 });
                 
-                db.collectionGroup("skills").where("composition", "in", compositions.map(c => c.id))
+                db.collectionGroup("skills").where("composition", "in", [ this.props.user.uid, ...compositions.map(c => c.id) ])
                 .get()
                 .then(skillsSnap => {
                     if(skillsSnap.empty){
@@ -130,8 +132,53 @@ class Skills extends Component<ISkillsProps, ISkillsState> {
     } 
 
     onEdit = (items) => {
-        console.log(items);
-    }    
+        //check if items have a common title
+        let categoryTitle = '';
+        const haveCommonCategoryTitle = propertyInArrayEqual(items, 'category');
+        if(haveCommonCategoryTitle){
+            categoryTitle = items[0].category;
+        }
+        this.setState({
+            selectedSkills: items,
+            categoryTitle
+        })
+        this.toggleCategyEditor();
+    }  
+    
+    toggleCategyEditor = () => {
+        this.setState({
+            showCategoryEditor: !this.state.showCategoryEditor
+        })
+    }
+
+    onChangeCategoryTitle = (e) => this.setState({categoryTitle: e.target.value});
+
+    setCategory = () => {
+        const batch = db.batch();
+        this.state.selectedSkills.forEach(skill => {
+            const ref = db.doc(skill.path || '');
+            batch.update(ref, {category: this.state.categoryTitle} );
+        });
+        batch.commit().then(_ => {
+            //update the skills
+            const skills = this.state.skills.map(skill => {
+                const found = this.state.selectedSkills.findIndex(ss => ss.id === skill.id) > -1;
+                if(found){
+                    return {
+                        ...skill,
+                        category: this.state.categoryTitle
+                    }
+                } else {
+                    return skill;
+                }
+            })
+            this.setState({
+                showCategoryEditor: false,
+                categoryTitle: '',
+                skills
+            })
+        });
+    }
 
     updateData = (index, id, value) => {
         if(!this.state.skills[index].path) return;
@@ -143,13 +190,44 @@ class Skills extends Component<ISkillsProps, ISkillsState> {
     render() {  
         return (
         this.state.doneLoading ? 
+        <React.Fragment>
         <section className="section has-background-white-ter" style={{minHeight: "100vh"}}>
-        <div className="container">
-            
-            <Table data={this.state.skills} columns={columns} header={'Skills'} onEdit={this.onEdit} updateData={this.updateData}/>
+            <div className="container">
+                <Table 
+                data={this.state.skills} 
+                columns={columns} 
+                header={'Skills'} 
+                onSelectMultiple={this.onEdit}
+                selectMultipleButtonText={'Edit selected'}
+                updateData={this.updateData}
+                uploadLink={'/skills/upload-csv'}
+                isUploadEnabled={true}/>
+            </div>
+        </section>
+        <div className={`modal ${this.state.showCategoryEditor ? 'is-active' : ''}`}>
+        <div className="modal-background"></div>
+        <div className="modal-card">
+            <header className="modal-card-head">
+                <p className="modal-card-title">Edit category on {this.state.selectedSkills.length} selected items</p>
+                <button className="delete" aria-label="close" onClick={this.toggleCategyEditor}></button>
+            </header>
+            <section className="modal-card-body">
+                    <input 
+                        className="input" 
+                        type="text" 
+                        placeholder="Enter category title..."
+                        value={this.state.categoryTitle}
+                        onChange={this.onChangeCategoryTitle} />
+            </section>
+            <footer className="modal-card-foot">
+                <button className="button" 
+                  onClick={this.toggleCategyEditor}>Cancel</button>
+                <button className="button is-link" 
+                  onClick={this.setCategory}>Set category</button>
+            </footer>
         </div>
-       
-        </section>    
+    </div>
+        </React.Fragment>    
         : <Loading />);    
     } 
 

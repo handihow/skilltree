@@ -110,3 +110,6 @@ export const arraysEqual = (a: any[], b: any[]) => {
     return true;
   }
 
+export const propertyInArrayEqual = (arr, property) => {
+    return arr.every( item => item[property] === arr[0][property]);
+}
