@@ -138,6 +138,13 @@ export const verifyAuth = () => dispatch => {
     .auth()
     .onAuthStateChanged(user => {
       if (user !== null) {
+        const provider = user?.providerData[0]?.providerId || null;
+        let hostedDomain;
+        if(provider && provider === 'google.com' && user.email && !['gmail.com', 'googlemail.com'].includes(user.email.split('@').pop() || '')){
+          hostedDomain = user.email.split('@').pop() || ''; 
+        } else if(provider && provider === 'microsoft.com' && user.email && !['outlook.com', 'live.com', 'hotmail.com'].includes(user.email.split('@').pop() || '')){
+          hostedDomain = user.email.split('@').pop() || ''; 
+        }
         //create or update user record in firestore db
         const signedInUser = {
           uid: user.uid,
@@ -145,7 +152,7 @@ export const verifyAuth = () => dispatch => {
           displayName: user.displayName,
           photoURL: user.photoURL ? user.photoURL : `https://eu.ui-avatars.com/api/?name=${user.displayName}`,
           emailVerified: user.emailVerified,
-          hostedDomain: user.email ? user.email.split('@').pop() : null,
+          hostedDomain: hostedDomain ? hostedDomain : null,
           provider: user?.providerData[0]?.providerId || null,
           creationTime: user?.metadata?.creationTime || null,
           lastSignInTime: user?.metadata?.lastSignInTime || null

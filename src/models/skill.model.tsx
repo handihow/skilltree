@@ -16,6 +16,7 @@ export default interface ISkill {
     quizId?: string;
     quizTitle?: string;
     category?: string;
+    reference?: string;
     //properties to track the parent and path
     parent?: string[];
     path?: string;
@@ -27,6 +28,8 @@ export default interface ISkill {
     name?: string;
     isSkill?: boolean;
     decorators?: any;
-    toggled?: boolean;    
-
+    toggled?: boolean;
+    //properties to assist in loading into skills table
+    compositionTitle?: string;
+    table?: string;
 }

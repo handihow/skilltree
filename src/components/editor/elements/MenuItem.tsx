@@ -1,14 +1,20 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-export default function MenuItem(props) {
+export default function MenuItem({
+  index,
+  title,
+  tooltip,
+  icon,
+  clicked,
+  isActive
+}) {
   return (
-    <li key={props.index}><NavLink to={props.link} activeClassName='is-active' className="pl-0 pt-0 has-text-centered" exact={props.exact}>
-        <div className="icon" data-tooltip={props.title}>
-        <FontAwesomeIcon icon={props.icon} />
+    <li key={index}><a href="# " className="pl-0 pt-0 has-text-centered" onClick={clicked}>
+        <div className="icon has-tooltip-right has-tooltip-primary" data-tooltip={isActive ? 'Click again to close editor' : tooltip}>
+        <FontAwesomeIcon icon={icon} />
         </div>
-        <div className="is-hidden-touch is-capitalized is-size-7">{props.title}</div></NavLink>
+        <div className="is-hidden-touch is-capitalized is-size-7">{isActive ? 'Close' : title}</div></a>
     </li>
   )
 }

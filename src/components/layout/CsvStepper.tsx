@@ -60,6 +60,7 @@ export default function CsvStepper({
                 selectMultipleButtonText={'Import selected records'}
                 updateData={() => {}}
                 isUploadEnabled={false}
+                isEditingEnabled={true}
                 uploadLink={null}
                 />
         </div>

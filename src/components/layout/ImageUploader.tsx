@@ -1,15 +1,14 @@
 import React, { Component } from 'react'
 import FileUploader from "react-firebase-file-uploader";
 import { db, storage } from '../../firebase/firebase';
-import { Redirect } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface IImageUploaderProps {
     compositionId: string;
+    doneUpdatingBackground: Function;
 }
 
 interface IImageUploaderState {
-    toEditor: boolean;
     isUploading: boolean;
     progress: number;
     uploadedBackgroundFile: string;
@@ -20,7 +19,6 @@ export class ImageUploader extends Component<IImageUploaderProps, IImageUploader
     constructor(props: IImageUploaderProps){
         super(props);
         this.state = {
-            toEditor: false,
             isUploading: false,
             progress: 0,
             uploadedBackgroundFile: '',
@@ -55,24 +53,19 @@ export class ImageUploader extends Component<IImageUploaderProps, IImageUploader
             hasBackgroundImage: true,
         }, {merge: true})
         .then( _=> {
-            this.setState({
-                toEditor: true
-            })
+            this.props.doneUpdatingBackground();
+
         })
     }
 
     cancelUseBackground = () => {
-        this.setState({
-            toEditor: true
-        })
+        this.props.doneUpdatingBackground();
     }
 
     render() {
         return (
-            this.state.toEditor ? 
-            <Redirect to={`/compositions/${this.props.compositionId}`}/> :
             <React.Fragment>
-            <label className="button is-primary is-medium is-primary is-outlined is-rounded" data-tooltip="Upload Image">
+            <label className="button is-primary is-medium is-primary is-outlined is-rounded has-tooltip-bottom" data-tooltip="Upload Image">
             <FontAwesomeIcon icon='upload' />
             <FileUploader
                 accept="image/*"

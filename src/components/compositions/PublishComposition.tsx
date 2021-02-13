@@ -70,7 +70,7 @@ export class PublishComposition extends Component<RouteComponentProps<TParams>, 
         return (
             <div className="columns is-mobile" style={{height:"95vh"}}>
                 <div className="column is-2">
-                    <EditorMenu id={compositionId} hideDraggables={true} />
+                    {/* <EditorMenu id={compositionId} hideDraggables={true} /> */}
                 </div>
                 <div className="column" style={{marginTop: "30px"}}>
                         <Header header='Publish' icon="share"></Header>

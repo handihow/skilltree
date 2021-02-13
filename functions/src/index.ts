@@ -109,7 +109,6 @@ exports.secret = functions.https.onCall((data, context) => {
       email: user.email,
       emailVerified: user.emailVerified,
       photoURL: user.photoURL ? user.photoURL : `https://eu.ui-avatars.com/api/?name=${user.displayName}`,
-      hostedDomain: user.email ? user.email.split('@').pop() : null,
       provider: user?.providerData[0]?.providerId || null,
       creationTime: user?.metadata?.creationTime || null
     }, {merge: true});

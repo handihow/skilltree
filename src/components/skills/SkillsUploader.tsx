@@ -21,7 +21,7 @@ interface ISkillsUploaderState {
     toSkillsList: boolean;
   }
 
-const availableColumns = ['title', 'description', 'category'];
+const availableColumns = ['title', 'description', 'category', 'reference'];
 
 class SkillsUploader extends Component<ISkillsUploaderProps, ISkillsUploaderState>  {
     constructor(props: ISkillsUploaderProps){
@@ -68,7 +68,6 @@ class SkillsUploader extends Component<ISkillsUploaderProps, ISkillsUploaderStat
                 step: 3
             });
         } else {
-            console.log(items);
             const batch = db.batch();
             items.forEach(item => {
                 const id = uuid();
@@ -155,7 +154,7 @@ class SkillsUploader extends Component<ISkillsUploaderProps, ISkillsUploaderStat
                 mappedColumn={this.mappedColumn}
                 doneMapping={this.doneMapping}
                 startAgain={this.startAgain}
-                templateLink={'https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/templates%2FTemplate%20skills%20upload.xlsx?alt=media&token=9e3aa2b9-be2b-4421-9306-d826df5ca3bc'}/>
+                templateLink={'https://firebasestorage.googleapis.com/v0/b/skilltree-b6bba.appspot.com/o/templates%2FTemplate%20skills%20upload.xlsx?alt=media&token=b77e96c6-fcc9-4289-9faa-6c341818091d'}/>
 
             
         )

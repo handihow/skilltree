@@ -8,20 +8,24 @@ import MenuItem from '../elements/MenuItem';
 interface IEditorMenuProps {
   id: string;
   hideDraggables: boolean;
+  toggleBackgroundEditor: Function;
+  isVisibleBackgroundEditor: boolean;
+  toggleThemeEditor: Function;
+  isVisibleThemeEditor: boolean;
 }
 
 export default function EditorMenu(props: IEditorMenuProps) {
   const draggableMenuItems = [
-    {'title': "Skilltree", 'img': "/Skilltree_icons-04.svg"},
-    {'title': "Root-skill", 'img': "/Skilltree_icons-05.svg"},
-    {'title': "Sibling-left-skill", 'img': "/Skilltree_icons-02.svg"},
-    {'title': "Sibling-right-skill", 'img': "/Skilltree_icons-03.svg"},
-    {'title': 'Child-skill', 'img': "/Skilltree_icons-01.svg" },
-    {'title': 'Quiz', 'img': "/Skilltree_icons-grey_Q&A black.svg"}
+    {'title': "Skilltree", 'img': "/Skilltree_icons-04.svg", 'tooltip': 'Add a skilltree'},
+    {'title': "Root-skill", 'img': "/Skilltree_icons-05.svg",  'tooltip': 'Add skill to root of skilltree'},
+    {'title': "Sibling-left-skill", 'img': "/Skilltree_icons-02.svg", 'tooltip': 'Add skill as sibling to skill'},
+    {'title': "Sibling-right-skill", 'img': "/Skilltree_icons-03.svg", 'tooltip': 'Add skill as sibling to skill'},
+    {'title': 'Child-skill', 'img': "/Skilltree_icons-01.svg", 'tooltip': 'Add skill as child of skill' },
+    {'title': 'Master-skills', 'icon': "th-list", 'tooltip': 'Add skills from master skills list'}
   ];
   const appearanceMenuItems = [
-    {'title': 'Background', 'icon': 'image', 'link': "/editor/"+props.id +"/background", 'exact': false},
-    {'title': 'Theme', 'icon': 'sliders-h', 'link': "/editor/"+props.id +"/theme", 'exact': false},
+    {'title': 'Background', 'icon': 'image', 'clicked': 'toggleBackgroundEditor', 'active': 'isVisibleBackgroundEditor', 'tooltip': 'Customize the background of the composition'},
+    {'title': 'Theme', 'icon': 'sliders-h', 'clicked': 'toggleThemeEditor', 'active': 'isVisibleThemeEditor', 'tooltip': 'Customize the appearance of the skilltree'},
   ];
   return (
     <aside className="menu has-background-light has-text-centered pt-4">
@@ -41,22 +45,24 @@ export default function EditorMenu(props: IEditorMenuProps) {
                 title={item.title}
                 index={index}
                 img={item.img}
+                icon={item.icon}
+                tooltip={item.tooltip}
               ></DraggableMenuItem>
             ))}
             </React.Fragment>
-            {props.hideDraggables &&
-            <React.Fragment>
-              <p className="menu-label is-hidden-touch">
-              Editor
-              </p>
-              <MenuItem title="Back to editor" icon="arrow-left" link={"/editor/"+props.id} exact={true}></MenuItem>
-            </React.Fragment>
-            }
             <p className="menu-label is-hidden-touch">
               Appearance
             </p>
             {appearanceMenuItems.map((item, index) => (
-              <MenuItem key={index} title={item.title} icon={item.icon} link={item.link} exact={item.exact}></MenuItem>
+              <MenuItem 
+                key={index} 
+                index={index} 
+                title={item.title} 
+                tooltip={item.tooltip}
+                icon={item.icon} 
+                clicked={props[item.clicked]}
+                isActive={props[item.active]}
+                ></MenuItem>
             ))}
             {provided.placeholder}
           </ul>

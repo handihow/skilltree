@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 
 import { useTable, useSortBy, useGlobalFilter, useRowSelect } from 'react-table';
 import GlobalFilter from './GlobalFilter';
-import Header from './Header';
 
 const IndeterminateCheckbox = React.forwardRef(
   ({ indeterminate, ...rest }, ref) => {
@@ -31,7 +30,8 @@ export default function Table({
     selectMultipleButtonText,
     updateData,
     uploadLink,
-    isUploadEnabled
+    isUploadEnabled,
+    isEditingEnabled
 }) {
     const memorizedData = useMemo(() => data, [data]);
     const memorizedColumns = useMemo(() => columns, [columns]);
@@ -86,17 +86,14 @@ export default function Table({
         <div className="level">
             <div className="level-left">
               <div className="level-item">
-                <Header header={header} />
+                <h3 className="title is-5">{header}</h3>
               </div>
-              {/* <div className={`level-item ${selectedFlatRows.length===0 ? 'is-hidden' : ''}`}>
-                methods
-              </div> */}
             </div>
             <div className="level-right">
               <div className="level-item">
                 <GlobalFilter globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
               </div>
-              <div className="level-item">
+              <div className={`level-item ${isEditingEnabled ? '' : 'is-hidden'}`}>
                 <button className="button" disabled={selectedFlatRows.length===0} onClick={() => onSelectMultiple(selectedFlatRows.map(
                     d => d.original
                   ))}>{selectMultipleButtonText}</button>
@@ -107,7 +104,7 @@ export default function Table({
             </div>
         </div>
         <div className="table-container">
-        <table className="table is-bordered is-fullwidth" {...getTableProps()}>
+        <table className="table is-fullwidth" {...getTableProps()}>
           <thead>
             {// Loop over the header rows
             headerGroups.map(headerGroup => (

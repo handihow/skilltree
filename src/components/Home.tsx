@@ -11,6 +11,7 @@ import IComposition from '../models/composition.model';
 import firebase from 'firebase/app';
 import { Redirect } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { getRelevantUserIds } from '../services/UserServices';
 
 interface IHomeProps {
   isAuthenticated: boolean;
@@ -20,6 +21,7 @@ interface IHomeProps {
 interface IHomeState {
   compositions: IComposition[];
   sharedCompositions: IComposition[];
+  hostedDomainCompositions: IComposition[];
   isEditingTitle: boolean;
   currentComposition?: IComposition;
   unsubscribeOwned?: any;
@@ -42,6 +44,7 @@ class Home extends Component<IHomeProps, IHomeState> {
       activeTab: 'owned',
       compositions: [],
       sharedCompositions: [],
+      hostedDomainCompositions: [],
       isEditingTitle: false,
       isActive: false,
       isAddingOrEditing: false,
@@ -49,28 +52,33 @@ class Home extends Component<IHomeProps, IHomeState> {
     }
   }
   
-  componentDidMount() {
+  async componentDidMount() {
+      const userIds = await getRelevantUserIds(this.props.user);
       const unsubscribeOwned = db.collection("compositions")
-        .where('user', '==', this.props.user.uid)
+        .where('user', 'in', userIds)
         .orderBy('lastUpdate', "desc")
         .onSnapshot(querySnapshot => {
-          const ownCompositions = querySnapshot.docs.map(doc => doc.data() as IComposition);
+          const allHostedDomainCompositions = querySnapshot.docs.map(doc => doc.data() as IComposition);
+          const ownCompositions = allHostedDomainCompositions.filter(hdc => hdc.user === this.props.user.uid);
+          const hostedDomainCompositions = allHostedDomainCompositions.filter(hdc => hdc.user !== this.props.user.uid);
           this.setState({ 
             compositions: ownCompositions,
+            hostedDomainCompositions: hostedDomainCompositions,
             unsubscribeOwned: unsubscribeOwned 
           });
         });
       
-        const unsubscribeShared = db.collection("compositions")
-        .where('sharedUsers', 'array-contains', this.props.user.uid)
-        .orderBy('lastUpdate', "desc")
-        .onSnapshot(querySnapshot => {
-          const sharedCompositions = querySnapshot.docs.map(doc => doc.data() as IComposition);
-          this.setState({ 
-            sharedCompositions: sharedCompositions,
-            unsubscribeShared: unsubscribeShared 
-          });
+      const unsubscribeShared = db.collection("compositions")
+      .where('sharedUsers', 'array-contains', this.props.user.uid)
+      .orderBy('lastUpdate', "desc")
+      .onSnapshot(querySnapshot => {
+        const sharedCompositions = querySnapshot.docs.map(doc => doc.data() as IComposition);
+        this.setState({ 
+          sharedCompositions: sharedCompositions,
+          unsubscribeShared: unsubscribeShared 
         });
+      });
+      
 
   } 
 
@@ -269,11 +277,15 @@ class Home extends Component<IHomeProps, IHomeState> {
               <li className={this.state.activeTab ==='shared' ? "is-active" : undefined}>
                   <a href="# " onClick={() => this.changeActiveTab('shared')}>Shared SkillTrees</a>
               </li>
+              {this.props.user.hostedDomain && <li className={this.state.activeTab ==='domain' ? "is-active" : undefined}>
+                  <a href="# " onClick={() => this.changeActiveTab('domain')}>Skilltrees in {this.props.user.hostedDomain}</a>
+              </li>}
           </ul>
           </div>
           {this.state.compositions && 
             <Compositions 
-              compositions={this.state.activeTab === 'owned' ? this.state.compositions : this.state.sharedCompositions} 
+              compositions={this.state.activeTab === 'owned' ? this.state.compositions : 
+                this.state.activeTab ==='shared' ? this.state.sharedCompositions : this.state.hostedDomainCompositions} 
               editCompositionTitle={this.toggleIsAddingOrEditing}
               deleteComposition={this.toggleIsActive} />
           }

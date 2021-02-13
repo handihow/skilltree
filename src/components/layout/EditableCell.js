@@ -24,7 +24,7 @@ const EditableCell = ({
       setValue(initialValue)
     }, [initialValue])
     
-    return <input className="input" value={value} onChange={onChange} onBlur={onBlur} />
+    return <input className="is-rounded input" value={value} onChange={onChange} onBlur={onBlur} />
   }
 
 export default EditableCell

@@ -1,4 +1,5 @@
 export default interface IResult {
+    id?: string;
     user: string; //refers to the user uid
     displayName: string;
     email: string;

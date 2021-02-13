@@ -19,6 +19,8 @@ import SkillForm from './elements/SkillForm';
 import ISkill from '../../models/skill.model';
 import {updateSkill} from '../../services/SkillServices';
 import { v4 as uuid } from "uuid";
+import BackgroundEditor from './layout/BackgroundEditor';
+import ThemeEditor from './layout/ThemeEditor';
 
 type TParams = { compositionId: string };
 
@@ -51,6 +53,8 @@ interface IEditorState {
     isAddingSiblingSkill: boolean;
     isAddingChildSkill: boolean;
     destroyInProgress: boolean;
+    showBackgroundEditor: boolean;
+    showThemeEditor: boolean;
 }
 
 const defaultState = {
@@ -68,7 +72,9 @@ const defaultState = {
     isAddingRootSkillAtIndex: 0,
     currentParentSkill: undefined,
     currentSkill: undefined,
-    currentSkilltree: undefined
+    currentSkilltree: undefined,
+    showBackgroundEditor: false,
+    showThemeEditor: false
 }
 
 export class Editor extends Component<IEditorProps, IEditorState> {
@@ -105,9 +111,8 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         this.subscribeSkilltreeChanges();
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(_prevProps) {
         if(this.props.hasDismissedWarning && !this.state.destroyInProgress){
-            console.log('you should delete the skill now');
             this.deleteSkilltree();
         }
     }
@@ -201,7 +206,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
             this.setState({
                 showSkilltreeForm: true
             });
-        } else if(result.draggableId==='root-skill' && this.state.skilltrees){
+        } else if(result.draggableId === 'root-skill' && this.state.skilltrees){
             const skilltreeId = result.destination.droppableId.replace("SKILLTREE-", "");
             const skilltreeIndex = this.state.skilltrees.findIndex(st => st.id === skilltreeId);
             if(skilltreeIndex === -1) return;
@@ -209,12 +214,11 @@ export class Editor extends Component<IEditorProps, IEditorState> {
             this.setState({
                 showSkillForm: true,
                 isAddingRootSkillAtIndex: order,
-                currentSkilltree: this.state.skilltrees[skilltreeIndex]
+                currentSkilltree: this.state.skilltrees[skilltreeIndex],
             })
         } else {
             console.log(result);
         }
-
     }
 
     async moveExistingSkilltree(result) {
@@ -293,6 +297,24 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         this.resetDefaultState();
     }
 
+    toggleBackgroundEditor = async () => {
+        if(this.state.showBackgroundEditor && this.state.composition?.id){
+            const composition = await getComposition(this.state.composition.id);
+            this.setCompositionBackground(composition || this.state.composition);
+        }
+        this.setState({
+            showBackgroundEditor: !this.state.showBackgroundEditor,
+            showThemeEditor: false
+        })
+    }
+
+    toggleThemeEditor = async () => {
+        this.setState({
+            showThemeEditor: !this.state.showThemeEditor,
+            showBackgroundEditor: false
+        })
+    }
+
 
     render() {
         const editorDisplayStyles: React.CSSProperties = {
@@ -304,6 +326,12 @@ export class Editor extends Component<IEditorProps, IEditorState> {
             backgroundImage: this.state.hasBackgroundImage ? `url(${this.state.backgroundImage})` : 'unset',
             backgroundSize: this.state.hasBackgroundImage ? 'cover' : 'unset',
         };
+
+        const backgroundAndThemeEditorStyles: React.CSSProperties = {  
+            height: "calc(100vh - 5rem - 30px)",
+            overflowY: 'auto',
+            overflowX: 'hidden',
+       }
         return (
             this.state.toEditor ?
                 <Redirect to={'/'} /> :
@@ -318,15 +346,24 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                             <div className="columns is-mobile mb-0 mt-0">
 
                                 <div className="column is-1 has-background-light pr-0 pt-0">
-                                    <EditorMenu id={this.props.match.params.compositionId} hideDraggables={false} />
+                                    <EditorMenu 
+                                        id={this.props.match.params.compositionId} 
+                                        hideDraggables={false} 
+                                        toggleThemeEditor={this.toggleThemeEditor}
+                                        isVisibleThemeEditor={this.state.showThemeEditor}
+                                        toggleBackgroundEditor={this.toggleBackgroundEditor}
+                                        isVisibleBackgroundEditor={this.state.showBackgroundEditor}
+                                    />
                                 </div>
+                                {this.state.showBackgroundEditor && !this.state.showThemeEditor && <div className="column is-4" style={backgroundAndThemeEditorStyles}>
+                                    <BackgroundEditor doneUpdatingBackground={this.toggleBackgroundEditor} compositionId={this.state.composition?.id || ''} />
+                                </div>}
                                 <div className="column pl-0 mt-0" style={{
                                         overflowY: 'auto',
                                         overflowX: 'hidden',
                                         ...editorDisplayStyles
                                     }}>
-                                    {this.state.skilltrees && this.state.skilltrees.length > 0 && this.state.composition &&
-
+                                    {this.state.skilltrees && this.state.skilltrees.length > 0 && this.state.composition && !this.state.showThemeEditor &&
                                         <EditorDisplay
                                             theme={this.state.composition.theme}
                                             skilltrees={this.state.skilltrees || []}
@@ -338,6 +375,8 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                                             editSkilltree={this.editSkilltree}
                                             deleteSkilltree={this.prepareDeleteSkilltree}
                                             editSkill={this.editSkill}/>}
+                                    {this.state.skilltrees && this.state.skilltrees.length > 0 && this.state.composition && this.state.showThemeEditor &&
+                                        <ThemeEditor compositionId={this.state.composition.id || ''} doneUpdatingTheme={this.toggleThemeEditor} />}
                                 </div>
                             </div>
 

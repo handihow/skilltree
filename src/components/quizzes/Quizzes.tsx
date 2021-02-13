@@ -11,7 +11,7 @@ import { toast } from 'react-toastify';
 import firebase from 'firebase/app';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Redirect } from 'react-router-dom';
-
+import { getRelevantUserIds } from '../../services/UserServices';
 
 interface IQuizzesProps {
   isAuthenticated: boolean;
@@ -21,6 +21,7 @@ interface IQuizzesProps {
 interface IQuizzesState {
   quizzes: IQuiz[];
   sharedQuizzes: IQuiz[];
+  hostedDomainQuizzes: IQuiz[];
   isEditingTitle: boolean;
   currentQuiz?: IQuiz;
   unsubscribeOwned?: any;
@@ -39,6 +40,7 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
         this.state = {
           quizzes: [],
           sharedQuizzes: [],
+          hostedDomainQuizzes: [],
           isEditingTitle: false,
           isAddingOrEditing: false,
           isActive: false,
@@ -48,14 +50,18 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
         }
       }
 
-    componentDidMount() {
+    async componentDidMount() {
+      const userIds = await getRelevantUserIds(this.props.user);
       const unsubscribeOwned = db.collection("quizzes")
-        .where('user', '==', this.props.user.uid)
+        .where('user', 'in', userIds)
         .orderBy('lastUpdate', "desc")
         .onSnapshot(querySnapshot => {
-          const ownQuizzes = querySnapshot.docs.map(doc => doc.data() as IQuiz);
+          const allHostedDomainQuizzes = querySnapshot.docs.map(doc => doc.data() as IQuiz);
+          const ownQuizzes = allHostedDomainQuizzes.filter(hdc => hdc.user === this.props.user.uid);
+          const hostedDomainQuizzes = allHostedDomainQuizzes.filter(hdc => hdc.user !== this.props.user.uid);
           this.setState({ 
             quizzes: ownQuizzes,
+            hostedDomainQuizzes,
             unsubscribeOwned: unsubscribeOwned 
           });
         });
@@ -192,11 +198,16 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
                   <li className={this.state.activeTab ==='shared' ? "is-active" : undefined}>
                       <a href="# " onClick={() => this.changeActiveTab('shared')}>Shared Quizzes</a>
                   </li>
+                  {this.props.user.hostedDomain && <li className={this.state.activeTab ==='domain' ? "is-active" : undefined}>
+                      <a href="# " onClick={() => this.changeActiveTab('domain')}>Quizzes in {this.props.user.hostedDomain}</a>
+                  </li>}
               </ul>
               </div>
 
+
               {((this.state.quizzes.length === 0 && this.state.activeTab==='owned') || 
-              (this.state.sharedQuizzes.length === 0 && this.state.activeTab === 'shared')) && 
+              (this.state.sharedQuizzes.length === 0 && this.state.activeTab === 'shared') || 
+              (this.state.hostedDomainQuizzes.length === 0 && this.state.activeTab === 'domain')) && 
                 <article className="message is-primary">
                 <div className="message-header">No Quizzes yet.. </div>
                 <div className="message-body">
@@ -215,6 +226,13 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
                 ))}
             {this.state.activeTab === 'shared' && 
                  this.state.sharedQuizzes?.map((quiz) => (
+                    <QuizItem key={quiz.id} quiz={quiz} 
+                    editQuizTitle={() => {}}
+                    deleteQuiz={() => {}}
+                     />
+                ))}
+            {this.state.activeTab === 'domain' && 
+                 this.state.hostedDomainQuizzes?.map((quiz) => (
                     <QuizItem key={quiz.id} quiz={quiz} 
                     editQuizTitle={() => {}}
                     deleteQuiz={() => {}}

@@ -1,40 +1,34 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { db, googleFontAPIKey } from '../../firebase/firebase';
-import { Redirect, Link, RouteComponentProps } from 'react-router-dom';
+import { db, googleFontAPIKey } from '../../../firebase/firebase';
 import { SketchPicker } from 'react-color';
-import SelectFieldWithColumn from '../layout/SelectFieldWithColumn';
-import CompositionDisplay from '../layout/CompositionDisplay';
-import {standardSkilltree, allColors, gradients} from '../../services/StandardData';
-import features from '../payments/Features';
+import SelectFieldWithColumn from '../../layout/SelectFieldWithColumn';
+import CompositionDisplay from '../../layout/CompositionDisplay';
+import {standardSkilltree, allColors, gradients} from '../../../services/StandardData';
 import { toast } from 'react-toastify';
 import firebase from 'firebase/app';
-import IComposition from '../../models/composition.model';
+import IComposition from '../../../models/composition.model';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Header from '../layout/Header';
+import Header from '../../layout/Header';
 
-type TParams =  { compositionId: string };
+interface IThemeEditorProps {
+    compositionId: string;
+    doneUpdatingTheme: Function;
+}
 
-interface ICompositionThemeState {
-    toEditor: boolean;
+interface IThemeEditorState {
     doneLoading: boolean;
-    hasUnlockedAllCustomThemeOptions: boolean;
     fontFamilies?: any[];
     theme?: any;
     composition?: IComposition;
-    unsubscribe?: any;
 }
 
-const featureId = 'custom-theme-options';
+export class ThemeEditor extends Component<IThemeEditorProps, IThemeEditorState> {
 
-export class CompositionTheme extends Component<RouteComponentProps<TParams>, ICompositionThemeState> {
-
-    constructor(props: RouteComponentProps<TParams>){
+    constructor(props: IThemeEditorProps){
         super(props);
         this.state = {
-            toEditor: false,
-            doneLoading: false,
-            hasUnlockedAllCustomThemeOptions: true
+            doneLoading: false
         }
     }
     
@@ -59,14 +53,12 @@ export class CompositionTheme extends Component<RouteComponentProps<TParams>, IC
     }
 
     saveChanges = () => {
-        db.collection('compositions').doc(this.props.match.params.compositionId).set({
+        db.collection('compositions').doc(this.props.compositionId).set({
                 theme: this.state.theme,
                 lastUpdate: firebase.firestore.Timestamp.now()
         }, {merge: true})
         .then(_ => {
-            this.setState({
-                toEditor: true
-            });
+            this.props.doneUpdatingTheme();
         })
         .catch(e => {
             console.error(e);
@@ -89,7 +81,7 @@ export class CompositionTheme extends Component<RouteComponentProps<TParams>, IC
             toast.error('Could not load Google fonts ' + e);
         })
 
-        db.collection('compositions').doc(currentComponent.props.match.params.compositionId).get()
+        db.collection('compositions').doc(currentComponent.props.compositionId).get()
             .then(doc => {
                 const data = doc.data() as IComposition;
                 currentComponent.setState({
@@ -100,27 +92,7 @@ export class CompositionTheme extends Component<RouteComponentProps<TParams>, IC
             .catch(e => {
                 toast.error(e.message);
             })
-        const unsubscribe = db.collection('compositions')
-            .doc(currentComponent.props.match.params.compositionId)
-            .collection('payments')
-            .doc(featureId)
-            .onSnapshot(function(doc) {
-                if(doc.exists){
-                    const paymentRecord = doc.data();
-                    if(paymentRecord?.success){
-                        currentComponent.setState({
-                            hasUnlockedAllCustomThemeOptions: true
-                        })
-                    }
-                }
-            });
-        currentComponent.setState({
-            unsubscribe: unsubscribe
-        })
-    }
-    
-    componentWillUnmount(){
-        this.state.unsubscribe();
+
     }
 
     render() {
@@ -223,82 +195,68 @@ export class CompositionTheme extends Component<RouteComponentProps<TParams>, IC
         ];
         
         return (
-            this.state.toEditor ?
-                <Redirect to={`/compositions/${this.props.match.params.compositionId}`} /> :
-                this.state.doneLoading && <div className="columns is-mobile">
-                    <div className="column is-2">
-                        {/* <EditorMenu id={this.props.match.params.compositionId} hideDraggables={true} /> */}
+                this.state.doneLoading && 
+                <div className="p-5 has-background-white">
+                <div className="level is-mobile">
+                    <div className="level-left">
+                        <Header header='Theme editor' icon="sliders-h"></Header>
                     </div>
-                    <div className="column" style={{ marginTop: "30px", marginRight: "10px" }}>
-                        <div className="level is-mobile">
-                            <div className="level-left">
-                                <Header header='Appearance' icon="sliders-h"></Header>
-                            </div>
-                            <div className="level-right">
-                                <div className="level-item">
-                                    <button className="button is-medium is-primary is-outlined is-rounded" 
-                                    onClick={this.saveChanges} data-tooltip="Save Changes">
-                                        <FontAwesomeIcon icon='save' />
-                                    </button>
-                                </div>
-                                <div className="level-item">
-                                    {!this.state.hasUnlockedAllCustomThemeOptions && 
-                                    <Link to={`/compositions/${this.props.match.params.compositionId}/unlock/custom-theme-options`} 
-                                    className="button">Unlock all options ${features[featureId].amount}</Link>}
-                                </div>
-                            </div>
-                        </div>
-                        <hr></hr>
-                        <div className="columns">
-                            <div className="column">
-                                <div className="columns is-multiline">
-                                {defaultSelectOptions.map((selectOption) => (
-                                    <SelectFieldWithColumn
-                                    key={selectOption.name}
-                                    title={selectOption.title}
-                                    name={selectOption.name}
-                                    value={selectOption.value}
-                                    onChange={this.handleChange}
-                                    options={selectOption.options || []}/>
-                                ))}
-                                {this.state.hasUnlockedAllCustomThemeOptions && 
-                                additionalSelectOptions.map((selectOption) => (
-                                    <SelectFieldWithColumn
-                                    key={selectOption.name}
-                                    title={selectOption.title}
-                                    name={selectOption.name}
-                                    value={selectOption.value}
-                                    onChange={this.handleChange}
-                                    options={selectOption.options || []}/>
-                                ))}
-                                <div className="column">
-                                    <div className="field">
-                                        <label className="label">Tree background</label>
-                                        <div className="control">
-                                            <SketchPicker
-                                                color={ this.state.theme ? this.state.theme.treeBackgroundColor : '' }
-                                                onChangeComplete={ this.handleBackgroundColorChange }
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            </div>
-                            <div className="column is-narrow">
-                                {this.state.theme && this.state.composition && <CompositionDisplay
-                                showController={false}
-                                composition={this.state.composition} 
-                                theme={this.state.theme} 
-                                skilltrees={[standardSkilltree]}
-                                title='' />} 
-                            </div>
-                        </div>
-                        
+                    <div className="level-right">
+                        <div className="level-item">
+                            <button className="button is-medium is-primary is-outlined is-rounded" 
+                            onClick={this.saveChanges} data-tooltip="Save Changes">
+                                <FontAwesomeIcon icon='save' />
+                            </button>
                         </div>
                     </div>
-                    
+                </div>
+                <hr></hr>
+                <div className="columns">
+                    <div className="column">
+                        <div className="columns is-multiline">
+                        {defaultSelectOptions.map((selectOption) => (
+                            <SelectFieldWithColumn
+                            key={selectOption.name}
+                            title={selectOption.title}
+                            name={selectOption.name}
+                            value={selectOption.value}
+                            onChange={this.handleChange}
+                            options={selectOption.options || []}/>
+                        ))}
+                        {additionalSelectOptions.map((selectOption) => (
+                            <SelectFieldWithColumn
+                            key={selectOption.name}
+                            title={selectOption.title}
+                            name={selectOption.name}
+                            value={selectOption.value}
+                            onChange={this.handleChange}
+                            options={selectOption.options || []}/>
+                        ))}
+                        <div className="column">
+                            <div className="field">
+                                <label className="label">Tree background</label>
+                                <div className="control">
+                                    <SketchPicker
+                                        color={ this.state.theme ? this.state.theme.treeBackgroundColor : '' }
+                                        onChangeComplete={ this.handleBackgroundColorChange }
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    <div className="column is-narrow">
+                        {this.state.theme && this.state.composition && <CompositionDisplay
+                        showController={false}
+                        composition={this.state.composition} 
+                        theme={this.state.theme} 
+                        skilltrees={[standardSkilltree]}
+                        title='' />} 
+                    </div>
+                </div>
+            </div>         
         )
     }
 }
 
-export default CompositionTheme
+export default ThemeEditor
