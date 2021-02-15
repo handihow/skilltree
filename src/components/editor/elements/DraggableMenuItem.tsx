@@ -18,7 +18,7 @@ export default function DraggableMenuItem({
             {...provided.draggableProps}
             {...provided.dragHandleProps}>
             <div className="has-text-centered">
-            <div className="icon has-text-dark has-tooltip-right has-tooltip-info" data-tooltip={tooltip}>
+            <div className="icon has-text-dark has-tooltip-right has-tooltip-primary" data-tooltip={tooltip}>
               {img ? <img src={img} alt=""></img> : <FontAwesomeIcon icon={icon} />}
             </div>
             <div className="is-hidden-touch is-capitalized is-size-7">{title}</div>

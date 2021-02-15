@@ -8,7 +8,7 @@ export const getComposition = async (compositionId: string) => {
     if(!compositionSnap.exists) {
         return null
     };
-    return compositionSnap.data() as IComposition;
+    return {...compositionSnap.data(), id: compositionSnap.id} as IComposition;
 }
 
 export const updateCompositionTimestamp = (compositionId) => {
@@ -17,8 +17,8 @@ export const updateCompositionTimestamp = (compositionId) => {
     })
 }
 
-export const updateCompositionTitle = (compositionId: string, title: string) => {
+export const updateCompositionProperty = (compositionId: string, property: string, value: string) => {
     db.collection('compositions').doc(compositionId).update({
-        title: title
+        [property]: value
     })
 }

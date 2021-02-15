@@ -10,6 +10,7 @@ import firebase from "firebase/app";
 import ReactImageFallback from "react-image-fallback";
 import { CSVLink } from "react-csv";
 import YouTube from 'react-youtube';
+import BackButton from '../layout/BackButton';
 
 type TParams =  { compositionId: string };
 
@@ -153,6 +154,9 @@ export class CompositionMonitor extends Component<ICompositionMonitorProps, ICom
                         </div>
                     </div>
                     <div className="level-right">
+                    <div className="level-item">
+                            <BackButton />
+                        </div>
                         <div className="level-item">
                             {this.state.composition && 
                             <Link to={`/compositions/${this.state.composition?.id || ''}/add-students`} 

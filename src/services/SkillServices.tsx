@@ -8,14 +8,43 @@ import { v4 as uuid } from "uuid";
 import firebase from 'firebase/app';
 import { getFlatDataFromTree } from 'react-sortable-tree';
 
-export const updateSkill = (updatedSkill: ISkill, parentSkilltree: ISkilltree, totalNumberOfSkillsInComposition: number, 
+export const getSkillById = (skillId: string) => {
+    return db.collectionGroup('skills').where('id', '==', skillId).get()
+    .then(snap => {
+        if(snap.empty){
+            return null;
+        } else {
+            return {...snap.docs[0].data(), path: snap.docs[0].ref.path, id: snap.docs[0].id} as ISkill
+        }
+    })
+    .catch(err => {
+        toast.error('Error finding skill ...' + err.message);
+        return null;
+    })
+}
+
+export const importMultipleSkills = async (
+    importedSkills: ISkill[], 
+    parentSkilltree: ISkilltree, 
+    isAddingRootSkillsAtIndex: number
+) => {
+    for (let index = 0; index < importedSkills.length; index++) {
+        const skill = importedSkills[index];
+        await updateSkill(skill, parentSkilltree, undefined, isAddingRootSkillsAtIndex + index)
+    }
+}
+
+export const updateSkill = (
+    updatedSkill: ISkill, 
+    parentSkilltree: ISkilltree, 
     parentSkill?: ISkill, 
-    isAddingRootSkillAtIndex?: number, isEditing?: boolean) => {
+    isAddingRootSkillAtIndex?: number, 
+    isEditing?: boolean) => {
     let path = ''; let order = 0;
     if(isEditing){
         path = updatedSkill.path || '';
         order = updatedSkill.order || 0;
-    } else if(isAddingRootSkillAtIndex && isAddingRootSkillAtIndex > 0) {
+    } else if(isAddingRootSkillAtIndex && isAddingRootSkillAtIndex > -1) {
         path = `${parentSkilltree?.path}/skills/${updatedSkill.id}`
         order = isAddingRootSkillAtIndex;
     } else {
@@ -25,11 +54,11 @@ export const updateSkill = (updatedSkill: ISkill, parentSkilltree: ISkilltree, t
     let skill : ISkill = {
         id: updatedSkill.id,
         title: updatedSkill.title,
-        description: updatedSkill.description,
-        direction: updatedSkill.direction,
-        links: updatedSkill.links,
-        optional: updatedSkill.optional,
-        countChildren: updatedSkill.countChildren,
+        description: updatedSkill.description || '',
+        direction: updatedSkill.direction || 'top',
+        links: updatedSkill.links || [],
+        optional: updatedSkill.optional ? true : false,
+        countChildren: updatedSkill.countChildren || 0,
         order: order
     }
     if(!isEditing){
@@ -148,7 +177,6 @@ export const moveSkill = (data: any, skilltree: ISkilltree) => {
             newPath += newSkillId;
         }
     });
-    console.log(newPath);
     let skill = cleanSkill(data.node, newSkillId, newSkillIndexInParent);
     skill.id = newSkillId;
     batch.set(db.doc(newPath), skill);

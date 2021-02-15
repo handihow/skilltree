@@ -11,16 +11,18 @@ import { toast } from 'react-toastify';
 import { connect } from "react-redux";
 import { SkilltreeForm } from './elements/SkilltreeForm';
 import { DragDropContext } from 'react-beautiful-dnd';
-import {getComposition, updateCompositionTitle} from '../../services/CompositionServices';
+import {getComposition, updateCompositionProperty} from '../../services/CompositionServices';
 import {updateSkilltree, deleteSkilltree, getNumberOfRootSkills} from '../../services/SkillTreeServices';
 import { showWarningModal, completedAfterWarning } from '../../actions/ui';
 import {standardEmptySkill} from '../../services/StandardData';
 import SkillForm from './elements/SkillForm';
 import ISkill from '../../models/skill.model';
-import {updateSkill} from '../../services/SkillServices';
+import {getSkillById, updateSkill, importMultipleSkills} from '../../services/SkillServices';
 import { v4 as uuid } from "uuid";
 import BackgroundEditor from './layout/BackgroundEditor';
 import ThemeEditor from './layout/ThemeEditor';
+import OptionsEditor from './layout/OptionsEditor';
+import { setSkilltree, completedImporting } from '../../actions/editor';
 
 type TParams = { compositionId: string };
 
@@ -29,6 +31,9 @@ interface IEditorProps extends RouteComponentProps<TParams> {
     isAuthenticated: boolean;
     dispatch: any;
     hasDismissedWarning: boolean;
+    hasStartedImportingSkills: boolean;
+    selectedSkills: ISkill[];
+    parentSkilltree: ISkilltree;
 }
 
 interface IEditorState {
@@ -37,6 +42,7 @@ interface IEditorState {
     backgroundImage?: string;
     skilltrees?: ISkilltree[];
     toEditor: boolean;
+    toSkillsTable: boolean;
     unsubscribe?: any;
     showSkilltreeForm: boolean;
     showSkillForm: boolean;
@@ -45,16 +51,14 @@ interface IEditorState {
     currentSkilltree?: ISkilltree;
     currentSkill?: ISkill;
     currentParentSkill?: ISkill;
-    numberOfSkills: number;
     enableDropSkilltrees: boolean;
     enableDropInSkilltree: boolean;
     enableDropSkills: boolean;
     isAddingRootSkillAtIndex: number;
-    isAddingSiblingSkill: boolean;
-    isAddingChildSkill: boolean;
     destroyInProgress: boolean;
     showBackgroundEditor: boolean;
     showThemeEditor: boolean;
+    showOptionsEditor: boolean;
 }
 
 const defaultState = {
@@ -62,19 +66,17 @@ const defaultState = {
     showSkillForm: false,
     isEditingSkilltree: false,
     isEditingSkill: false,
-    numberOfSkills: 0,
     enableDropSkilltrees: false,
     enableDropInSkilltree: false,
     enableDropSkills: true,
-    isAddingSiblingSkill: false,
-    isAddingChildSkill: false,
     destroyInProgress: false,
-    isAddingRootSkillAtIndex: 0,
+    isAddingRootSkillAtIndex: -1,
     currentParentSkill: undefined,
     currentSkill: undefined,
     currentSkilltree: undefined,
     showBackgroundEditor: false,
-    showThemeEditor: false
+    showThemeEditor: false,
+    showOptionsEditor: false
 }
 
 export class Editor extends Component<IEditorProps, IEditorState> {
@@ -83,6 +85,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         this.state = {
             hasBackgroundImage: false,
             toEditor: false,
+            toSkillsTable: false,
             ...defaultState
         };
         this.handleOnDragStart = this.handleOnDragStart.bind(this);
@@ -93,11 +96,17 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         this.deleteSkilltree = this.deleteSkilltree.bind(this);
         this.editSkill = this.editSkill.bind(this); 
         this.updateSkill = this.updateSkill.bind(this); 
-        this.changeCompositionTitle = this.changeCompositionTitle.bind(this);
+        this.handleCompositionChange = this.handleCompositionChange.bind(this);
         this.resetDefaultState = this.resetDefaultState.bind(this);
     }
 
     async componentDidMount() {
+        if(this.props.hasStartedImportingSkills){
+            //check if we need to import any skills
+            const order = await getNumberOfRootSkills(this.props.parentSkilltree);
+            await importMultipleSkills(this.props.selectedSkills, this.props.parentSkilltree, order);
+            this.props.dispatch(completedImporting());
+        }
         const compositionId = this.props.match.params.compositionId;
         const composition = await getComposition(compositionId);
         if(!composition || this.props.user.uid !== composition.user){
@@ -155,13 +164,15 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         });
     }
 
-    changeCompositionTitle(event){
-        const title = event.value || '';
-        updateCompositionTitle(this.props.match.params.compositionId, title);
+    handleCompositionChange = (property: string, value: string) => {
+        if(!this.state.composition || !this.state.composition.id) return;
+        const title = property === 'title' ? value : this.state.composition.title;
+        updateCompositionProperty(this.state.composition.id, property, value);
         this.setState({
             composition: {
                 ...this.state.composition,
-                title
+                title,
+                [property]: value
             }
         });
     }
@@ -178,8 +189,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                 enableDropInSkilltree: false,
                 enableDropSkills: false
             })
-        } else if(result.draggableId === 'root-skill'){
-            console.log('dragging a root skill');
+        } else if(['root-skill', 'master-skills'].includes(result.draggableId)){
             this.setState({
                 enableDropSkilltrees: false,
                 enableDropInSkilltree: true,
@@ -206,19 +216,71 @@ export class Editor extends Component<IEditorProps, IEditorState> {
             this.setState({
                 showSkilltreeForm: true
             });
-        } else if(result.draggableId === 'root-skill' && this.state.skilltrees){
-            const skilltreeId = result.destination.droppableId.replace("SKILLTREE-", "");
-            const skilltreeIndex = this.state.skilltrees.findIndex(st => st.id === skilltreeId);
-            if(skilltreeIndex === -1) return;
-            const order = await getNumberOfRootSkills(this.state.skilltrees[skilltreeIndex])
+        } else if(result.draggableId === 'root-skill'){
+            const currentSkilltree = this.getCurrentSkilltree(result.destination.droppableId.replace("SKILLTREE-", ""));
+            if(!currentSkilltree) return;
+            const order = await getNumberOfRootSkills(currentSkilltree);
             this.setState({
                 showSkillForm: true,
                 isAddingRootSkillAtIndex: order,
-                currentSkilltree: this.state.skilltrees[skilltreeIndex],
+                currentSkilltree: currentSkilltree,
             })
+        } else if(result.draggableId === 'sibling-skill'){
+            const droppedSkillId = result.destination.droppableId.replace("SKILL-", "");
+            const siblingSkill = await getSkillById(droppedSkillId);
+            if(!siblingSkill) return;
+            const splittedPath = siblingSkill?.path?.split('/');
+            const currentSkilltree = this.getCurrentSkilltree(siblingSkill.skilltree || '');
+            if(!currentSkilltree) return;
+            if(splittedPath?.length === 6){
+                //new root skill
+                const order = await getNumberOfRootSkills(currentSkilltree);
+                this.setState({
+                    showSkillForm: true,
+                    isAddingRootSkillAtIndex: order,
+                    currentSkilltree
+                })
+            } else if(splittedPath) {
+                //need to find parent skill, it will be in the splitted path one step up from sibling skill
+                console.log(splittedPath.length);
+                const parentSkill = await getSkillById(splittedPath[splittedPath.length - 3]);
+                if(!parentSkill) return;
+                this.setState({
+                    showSkillForm: true,
+                    currentParentSkill: parentSkill,
+                    currentSkilltree
+                })
+            }
+
+        } else if(result.draggableId === 'child-skill'){
+            const droppedSkillId = result.destination.droppableId.replace("SKILL-", "");
+            const parentSkill = await getSkillById(droppedSkillId);
+            if(!parentSkill) return;
+            const currentSkilltree = this.getCurrentSkilltree(parentSkill.skilltree || '');
+            if(!currentSkilltree) return;
+            this.setState({
+                showSkillForm: true,
+                currentParentSkill: parentSkill,
+                currentSkilltree
+            })
+        } else if(result.draggableId === 'master-skills'){
+            console.log('dragged master skills');
+            const currentSkilltree = this.getCurrentSkilltree(result.destination.droppableId.replace("SKILLTREE-", ""));
+            const { dispatch } = this.props;
+            dispatch(setSkilltree(currentSkilltree));
+            this.setState({
+                toSkillsTable: true
+            });
         } else {
             console.log(result);
         }
+    }
+
+    getCurrentSkilltree = (skilltreeId: string) => {
+        if(!this.state.skilltrees) return;
+        const skilltreeIndex = this.state.skilltrees.findIndex(st => st.id === skilltreeId);
+        if(skilltreeIndex === -1) return;
+        return this.state.skilltrees[skilltreeIndex];
     }
 
     async moveExistingSkilltree(result) {
@@ -285,7 +347,6 @@ export class Editor extends Component<IEditorProps, IEditorState> {
             showSkillForm: true,
             currentSkill: skill,
             isEditingSkill: true,
-            numberOfSkills: skills.length,
             currentParentSkill: parentSkillIndex > -1 ? skills[parentSkillIndex] : undefined,
             currentSkilltree: parentSkilltreeIndex > -1 ? this.state.skilltrees[parentSkilltreeIndex] : undefined
         });
@@ -293,7 +354,13 @@ export class Editor extends Component<IEditorProps, IEditorState> {
 
     async updateSkill(skill: ISkill){
         if(!this.state.currentSkilltree) return;
-        await updateSkill(skill, this.state.currentSkilltree, this.state.numberOfSkills, this.state.currentParentSkill, this.state.isAddingRootSkillAtIndex, this.state.isEditingSkill)
+        await updateSkill(
+            skill, 
+            this.state.currentSkilltree, 
+            this.state.currentParentSkill, 
+            this.state.isAddingRootSkillAtIndex, 
+            this.state.isEditingSkill
+        )
         this.resetDefaultState();
     }
 
@@ -304,13 +371,23 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         }
         this.setState({
             showBackgroundEditor: !this.state.showBackgroundEditor,
-            showThemeEditor: false
+            showThemeEditor: false,
+            showOptionsEditor: false
         })
     }
 
-    toggleThemeEditor = async () => {
+    toggleThemeEditor = () => {
         this.setState({
             showThemeEditor: !this.state.showThemeEditor,
+            showBackgroundEditor: false,
+            showOptionsEditor: false
+        })
+    }
+
+    toggleOptionsEditor = () => {
+        this.setState({
+            showOptionsEditor: !this.state.showOptionsEditor,
+            showThemeEditor: false,
             showBackgroundEditor: false
         })
     }
@@ -335,13 +412,14 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         return (
             this.state.toEditor ?
                 <Redirect to={'/'} /> :
+            this.state.toSkillsTable ? 
+                <Redirect to={'/skills'} /> :
                 !this.state.skilltrees || this.state.skilltrees.length === 0 ?
                     <Loading /> :
                     <React.Fragment>
-                        <EditorNavbar numberOfSkills={this.state.numberOfSkills} 
-                        id={this.state.composition?.id}
+                        <EditorNavbar  
                         composition={this.state.composition}
-                        changeCompositionTitle={this.changeCompositionTitle}></EditorNavbar>
+                        changeCompositionTitle={this.handleCompositionChange}></EditorNavbar>
                         <DragDropContext onDragEnd={this.handleOnDragEnd} onDragStart={this.handleOnDragStart}>
                             <div className="columns is-mobile mb-0 mt-0">
 
@@ -353,10 +431,15 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                                         isVisibleThemeEditor={this.state.showThemeEditor}
                                         toggleBackgroundEditor={this.toggleBackgroundEditor}
                                         isVisibleBackgroundEditor={this.state.showBackgroundEditor}
+                                        toggleOptionsEditor={this.toggleOptionsEditor}
+                                        isVisibleOptionsEditor={this.state.showOptionsEditor}
                                     />
                                 </div>
-                                {this.state.showBackgroundEditor && !this.state.showThemeEditor && <div className="column is-4" style={backgroundAndThemeEditorStyles}>
+                                {this.state.showBackgroundEditor && <div className="column is-4" style={backgroundAndThemeEditorStyles}>
                                     <BackgroundEditor doneUpdatingBackground={this.toggleBackgroundEditor} compositionId={this.state.composition?.id || ''} />
+                                </div>}
+                                {this.state.showOptionsEditor && <div className="column is-4" style={backgroundAndThemeEditorStyles}>
+                                    <OptionsEditor composition={this.state.composition} handleChange={this.handleCompositionChange} />
                                 </div>}
                                 <div className="column pl-0 mt-0" style={{
                                         overflowY: 'auto',
@@ -389,7 +472,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                             compositionId={this.props.match.params.compositionId}
                             order={this.state.isEditingSkilltree ? this.state.currentSkilltree?.order || 0 : this.state.skilltrees.length} />}
                         {this.state.showSkillForm && 
-                            <SkillForm isEditing={this.state.isEditingSkill} updateSkill={this.updateSkill} closeModal={this.resetDefaultState}
+                        <SkillForm isEditing={this.state.isEditingSkill} updateSkill={this.updateSkill} closeModal={this.resetDefaultState}
                                 skill={this.state.currentSkill ? this.state.currentSkill : {id: uuid(), ...standardEmptySkill}} />}
                     </React.Fragment>
         )
@@ -400,7 +483,10 @@ function mapStateToProps(state) {
     return {
         isAuthenticated: state.auth.isAuthenticated,
         user: state.auth.user,
-        hasDismissedWarning: state.ui.hasDismissedWarning
+        hasDismissedWarning: state.ui.hasDismissedWarning,
+        parentSkilltree: state.editor.parentSkilltree,
+        hasStartedImportingSkills: state.editor.hasStartedImportingSkills,
+        selectedSkills: state.editor.selectedSkills
     };
 }
 

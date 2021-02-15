@@ -19,7 +19,6 @@ import DeleteProfile from "./components/pages/DeleteProfile";
 import Editor from './components/editor/Editor';
 import Composition from './components/compositions/Composition';
 import CompositionViewer from './components/compositions/CompositionViewer';
-import CompositionTheme from './components/compositions/CompositionTheme';
 import PublishComposition from './components/compositions/PublishComposition';
 import ExportComposition from './components/compositions/ExportComposition';
 import Payments from './components/payments/Payments';
@@ -119,12 +118,6 @@ function App(props) {
           path="/compositions/:compositionId"
           exact
           component={Composition}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute 
-          path="/editor/:compositionId/theme"
-          component={CompositionTheme}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
         />

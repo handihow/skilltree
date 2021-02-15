@@ -196,7 +196,7 @@ export class ThemeEditor extends Component<IThemeEditorProps, IThemeEditorState>
         
         return (
                 this.state.doneLoading && 
-                <div className="p-5 has-background-white">
+                <div className="p-5 has-background-white-ter">
                 <div className="level is-mobile">
                     <div className="level-left">
                         <Header header='Theme editor' icon="sliders-h"></Header>

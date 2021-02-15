@@ -3,7 +3,10 @@ import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import BackButton from '../../layout/BackButton';
 
-export default function EditorNavbar(props) {
+export default function EditorNavbar({
+    composition,
+    changeCompositionTitle
+}) {
     return (
         <nav className="level has-background-grey-lighter mb-0 p-3 is-mobile">
             <div className="level-left">
@@ -19,24 +22,34 @@ export default function EditorNavbar(props) {
                     <div className="field-body">
                         <p className="control" style={{width: '250px'}}>
                         <input className="input" type="text" 
-                            value={props.composition?.title || ''} onChange={({target}) => props.changeCompositionTitle(target)}></input>
+                            value={composition?.title || ''} onChange={({target}) => changeCompositionTitle('title', target.value)}></input>
                         </p>
                     </div>
                 </div>
                 </div>
                 </div>
         </div>
+        <div className="level-item">
+            <a href="https://github.com/handihow/skilltree/wiki/Drag-and-Drop-Editor" 
+                target="_blank" rel="noreferrer">View Drag 'n Drop Editor How-To Wiki</a>
+        </div>
         <div className="level-right">
             <div className="level-item">
-                <NavLink to={"/compositions/"+props.id +"/viewer"} activeClassName='is-active' className="pl-0 pt-0 has-text-centered">
+                <NavLink to={"/compositions/"+composition?.id +"/viewer"} activeClassName='is-active' className="pl-0 pt-0 has-text-centered">
                 <div className="icon has-text-dark" data-tooltip="View">
                 <FontAwesomeIcon icon="eye"/>
                 </div></NavLink></div>
+                <div className="level-item">
+                <NavLink to={"/compositions/"+composition?.id +"/monitor"} activeClassName='is-active' className="pl-0 pt-0 has-text-centered">
+                <div className="icon has-text-dark" data-tooltip="Monitor students">
+                <FontAwesomeIcon icon="users" />
+                </div></NavLink></div>
             <div className="level-item">
-                <NavLink to={"/editor/"+props.id +"/publish"} activeClassName='is-active' className="pl-0 pt-0 has-text-centered">
-                <div className="icon has-text-dark" data-tooltip="Publish">
+                <NavLink to={"/editor/"+composition?.id +"/publish"} activeClassName='is-active' className="pl-0 pt-0 has-text-centered">
+                <div className="icon has-text-dark" data-tooltip="Share">
                 <FontAwesomeIcon icon="share" />
                 </div></NavLink></div>
+            
         </div>
     </nav>
   )

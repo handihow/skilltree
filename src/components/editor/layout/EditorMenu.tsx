@@ -12,20 +12,22 @@ interface IEditorMenuProps {
   isVisibleBackgroundEditor: boolean;
   toggleThemeEditor: Function;
   isVisibleThemeEditor: boolean;
+  toggleOptionsEditor: Function;
+  isVisibleOptionsEditor: boolean;
 }
 
 export default function EditorMenu(props: IEditorMenuProps) {
   const draggableMenuItems = [
     {'title': "Skilltree", 'img': "/Skilltree_icons-04.svg", 'tooltip': 'Add a skilltree'},
     {'title': "Root-skill", 'img': "/Skilltree_icons-05.svg",  'tooltip': 'Add skill to root of skilltree'},
-    {'title': "Sibling-left-skill", 'img': "/Skilltree_icons-02.svg", 'tooltip': 'Add skill as sibling to skill'},
-    {'title': "Sibling-right-skill", 'img': "/Skilltree_icons-03.svg", 'tooltip': 'Add skill as sibling to skill'},
+    {'title': "Sibling-skill", 'img': "/Skilltree_icons-03.svg", 'tooltip': 'Add skill as sibling to skill'},
     {'title': 'Child-skill', 'img': "/Skilltree_icons-01.svg", 'tooltip': 'Add skill as child of skill' },
-    {'title': 'Master-skills', 'icon': "th-list", 'tooltip': 'Add skills from master skills list'}
+    {'title': 'Master-skills', 'icon': "th-list", 'tooltip': 'Import multiple skills from your skills list'}
   ];
   const appearanceMenuItems = [
     {'title': 'Background', 'icon': 'image', 'clicked': 'toggleBackgroundEditor', 'active': 'isVisibleBackgroundEditor', 'tooltip': 'Customize the background of the composition'},
     {'title': 'Theme', 'icon': 'sliders-h', 'clicked': 'toggleThemeEditor', 'active': 'isVisibleThemeEditor', 'tooltip': 'Customize the appearance of the skilltree'},
+    {'title': 'Settings', 'icon': 'cogs', 'clicked': 'toggleOptionsEditor', 'active': 'isVisibleOptionsEditor', 'tooltip': 'Settings for your skilltree'},
   ];
   return (
     <aside className="menu has-background-light has-text-centered pt-4">

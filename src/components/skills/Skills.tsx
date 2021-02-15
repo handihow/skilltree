@@ -7,17 +7,21 @@ import { toast } from 'react-toastify';
 import Loading from '../layout/Loading';
 import Table from '../layout/Table';
 import EditableCell from '../layout/EditableCell';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { propertyInArrayEqual } from '../../services/StandardFunctions';
 import { getRelevantUserIds } from '../../services/UserServices';
 import Header from '../layout/Header';
 import {v4 as uuid} from "uuid"; 
 import { showWarningModal, completedAfterWarning } from '../../actions/ui';
+import { startedImporting } from '../../actions/editor';
+import ISkilltree from '../../models/skilltree.model';
 
 interface ISkillsProps {
   isAuthenticated: boolean;
   user: any;
   hasDismissedWarning: boolean;
+  parentSkilltree: ISkilltree,
+  hasSelectedParentSkilltree: boolean;
   dispatch: any;
 }
 
@@ -30,13 +34,13 @@ interface ISkillsState {
   categoryTitle: string;
   activeTab: string;
   destroyInProgress: boolean;
+  toEditor: boolean;
 }
 
 const columns = [
     {
         Header: 'Title',
         accessor: 'title', // accessor is the "key" in the data,
-        Cell: EditableCell
     },
     {
         Header: 'Icon',
@@ -51,12 +55,6 @@ const columns = [
     {
         Header: 'Category',
         accessor: 'category',
-        Cell: EditableCell
-    },
-    {
-        Header: 'Reference',
-        accessor: 'reference',
-        Cell: EditableCell
     }
 ]
 
@@ -70,6 +68,13 @@ const compositionColumn = {
     Header: 'Composition',
     accessor: 'compositionTitle'
 };
+
+const referenceColumn =
+{
+    Header: 'Reference',
+    accessor: 'reference',
+    Cell: EditableCell
+}
 
 const actionsColumn = {
     Header: "Actions",
@@ -89,7 +94,8 @@ class Skills extends Component<ISkillsProps, ISkillsState> {
           doneLoading: false,
           showEditMultipleModal: false,
           categoryTitle: '',
-          destroyInProgress: false
+          destroyInProgress: false,
+          toEditor: false
         }
         this.prepareDeleteSkills = this.prepareDeleteSkills.bind(this);
       }
@@ -302,15 +308,39 @@ class Skills extends Component<ISkillsProps, ISkillsState> {
         });
       }
 
+    importSelectedSkills = () => {
+        if(!this.state.selectedSkills) return;
+        const { dispatch } = this.props;
+        dispatch(startedImporting(this.state.selectedSkills));
+        this.setState({
+            toEditor: true
+        })
+    }
+
+
     render() {  
         return (
+        this.state.toEditor ? 
+        <Redirect to={`/editor/${this.props.parentSkilltree.composition}`} /> :
         this.state.doneLoading ? 
         <React.Fragment>
         <section className="section has-background-white-ter" style={{minHeight: "100vh"}}>
             <div className="container">
-                <div className="level">
-                <Header header={'Skills'} />
+            <div className="level">
+                <div className="level-left">
+                    <Header header={this.props.hasSelectedParentSkilltree ? 'Import skills into ' + this.props.parentSkilltree.title : 'Skills'} />
                 </div>
+            </div>
+            {this.props.hasSelectedParentSkilltree &&
+                <div className="message is-info">
+                    <div className="message-header">
+                    
+                    </div>
+                    <div className="message-body">
+                        <p>Select skills in the table below and click on 'Edit selected' to start import process... </p>
+                        <a href="https://github.com/handihow/skilltree/wiki/Managing-skills" target="_blank" rel="noreferrer">View Manage Skills Wiki page</a> to learn more.
+                    </div>
+                </div>}
                 
               <div className="tabs">
               <ul>
@@ -330,13 +360,13 @@ class Skills extends Component<ISkillsProps, ISkillsState> {
                 columns={this.state.activeTab === 'domain' ? 
                                 [...columns, compositionColumn, hierarchyColumn] :
                                 this.state.activeTab === 'skilltrees' ?
-                                [...columns, compositionColumn, hierarchyColumn, actionsColumn] : [...columns, actionsColumn]} 
+                                [...columns, compositionColumn, hierarchyColumn, actionsColumn] : [...columns, referenceColumn, actionsColumn]} 
                 header={this.state.activeTab ==='master' ? 'Master Skills' : this.state.activeTab ==='skilltrees' ? 'Skills in your skilltrees' : 'Skills in domain ' + this.props.user.hostedDomain} 
                 onSelectMultiple={this.onEdit}
                 selectMultipleButtonText={'Edit selected'}
                 updateData={this.updateData}
                 uploadLink={'/skills/upload-csv'}
-                isUploadEnabled={this.state.activeTab ==='master'}
+                isUploadEnabled={this.state.activeTab ==='master' && !this.props.hasSelectedParentSkilltree}
                 isEditingEnabled={true}/>
             </div>
         </section>
@@ -348,7 +378,7 @@ class Skills extends Component<ISkillsProps, ISkillsState> {
                     <button className="delete" aria-label="close" onClick={this.toggleEditMultipleModal}></button>
                 </header>
                 <section className="modal-card-body">
-                        {this.state.activeTab !== 'domain' &&
+                        {this.state.activeTab !== 'domain' && !this.props.hasSelectedParentSkilltree &&
                         <div className="field">
                         <label className="label">Category</label>
                         <div className="control">
@@ -360,22 +390,26 @@ class Skills extends Component<ISkillsProps, ISkillsState> {
                             onChange={this.onChangeCategoryTitle} />
                         </div>
                         </div>}
-                        {this.state.activeTab !== 'master' && 
+                        {this.state.activeTab !== 'master' &&  !this.props.hasSelectedParentSkilltree &&
                             <div>You can copy skills to your master skills list using button below</div>}
-                        {this.state.activeTab === 'master' && 
+                        {this.state.activeTab === 'master' && !this.props.hasSelectedParentSkilltree &&
                             <div>You can delete the selected skills from your master skills list using button below</div>}
+                        {this.props.hasSelectedParentSkilltree &&
+                            <div>You can import the selected skills now using button below</div>}
                 </section>
                 <footer className="modal-card-foot">
                     <button className="button" 
                     onClick={this.toggleEditMultipleModal}>Cancel</button>
-                    {this.state.activeTab !== 'domain' &&<button className="button is-info" 
+                    {this.state.activeTab !== 'domain' &&  !this.props.hasSelectedParentSkilltree &&<button className="button is-info" 
                     onClick={this.setCategory}>Set category</button>}
-                    {this.state.activeTab !== 'master' && 
+                    {this.state.activeTab !== 'master' &&  !this.props.hasSelectedParentSkilltree && 
                             <button className="button is-primary" 
                             onClick={this.copyToMaster}>Copy to master</button>}
-                    {this.state.activeTab === 'master' && 
+                    {this.state.activeTab === 'master' &&  !this.props.hasSelectedParentSkilltree && 
                             <button className="button is-warning" 
                             onClick={this.prepareDeleteSkills}>Delete from master</button>}
+                    {this.props.hasSelectedParentSkilltree && <button className="button is-primary" 
+                        onClick={this.importSelectedSkills}>Import selected</button>}
                 </footer>
             </div>
         </div>
@@ -389,7 +423,9 @@ function mapStateToProps(state) {
   return {
     isAuthenticated: state.auth.isAuthenticated,
     user: state.auth.user,
-    hasDismissedWarning: state.ui.hasDismissedWarning
+    hasDismissedWarning: state.ui.hasDismissedWarning,
+    parentSkilltree: state.editor.parentSkilltree,
+    hasSelectedParentSkilltree: state.editor.hasSelectedParentSkilltree
   };
 }
 
