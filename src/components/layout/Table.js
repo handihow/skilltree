@@ -150,6 +150,7 @@ export default function Table({
                 </tr>
               )
             })}
+            {rows.length === 0 && <tr><td>No data to display...</td></tr>}
           </tbody>
         </table>
         </div>

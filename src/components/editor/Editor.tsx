@@ -12,7 +12,7 @@ import { connect } from "react-redux";
 import { SkilltreeForm } from './elements/SkilltreeForm';
 import { DragDropContext } from 'react-beautiful-dnd';
 import {getComposition, updateCompositionProperty} from '../../services/CompositionServices';
-import {updateSkilltree, deleteSkilltree, getNumberOfRootSkills} from '../../services/SkillTreeServices';
+import {updateSkilltree, deleteSkilltree, getNumberOfRootSkills, getNumberSkills} from '../../services/SkillTreeServices';
 import { showWarningModal, completedAfterWarning } from '../../actions/ui';
 import {standardEmptySkill} from '../../services/StandardData';
 import SkillForm from './elements/SkillForm';
@@ -23,6 +23,7 @@ import BackgroundEditor from './layout/BackgroundEditor';
 import ThemeEditor from './layout/ThemeEditor';
 import OptionsEditor from './layout/OptionsEditor';
 import { setSkilltree, completedImporting } from '../../actions/editor';
+import ShareLinkModal from './elements/ShareLinkModal';
 
 type TParams = { compositionId: string };
 
@@ -38,6 +39,7 @@ interface IEditorProps extends RouteComponentProps<TParams> {
 
 interface IEditorState {
     composition?: IComposition;
+    url: string;
     hasBackgroundImage: boolean;
     backgroundImage?: string;
     skilltrees?: ISkilltree[];
@@ -46,6 +48,7 @@ interface IEditorState {
     unsubscribe?: any;
     showSkilltreeForm: boolean;
     showSkillForm: boolean;
+    showShareLinkModal: boolean;
     isEditingSkilltree: boolean;
     isEditingSkill: boolean;
     currentSkilltree?: ISkilltree;
@@ -76,7 +79,9 @@ const defaultState = {
     currentSkilltree: undefined,
     showBackgroundEditor: false,
     showThemeEditor: false,
-    showOptionsEditor: false
+    showOptionsEditor: false,
+    url: '',
+    showShareLinkModal: false
 }
 
 export class Editor extends Component<IEditorProps, IEditorState> {
@@ -136,13 +141,15 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                     this.setState({
                         hasBackgroundImage: true,
                         backgroundImage: url,
-                        composition: composition
+                        composition: composition,
+                        url: window.location.protocol + '//' + window.location.host + '/compositions/' + composition.id + '/viewer'
                     });
                 });
         } else {
             this.setState({
                 hasBackgroundImage: false,
-                composition: composition
+                composition: composition,
+                url: window.location.protocol + '//' + window.location.host + '/compositions/' + composition.id + '/viewer'
             })
         }  
     }
@@ -321,7 +328,8 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         this.setState({
             destroyInProgress: true
         })
-        await deleteSkilltree(this.state.composition?.id, this.state.currentSkilltree);
+        const countSkills = await getNumberSkills(this.state.currentSkilltree);
+        await deleteSkilltree(this.state.composition?.id, this.state.currentSkilltree, countSkills);
         const { dispatch } = this.props;
         dispatch(completedAfterWarning());
         this.setState({
@@ -392,6 +400,11 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         })
     }
 
+    toggleShareLinkModal = () => {
+        this.setState({
+            showShareLinkModal: !this.state.showShareLinkModal
+        })
+    }
 
     render() {
         const editorDisplayStyles: React.CSSProperties = {
@@ -409,73 +422,81 @@ export class Editor extends Component<IEditorProps, IEditorState> {
             overflowY: 'auto',
             overflowX: 'hidden',
        }
-        return (
-            this.state.toEditor ?
-                <Redirect to={'/'} /> :
-            this.state.toSkillsTable ? 
-                <Redirect to={'/skills'} /> :
-                !this.state.skilltrees || this.state.skilltrees.length === 0 ?
-                    <Loading /> :
-                    <React.Fragment>
-                        <EditorNavbar  
-                        composition={this.state.composition}
-                        changeCompositionTitle={this.handleCompositionChange}></EditorNavbar>
-                        <DragDropContext onDragEnd={this.handleOnDragEnd} onDragStart={this.handleOnDragStart}>
-                            <div className="columns is-mobile mb-0 mt-0">
+       
+        if(this.state.toEditor){
+            return(
+            <Redirect to={'/'} />)
+        } else if(this.state.toSkillsTable){
+            return(
+            <Redirect to={'/skills'} />)
+        } else if(!this.state.skilltrees){
+            return(
+            <Loading /> )
+        } else {
+            return(
+            <React.Fragment>
+                    <EditorNavbar  
+                    composition={this.state.composition}
+                    changeCompositionTitle={this.handleCompositionChange}
+                    toggleShareLinkModal={this.toggleShareLinkModal}></EditorNavbar>
+                    <DragDropContext onDragEnd={this.handleOnDragEnd} onDragStart={this.handleOnDragStart}>
+                        <div className="columns is-mobile mb-0 mt-0">
 
-                                <div className="column is-1 has-background-light pr-0 pt-0">
-                                    <EditorMenu 
-                                        id={this.props.match.params.compositionId} 
-                                        hideDraggables={false} 
-                                        toggleThemeEditor={this.toggleThemeEditor}
-                                        isVisibleThemeEditor={this.state.showThemeEditor}
-                                        toggleBackgroundEditor={this.toggleBackgroundEditor}
-                                        isVisibleBackgroundEditor={this.state.showBackgroundEditor}
-                                        toggleOptionsEditor={this.toggleOptionsEditor}
-                                        isVisibleOptionsEditor={this.state.showOptionsEditor}
-                                    />
-                                </div>
-                                {this.state.showBackgroundEditor && <div className="column is-4" style={backgroundAndThemeEditorStyles}>
-                                    <BackgroundEditor doneUpdatingBackground={this.toggleBackgroundEditor} compositionId={this.state.composition?.id || ''} />
-                                </div>}
-                                {this.state.showOptionsEditor && <div className="column is-4" style={backgroundAndThemeEditorStyles}>
-                                    <OptionsEditor composition={this.state.composition} handleChange={this.handleCompositionChange} />
-                                </div>}
-                                <div className="column pl-0 mt-0" style={{
-                                        overflowY: 'auto',
-                                        overflowX: 'hidden',
-                                        ...editorDisplayStyles
-                                    }}>
-                                    {this.state.skilltrees && this.state.skilltrees.length > 0 && this.state.composition && !this.state.showThemeEditor &&
-                                        <EditorDisplay
-                                            theme={this.state.composition.theme}
-                                            skilltrees={this.state.skilltrees || []}
-                                            composition={this.state.composition}
-                                            title={this.state.composition?.title || ''}
-                                            isDropDisabledSkilltrees={!this.state.enableDropSkilltrees}
-                                            isDropDisabledSkills={!this.state.enableDropSkills}
-                                            isDropDisabledSkilltree={!this.state.enableDropInSkilltree}
-                                            editSkilltree={this.editSkilltree}
-                                            deleteSkilltree={this.prepareDeleteSkilltree}
-                                            editSkill={this.editSkill}/>}
-                                    {this.state.skilltrees && this.state.skilltrees.length > 0 && this.state.composition && this.state.showThemeEditor &&
-                                        <ThemeEditor compositionId={this.state.composition.id || ''} doneUpdatingTheme={this.toggleThemeEditor} />}
-                                </div>
+                            <div className="column is-1 has-background-light pr-0 pt-0">
+                                <EditorMenu 
+                                    id={this.props.match.params.compositionId} 
+                                    hideDraggables={false} 
+                                    toggleThemeEditor={this.toggleThemeEditor}
+                                    isVisibleThemeEditor={this.state.showThemeEditor}
+                                    toggleBackgroundEditor={this.toggleBackgroundEditor}
+                                    isVisibleBackgroundEditor={this.state.showBackgroundEditor}
+                                    toggleOptionsEditor={this.toggleOptionsEditor}
+                                    isVisibleOptionsEditor={this.state.showOptionsEditor}
+                                />
                             </div>
+                            {this.state.showBackgroundEditor && <div className="column is-4" style={backgroundAndThemeEditorStyles}>
+                                <BackgroundEditor doneUpdatingBackground={this.toggleBackgroundEditor} compositionId={this.state.composition?.id || ''} />
+                            </div>}
+                            {this.state.showOptionsEditor && <div className="column is-4" style={backgroundAndThemeEditorStyles}>
+                                <OptionsEditor composition={this.state.composition} handleChange={this.handleCompositionChange} />
+                            </div>}
+                            <div className="column pl-0 mt-0" style={{
+                                    overflowY: 'auto',
+                                    overflowX: 'hidden',
+                                    ...editorDisplayStyles
+                                }}>
+                                {this.state.composition && !this.state.showThemeEditor &&
+                                    <EditorDisplay
+                                        theme={this.state.composition.theme}
+                                        skilltrees={this.state.skilltrees || []}
+                                        composition={this.state.composition}
+                                        title={this.state.composition?.title || ''}
+                                        isDropDisabledSkilltrees={!this.state.enableDropSkilltrees}
+                                        isDropDisabledSkills={!this.state.enableDropSkills}
+                                        isDropDisabledSkilltree={!this.state.enableDropInSkilltree}
+                                        editSkilltree={this.editSkilltree}
+                                        deleteSkilltree={this.prepareDeleteSkilltree}
+                                        editSkill={this.editSkill}/>}
+                                {this.state.skilltrees && this.state.skilltrees.length > 0 && this.state.composition && this.state.showThemeEditor &&
+                                    <ThemeEditor compositionId={this.state.composition.id || ''} doneUpdatingTheme={this.toggleThemeEditor} />}
+                            </div>
+                        </div>
 
-                        </DragDropContext>
-                        {this.state.showSkilltreeForm && <SkilltreeForm
-                            isEditing={this.state.isEditingSkilltree}
-                            skilltree={this.state.currentSkilltree}
-                            closeModal={this.resetDefaultState}
-                            updateSkilltree={this.updateSkilltree}
-                            compositionId={this.props.match.params.compositionId}
-                            order={this.state.isEditingSkilltree ? this.state.currentSkilltree?.order || 0 : this.state.skilltrees.length} />}
-                        {this.state.showSkillForm && 
-                        <SkillForm isEditing={this.state.isEditingSkill} updateSkill={this.updateSkill} closeModal={this.resetDefaultState}
-                                skill={this.state.currentSkill ? this.state.currentSkill : {id: uuid(), ...standardEmptySkill}} />}
-                    </React.Fragment>
-        )
+                    </DragDropContext>
+                    {this.state.showSkilltreeForm && <SkilltreeForm
+                        isEditing={this.state.isEditingSkilltree}
+                        skilltree={this.state.currentSkilltree}
+                        closeModal={this.resetDefaultState}
+                        updateSkilltree={this.updateSkilltree}
+                        compositionId={this.props.match.params.compositionId}
+                        order={this.state.isEditingSkilltree ? this.state.currentSkilltree?.order || 0 : this.state.skilltrees.length} />}
+                    {this.state.showSkillForm && 
+                    <SkillForm isEditing={this.state.isEditingSkill} updateSkill={this.updateSkill} closeModal={this.resetDefaultState}
+                            skill={this.state.currentSkill ? this.state.currentSkill : {id: uuid(), ...standardEmptySkill}} />}
+                    {this.state.showShareLinkModal && 
+                        <ShareLinkModal url={this.state.url} toggleShareLinkModal={this.toggleShareLinkModal}/>}
+                </React.Fragment>)
+        }           
     }
 }
 

@@ -100,18 +100,16 @@ class SkillTreeEditor extends Component<ISkillTreeEditorProps, ISkillTreeEditorS
         const keepsParent = arraysEqual(data.nextPath, data.prevPath);
         const keepsIndex = data.prevTreeIndex === data.nextTreeIndex;
         if(keepsParent && keepsIndex) return;
-        this.setState({
-            allowSubscriptionUpdates: false
-        });
         if(keepsParent){
             // changeOrderOfSkills()
-            console.log('keeping parent');
+            this.setState({
+                allowSubscriptionUpdates: false
+            });
             reorderSkills(data);
         } else {
             moveSkill(data, this.props.skilltree);
         }
     }
-
     
     prepareDeleteSkill(skill: ISkill) {
         this.setState({

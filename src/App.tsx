@@ -10,7 +10,6 @@ import Login from "./components/Login";
 import Recover from './components/Recover';
 import Register from './components/Register';
 import About from "./components/pages/About";
-import Support from "./components/pages/Support";
 import NavBar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import Profile from './components/pages/Profile';
@@ -19,8 +18,6 @@ import DeleteProfile from "./components/pages/DeleteProfile";
 import Editor from './components/editor/Editor';
 import Composition from './components/compositions/Composition';
 import CompositionViewer from './components/compositions/CompositionViewer';
-import PublishComposition from './components/compositions/PublishComposition';
-import ExportComposition from './components/compositions/ExportComposition';
 import Payments from './components/payments/Payments';
 import PaymentConfirmation from './components/payments/PaymentConfirmation';
 import Quizzes from './components/quizzes/Quizzes';
@@ -122,18 +119,6 @@ function App(props) {
           isVerifying={isVerifying}
         />
         <ProtectedRoute 
-          path="/editor/:compositionId/publish"
-          component={PublishComposition}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute 
-          path="/editor/:compositionId/export"
-          component={ExportComposition}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute 
           exact={true}
           path="/compositions/:compositionId/monitor"
           component={CompositionMonitor}
@@ -200,7 +185,6 @@ function App(props) {
         <Route path="/recover" component={Recover} />
         <Route path="/register" component={Register} />
         <Route path="/about" component={About} />
-        <Route path="/support" component={Support} />
       </Switch>
       </div>
       <Footer />

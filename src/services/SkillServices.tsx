@@ -3,8 +3,6 @@ import { toast } from 'react-toastify';
 import ISkill from '../models/skill.model';
 import ISkilltree from '../models/skilltree.model';
 import { v4 as uuid } from "uuid";
-// import { standardRootSkill } from "./StandardData";
-// import {updateCompositionTimestamp} from './CompositionServices';
 import firebase from 'firebase/app';
 import { getFlatDataFromTree } from 'react-sortable-tree';
 

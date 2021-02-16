@@ -30,6 +30,8 @@ interface IHomeState {
   isActive: boolean;
   isAddingOrEditing: boolean;
   mustEditProfile: boolean;
+  toEditor: boolean;
+  compositionId: string;
 }
 
 class Home extends Component<IHomeProps, IHomeState> {
@@ -48,7 +50,9 @@ class Home extends Component<IHomeProps, IHomeState> {
       isEditingTitle: false,
       isActive: false,
       isAddingOrEditing: false,
-      mustEditProfile: mustEditProfile
+      mustEditProfile: mustEditProfile,
+      toEditor: false,
+      compositionId: ''
     }
   }
   
@@ -95,8 +99,9 @@ class Home extends Component<IHomeProps, IHomeState> {
     this.setState({
       isAddingOrEditing: false
     });
+    const compositionId = uuid();
     const newComposition : IComposition = {
-      id: uuid(), 
+      id: compositionId, 
       title, 
       theme, 
       user: this.props.user.uid,
@@ -144,6 +149,12 @@ class Home extends Component<IHomeProps, IHomeState> {
             });
           })
           batch.commit()
+          .then(_ => {
+            this.setState({
+              toEditor: true,
+              compositionId
+            })
+          })
           .catch(error => {
             toast.error(error.message);
           });
@@ -250,6 +261,10 @@ class Home extends Component<IHomeProps, IHomeState> {
     if(this.state.mustEditProfile){
       return (
         <Redirect to="/profile/edit" />
+      )
+    } else if(this.state.toEditor){
+      return (
+        <Redirect to={"/editor/"+this.state.compositionId}/>
       )
     } else {
       return (

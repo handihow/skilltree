@@ -4,12 +4,29 @@ import ISkilltree from '../models/skilltree.model';
 import { v4 as uuid } from "uuid";
 import { standardRootSkill } from "./StandardData";
 import {updateCompositionTimestamp} from './CompositionServices';
+import firebase from 'firebase/app';
 
 export const getNumberOfRootSkills = (skilltree: ISkilltree) => {
     return db
     .collection('compositions').doc(skilltree.composition)
     .collection('skilltrees').doc(skilltree.id)
     .collection('skills').get()
+    .then(skills => {
+        if(skills.empty){
+            return 0;
+        }
+        return skills.docs.length;
+    })
+    .catch(err => {
+        return 0;
+    })
+}
+
+export const getNumberSkills = (skilltree: ISkilltree) => {
+    return db
+    .collectionGroup('skills')
+    .where('skilltree', '==', skilltree.id)
+    .get()
     .then(skills => {
         if(skills.empty){
             return 0;
@@ -50,29 +67,36 @@ export const updateSkilltree = (skilltree: ISkilltree,
                     .then(_ => {
                         toast.info("Skilltree successfully created");
                     });
+                db.collection('compositions').doc(compositionId).update({
+                    skillcount: firebase.firestore.FieldValue.increment(1),
+                    lastUpdate: firebase.firestore.Timestamp.now()
+                });
             } else {
                 toast.info("Skilltree successfully updated");
+                updateCompositionTimestamp(compositionId)
             }
-            updateCompositionTimestamp(compositionId)
         })
         .catch(error => {
             toast.error('Something went wrong...' + error.message);
         })
 }
 
-export const deleteSkilltree = (compositionId: string, skilltree: ISkilltree) => {
+export const deleteSkilltree = (compositionId: string, skilltree: ISkilltree, numberOfSkillsInSkilltree: number) => {
     const skilltreePath = `compositions/${compositionId}/skilltrees/${skilltree?.id}`;
     const deleteFirestorePathRecursively = functions.httpsCallable('deleteFirestorePathRecursively');
     return deleteFirestorePathRecursively({
         collection: 'Skilltree',
         path: skilltreePath
     }).then(function (result) {
-        updateCompositionTimestamp(compositionId)
         if (result.data.error) {
             toast.error(result.data.error);
         } else {
             toast.info('Skilltree and related child skills deleted successfully');
         }
+        db.collection('compositions').doc(compositionId).update({
+            skillcount: firebase.firestore.FieldValue.increment(-numberOfSkillsInSkilltree),
+            lastUpdate: firebase.firestore.Timestamp.now()
+        });
     }).catch(function (error) {
         toast.error(error.message);
     });

@@ -51,11 +51,13 @@ class EditorDisplay extends Component<IEditorDisplayProps, IEditorDisplayState> 
 
     render(){
         return (
-            <Droppable droppableId={"EDITOR-" + this.props.composition.id} isDropDisabled={this.props.isDropDisabledSkilltrees}>
+            <Droppable droppableId={"EDITOR-" + this.props.composition.id} 
+            isDropDisabled={this.props.isDropDisabledSkilltrees}>
             {(provided, snapshot) => (
                 <div {...provided.droppableProps} ref={provided.innerRef}
-                style={{ backgroundColor: snapshot.isDraggingOver ? '#d4823a' : 'unset' }}>
-                    <div className="is-flex is-flex-direction-row is-flex-wrap-wrap is-justify-content-space-evenly">
+                style={{ backgroundColor: snapshot.isDraggingOver ? '#d4823a' : 'unset', height: this.props.skilltrees.length === 0 ? '100%' : 'unset' }}>
+                    <div className="is-flex is-flex-direction-row is-flex-wrap-wrap is-justify-content-space-evenly"
+                    >
                       {this.props.skilltrees.map((skilltree, index) => {
                         return (
                         <SkillTreeEditor

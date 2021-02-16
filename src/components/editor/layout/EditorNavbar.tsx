@@ -5,7 +5,8 @@ import BackButton from '../../layout/BackButton';
 
 export default function EditorNavbar({
     composition,
-    changeCompositionTitle
+    changeCompositionTitle,
+    toggleShareLinkModal
 }) {
     return (
         <nav className="level has-background-grey-lighter mb-0 p-3 is-mobile">
@@ -29,10 +30,6 @@ export default function EditorNavbar({
                 </div>
                 </div>
         </div>
-        <div className="level-item">
-            <a href="https://github.com/handihow/skilltree/wiki/Drag-and-Drop-Editor" 
-                target="_blank" rel="noreferrer">View Drag 'n Drop Editor How-To Wiki</a>
-        </div>
         <div className="level-right">
             <div className="level-item">
                 <NavLink to={"/compositions/"+composition?.id +"/viewer"} activeClassName='is-active' className="pl-0 pt-0 has-text-centered">
@@ -45,10 +42,10 @@ export default function EditorNavbar({
                 <FontAwesomeIcon icon="users" />
                 </div></NavLink></div>
             <div className="level-item">
-                <NavLink to={"/editor/"+composition?.id +"/publish"} activeClassName='is-active' className="pl-0 pt-0 has-text-centered">
+                <a href="# " className="pl-0 pt-0 has-text-centered" onClick={() => toggleShareLinkModal()}>
                 <div className="icon has-text-dark" data-tooltip="Share">
                 <FontAwesomeIcon icon="share" />
-                </div></NavLink></div>
+                </div></a></div>
             
         </div>
     </nav>

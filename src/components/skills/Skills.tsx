@@ -100,77 +100,125 @@ class Skills extends Component<ISkillsProps, ISkillsState> {
         this.prepareDeleteSkills = this.prepareDeleteSkills.bind(this);
       }
 
-    async componentDidMount() {
-        const userIds = await getRelevantUserIds(this.props.user);
-        db.collection("compositions")
-        .where('user', 'in', userIds).get()
-        .then(collectionsSnap => {
-            if(collectionsSnap.empty){
-                this.setState({
-                    doneLoading: true
-                })
+    componentDidMount() {
+        this.getRelevantSkills('master');
+        
+    } 
+
+    getRelevantSkills = async (activeTab: string) => {
+        if(activeTab === 'master'){
+            const masterSkillsSnap = await db.collection('skills').where('composition', '==', this.props.user.uid).get();
+            if(masterSkillsSnap.empty){
+                this.doneLoadingNoSkills();
             } else {
-                const compositions = collectionsSnap.docs.map(doc => {
+                this.doneLoadingWithSkills(masterSkillsSnap);
+            }
+        } else if(activeTab === 'skilltrees'){
+            const compositionsSnap = await db.collection('compositions')
+                                        .where('user', '==', this.props.user.uid)
+                                        .orderBy('lastUpdate', 'desc')
+                                        .limit(10)
+                                        .get();
+            if(compositionsSnap.empty){
+                this.doneLoadingNoSkills();
+            } else {
+                const compositions = compositionsSnap.docs.map(doc => {
                     const composition = {
                         ...doc.data() as IComposition,
                         id: doc.id
                     }
                     return composition
                 });
-                
-                db.collectionGroup("skills").where("composition", "in", [ this.props.user.uid, ...compositions.map(c => c.id) ])
-                .get()
-                .then(skillsSnap => {
-                    if(skillsSnap.empty){
-                        this.setState({
-                            doneLoading: true
-                        })
-                    } else {
-                        const skills = skillsSnap.docs.map(doc => {
-                            let hierarchy = 0;
-                            const splittedPath = doc.ref.path.split('/').length;
-                            if(splittedPath > 5) {
-                                hierarchy = (doc.ref.path.split('/').length - 4) / 2;
-                            }
-                            let skill: ISkill = {
-                                category: 'None',
-                                reference: 'None',
-                                ...doc.data() as ISkill,
-                                hierarchy,
-                                path: doc.ref.path
-                            }
-                            skill.compositionTitle = 'Master';
-                            const compositionIndex = compositions.findIndex(c => c.id === skill.composition);
-                            if(compositionIndex > -1){
-                                skill.compositionTitle = compositions[compositionIndex].title;
-                                skill.table = compositions[compositionIndex].user === this.props.user.uid ? 'skilltrees' : 'domain';
-                            } else {
-                                skill.table = 'master';
-                            }
-                            return skill;
-                        });
-                        
-                        this.setState({
-                            doneLoading: true,
-                            skills
-                        });
-                    }
-                })
-                .catch(err => {
-                    toast.error(err.message);
-                    this.setState({
-                        doneLoading: true
-                    })
-                })
+                console.log(compositions);
+                const skilltreeSkillsSnap = await db.collectionGroup("skills")
+                .where("composition", "in", compositions.map(c => c.id))
+                .get();
+                if(skilltreeSkillsSnap.empty){
+                    this.doneLoadingNoSkills();
+                } else {
+                    this.doneLoadingWithSkills(skilltreeSkillsSnap, compositions);
+                }
             }
-        })
-        .catch(err => {
-            toast.error(err.message);
-            this.setState({
-                doneLoading: true
+        } else {
+            const userIds = await getRelevantUserIds(this.props.user);
+            db.collection("compositions")
+            .where('user', 'in', userIds)
+            .orderBy("lastUpdate", "desc")
+            .limit(10)
+            .get()
+            .then(collectionsSnap => {
+                console.log('collectionSnap')
+                if(collectionsSnap.empty){
+                    this.doneLoadingNoSkills()
+                } else {
+                    const compositions = collectionsSnap.docs.map(doc => {
+                        const composition = {
+                            ...doc.data() as IComposition,
+                            id: doc.id
+                        }
+                        return composition
+                    });
+                    db.collectionGroup("skills").where("composition", "in", compositions.map(c => c.id))
+                    .get()
+                    .then(skillsSnap => {
+                        if(skillsSnap.empty){
+                            this.doneLoadingNoSkills();
+                        } else {
+                            this.doneLoadingWithSkills(skillsSnap, compositions);
+                        }
+                    })
+                    .catch(err => {
+                        toast.error(err.message);
+                        this.doneLoadingNoSkills();
+                    })
+                }
             })
+            .catch(err => {
+                toast.error(err.message);
+                this.doneLoadingNoSkills()
+            })
+        }
+    }
+
+    doneLoadingNoSkills = () => {
+        this.setState({
+            doneLoading: true
         })
-    } 
+    }
+
+    doneLoadingWithSkills = (skillsSnap, compositions?) => {
+        const skills = skillsSnap.docs.map(doc => {
+            let hierarchy = 0;
+            const splittedPath = doc.ref.path.split('/').length;
+            if(splittedPath > 5) {
+                hierarchy = (doc.ref.path.split('/').length - 4) / 2;
+            }
+            let skill: ISkill = {
+                category: 'None',
+                reference: 'None',
+                ...doc.data() as ISkill,
+                hierarchy,
+                path: doc.ref.path
+            }
+            skill.compositionTitle = 'Master';
+            console.log(compositions);
+            if(compositions && compositions.length > 0){
+                const compositionIndex = compositions.findIndex(c => c.id === skill.composition);
+                skill.compositionTitle = compositionIndex > -1 ? compositions[compositionIndex].title : '';
+                skill.table = compositionIndex > -1 ? 
+                                compositions[compositionIndex].user === this.props.user.uid ? 'skilltrees' : 'domain'
+                                : 'no table';
+            } else {
+                skill.table = 'master';
+            }
+            return skill;
+        });
+        
+        this.setState({
+            doneLoading: true,
+            skills
+        });
+    }
 
     componentDidUpdate(_prevProps) {
         if(this.props.hasDismissedWarning && !this.state.destroyInProgress){
@@ -304,8 +352,10 @@ class Skills extends Component<ISkillsProps, ISkillsState> {
 
     changeActiveTab = (tab: string) => {
         this.setState({
-            activeTab: tab
+            activeTab: tab,
+            skills: []
         });
+        this.getRelevantSkills(tab);
       }
 
     importSelectedSkills = () => {
