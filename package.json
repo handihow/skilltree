@@ -24,7 +24,7 @@
     "font-picker-react": "^3.5.2",
     "generate-password": "^1.6.0",
     "node-sass": "^5.0.0",
-    "normalize-url": "^5.3.0",
+    "normalize-url": "^4.5.0",
     "react": "^16.14.0",
     "react-addons-update": "^15.6.3",
     "react-app-polyfill": "^2.0.0",

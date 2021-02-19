@@ -79,10 +79,6 @@ export default function About() {
                     </ol>
 
                 </div>
-                Learn how to create a digital skill tree! Check out the video below.
-                <YouTube
-                    videoId="RGJJt1Vl3Ro"
-                    opts = {{height: '300', width: '550'}}/>
             
             </div>
         </section>

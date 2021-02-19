@@ -91,12 +91,12 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                 <div className="navbar-end">
                 <div className="navbar-item">
                     <div className="buttons">
-                        <a className="button is-primary is-rounded is-medium" 
+                        {isAuthenticated &&<a className="button is-primary is-rounded is-medium" 
                             href="https://github.com/handihow/skilltree/issues" target="_blank" rel="noreferrer">
                                  <span className="icon has-tooltip-bottom" data-tooltip="Report bug">
                                     <FontAwesomeIcon icon='bug' />
                                 </span>
-                        </a>
+                        </a>}
                         <a className="button is-primary is-rounded is-medium" 
                             href="https://github.com/handihow/skilltree/wiki" target="_blank" rel="noreferrer">
                                  <span className="icon has-tooltip-bottom" data-tooltip="Help">

@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import { Redirect, Link } from "react-router-dom";
 import { loginUser, loginWithGoogle, loginWithMicrosoft } from "../actions";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import YouTube from 'react-youtube';
 
 const hrStyle =  {
     display: 'inline-block',
@@ -89,19 +88,6 @@ class Login extends Component<ILoginProps, ILoginState> {
                     </section>
                     <section className="section">
                         <div className="container">
-                        <div className="columns">
-                            <div className="column is-half is-hidden-mobile">
-                                <div style={{
-                                margin: "0",
-                                position: "absolute",
-                                top: "50%",
-                                transform: "translateY(-50%)"
-                            }}>
-                                <YouTube
-                                videoId="XgAQkkm6MpA"
-                                opts = {{height: '270', width: '450'}}/></div>
-                            </div>
-                            <div className="column is-half">
                             <div className="has-text-centered">
                             <LoginButton icon="google" iconPrefix="fab" buttonText="Sign in with Google" onClick={this.handleLoginWithGoogle} color="is-danger" />
                             <LoginButton icon="microsoft" iconPrefix="fab" buttonText="Sign in with Microsoft" onClick={this.handleLoginWithMicrosoft} color="is-info" />
@@ -136,9 +122,6 @@ class Login extends Component<ILoginProps, ILoginState> {
                                 </div>
 
                             </div>
-                        </div>
-                        </div>
-                        
                     </section>
                 </React.Fragment>
             );
