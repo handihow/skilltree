@@ -1,197 +1,218 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 
 import { Route, Switch } from "react-router-dom";
 import { connect } from "react-redux";
-import WarningModal from './components/layout/WarningModal';
+import WarningModal from "./components/layout/WarningModal";
 
-import ProtectedRoute from "./components/ProtectedRoute";
-import Home from "./components/Home";
-import Login from "./components/Login";
-import Recover from './components/Recover';
-import Register from './components/Register';
-import About from "./components/pages/About";
-import NavBar from './components/layout/Navbar';
-import Footer from './components/layout/Footer';
-import Profile from './components/pages/Profile';
-import EditProfile from "./components/pages/EditProfile";
-import DeleteProfile from "./components/pages/DeleteProfile";
-import Editor from './components/editor/Editor';
-import Composition from './components/compositions/Composition';
-import CompositionViewer from './components/compositions/CompositionViewer';
-import Payments from './components/payments/Payments';
-import PaymentConfirmation from './components/payments/PaymentConfirmation';
-import Quizzes from './components/quizzes/Quizzes';
-import QuizBuilder from './components/quizzes/QuizBuilder';
-import DoQuiz from './components/quizzes/DoQuiz';
-import QuizResults from './components/quizzes/QuizResults';
-import QuizResult from './components/quizzes/QuizResult';
-import JoinQuiz from './components/quizzes/JoinQuiz';
-import Skills from './components/skills/Skills';
-import SkillsUploader from './components/skills/SkillsUploader';
-import Skill from './components/skills/Skill';
+import "./App.sass";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-import CompositionAddStudents from './components/compositions/CompositionAddStudents';
+const ProtectedRoute = React.lazy(() => import("./components/ProtectedRoute"));
+const Home = React.lazy(() => import("./components/Home"));
+const Login = React.lazy(() => import("./components/Login"));
+const Recover = React.lazy(() => import("./components/Recover"));
+const Register = React.lazy(() => import("./components/Register"));
+const About = React.lazy(() => import("./components/pages/About"));
+const NavBar = React.lazy(() => import("./components/layout/Navbar"));
+const Footer = React.lazy(() => import("./components/layout/Footer"));
+const Profile = React.lazy(() => import("./components/pages/Profile"));
+const EditProfile = React.lazy(() => import("./components/pages/EditProfile"));
+const DeleteProfile = React.lazy(
+  () => import("./components/pages/DeleteProfile")
+);
+const Editor = React.lazy(() => import("./components/editor/Editor"));
+const Composition = React.lazy(
+  () => import("./components/compositions/Composition")
+);
+const CompositionViewer = React.lazy(
+  () => import("./components/compositions/CompositionViewer")
+);
+const Payments = React.lazy(() => import("./components/payments/Payments"));
+const PaymentConfirmation = React.lazy(
+  () => import("./components/payments/PaymentConfirmation")
+);
+const Quizzes = React.lazy(() => import("./components/quizzes/Quizzes"));
+const QuizBuilder = React.lazy(
+  () => import("./components/quizzes/QuizBuilder")
+);
+const DoQuiz = React.lazy(() => import("./components/quizzes/DoQuiz"));
+const QuizResults = React.lazy(
+  () => import("./components/quizzes/QuizResults")
+);
+const QuizResult = React.lazy(() => import("./components/quizzes/QuizResult"));
+const JoinQuiz = React.lazy(() => import("./components/quizzes/JoinQuiz"));
+const Skills = React.lazy(() => import("./components/skills/Skills"));
+const SkillsUploader = React.lazy(
+  () => import("./components/skills/SkillsUploader")
+);
+const Skill = React.lazy(() => import("./components/skills/Skill"));
 
-import './App.sass';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import CompositionMonitor from "./components/compositions/CompositionMonitor";
+const CompositionAddStudents = React.lazy(
+  () => import("./components/compositions/CompositionAddStudents")
+);
 
+const CompositionMonitor = React.lazy(
+  () => import("./components/compositions/CompositionMonitor")
+);
 
 // Call it once in your app. At the root of your app is the best place
-toast.configure()
+toast.configure();
 
 function App(props) {
   const { isAuthenticated, isVerifying } = props;
-    return (
-      <React.Fragment>
-      <div style={{minHeight:'100%'}}>
-      <NavBar />
-      <Switch>
-        <ProtectedRoute
-          exact
-          path="/"
-          component={Home}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute
-          exact
-          path="/quizzes"
-          component={Quizzes}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute
-          exact
-          path="/skills"
-          component={Skills}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute
-          exact
-          path="/skills/upload-csv"
-          component={SkillsUploader}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute 
-          path="/skills/:skillId"
-          exact
-          component={Skill}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute
-          exact
-          path="/profile"
-          component={Profile}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute
-          exact
-          path="/profile/edit"
-          component={EditProfile}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute
-          exact
-          path="/profile/delete"
-          component={DeleteProfile}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute 
-          path="/editor/:compositionId"
-          exact
-          component={Editor}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute 
-          path="/compositions/:compositionId"
-          exact
-          component={Composition}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute 
-          exact={true}
-          path="/compositions/:compositionId/monitor"
-          component={CompositionMonitor}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute 
-          exact={true}
-          path="/compositions/:compositionId/add-students"
-          component={CompositionAddStudents}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute 
-          path="/compositions/:compositionId/monitor/:userId"
-          component={CompositionViewer}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute 
-          path="/compositions/:compositionId/unlock/:featureId"
-          component={Payments}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute 
-          path="/compositions/:compositionId/confirmation/:featureId"
-          component={PaymentConfirmation}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute 
-          path="/quizzes/:quizId/builder/:builder"
-          component={QuizBuilder}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute 
-          path="/quizzes/:quizId/test"
-          component={DoQuiz}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute 
-          path="/quizzes/:quizId/results"
-          component={QuizResults}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute 
-          path="/quizzes/:quizId/result"
-          component={QuizResult}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <ProtectedRoute 
-          path="/quizzes/:quizId/join"
-          component={JoinQuiz}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-        />
-        <Route path="/compositions/:compositionId/viewer" component={CompositionViewer} />
-        <Route path="/login" component={Login} />
-        <Route path="/recover" component={Recover} />
-        <Route path="/register" component={Register} />
-        <Route path="/about" component={About} />
-      </Switch>
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <div style={{ minHeight: "100%" }}>
+        <NavBar />
+        <Switch>
+          <ProtectedRoute
+            exact
+            path="/"
+            component={Home}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <ProtectedRoute
+            exact
+            path="/quizzes"
+            component={Quizzes}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <ProtectedRoute
+            exact
+            path="/skills"
+            component={Skills}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <ProtectedRoute
+            exact
+            path="/skills/upload-csv"
+            component={SkillsUploader}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <ProtectedRoute
+            path="/skills/:skillId"
+            exact
+            component={Skill}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <ProtectedRoute
+            exact
+            path="/profile"
+            component={Profile}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <ProtectedRoute
+            exact
+            path="/profile/edit"
+            component={EditProfile}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <ProtectedRoute
+            exact
+            path="/profile/delete"
+            component={DeleteProfile}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <ProtectedRoute
+            path="/editor/:compositionId"
+            exact
+            component={Editor}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <ProtectedRoute
+            path="/compositions/:compositionId"
+            exact
+            component={Composition}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <ProtectedRoute
+            exact={true}
+            path="/compositions/:compositionId/monitor"
+            component={CompositionMonitor}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <ProtectedRoute
+            exact={true}
+            path="/compositions/:compositionId/add-students"
+            component={CompositionAddStudents}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <ProtectedRoute
+            path="/compositions/:compositionId/monitor/:userId"
+            component={CompositionViewer}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <ProtectedRoute
+            path="/compositions/:compositionId/unlock/:featureId"
+            component={Payments}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <ProtectedRoute
+            path="/compositions/:compositionId/confirmation/:featureId"
+            component={PaymentConfirmation}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <ProtectedRoute
+            path="/quizzes/:quizId/builder/:builder"
+            component={QuizBuilder}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <ProtectedRoute
+            path="/quizzes/:quizId/test"
+            component={DoQuiz}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <ProtectedRoute
+            path="/quizzes/:quizId/results"
+            component={QuizResults}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <ProtectedRoute
+            path="/quizzes/:quizId/result"
+            component={QuizResult}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <ProtectedRoute
+            path="/quizzes/:quizId/join"
+            component={JoinQuiz}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+          />
+          <Route
+            path="/compositions/:compositionId/viewer"
+            component={CompositionViewer}
+          />
+          <Route path="/login" component={Login} />
+          <Route path="/recover" component={Recover} />
+          <Route path="/register" component={Register} />
+          <Route path="/about" component={About} />
+        </Switch>
       </div>
       <Footer />
       <WarningModal />
-      </React.Fragment>
-    );
-  }
+    </Suspense>
+  );
+}
 
 function mapStateToProps(state) {
   return {
@@ -199,9 +220,8 @@ function mapStateToProps(state) {
     isVerifying: state.auth.isVerifying,
     user: state.auth.user,
     showWarningModal: state.showWarningModal,
-    warningMessage: state.warningMessage
+    warningMessage: state.warningMessage,
   };
 }
-
 
 export default connect(mapStateToProps)(App);
