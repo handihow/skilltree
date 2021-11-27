@@ -3,6 +3,7 @@ import React from 'react'
 export default function Footer() {
     return (
         <footer className="footer" style={{
+            marginTop: '20px',
             position:'absolute',
             bottom:'-60',
             width:'100%',

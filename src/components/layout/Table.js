@@ -1,6 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, {useMemo} from 'react';
-import { Link } from 'react-router-dom';
 
 import { useTable, useSortBy, useGlobalFilter, useRowSelect } from 'react-table';
 import GlobalFilter from './GlobalFilter';
@@ -29,8 +28,6 @@ export default function Table({
     onSelectMultiple,
     selectMultipleButtonText,
     updateData,
-    uploadLink,
-    isUploadEnabled,
     isEditingEnabled
 }) {
     const memorizedData = useMemo(() => data, [data]);
@@ -85,21 +82,13 @@ export default function Table({
         <React.Fragment>
         <div className="level">
             <div className="level-left">
-              <div className="level-item">
-                <h3 className="title is-5">{header}</h3>
-              </div>
+            <GlobalFilter globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
             </div>
             <div className="level-right">
-              <div className="level-item">
-                <GlobalFilter globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
-              </div>
               <div className={`level-item ${isEditingEnabled ? '' : 'is-hidden'}`}>
                 <button className="button" disabled={selectedFlatRows.length===0} onClick={() => onSelectMultiple(selectedFlatRows.map(
                     d => d.original
                   ))}>{selectMultipleButtonText}</button>
-              </div>
-              <div className={`level-item ${isUploadEnabled ? '' : 'is-hidden'}`}>
-                <Link className="button" to={uploadLink ? uploadLink : ''}>Upload</Link>
               </div>
             </div>
         </div>

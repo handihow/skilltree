@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import IQuiz from '../../models/quiz.model';
+import { toast } from "react-toastify";
 
 interface IAddQuizProps {
     addQuiz: Function;
@@ -38,7 +39,9 @@ export class AddQuiz extends Component<IAddQuizProps, IAddQuizState> {
 
     onSubmit = (e) => {
         e.preventDefault();
-        if(this.props.isEditingTitle) {
+        if(this.state.title.length === 0){
+            toast.error("Please enter a title");
+        } else if(this.props.isEditingTitle) {
             this.props.updateQuizTitle(this.state.title);
         } else {
             this.props.addQuiz(this.state.title);
@@ -55,6 +58,7 @@ export class AddQuiz extends Component<IAddQuizProps, IAddQuizState> {
                         className="input" 
                         type="text" 
                         placeholder="Title New Quiz..."
+                        autoFocus
                         value={this.state.title}
                         onChange={this.onChange} />
                         

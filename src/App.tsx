@@ -62,7 +62,7 @@ toast.configure();
 function App(props) {
   const { isAuthenticated, isVerifying } = props;
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div className="pageloader is-primary is-active"><span className="title">Please wait...</span></div>}>
       <div style={{ minHeight: "100%" }}>
         <NavBar />
         <Switch>

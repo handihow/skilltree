@@ -1,6 +1,9 @@
 import React from 'react'
 import CSVReader from "react-csv-reader";
 import Table from '../layout/Table';
+import Header from "../layout/Header";
+import BackButton from '../layout/BackButton';
+
 
 const papaparseOptions = {
     header: true,
@@ -25,9 +28,20 @@ export default function CsvStepper({
     templateLink
 }) {
     return (
-        <section className="section">
+        <React.Fragment>
+        <div className="level has-background-light mb-0 p-3 is-mobile">
+          <div className="level-item has-text-centered">
+            <Header
+              icon="upload"
+              header="Upload skills from csv"
+            />
+          </div>
+          <div className="level-item">
+            <BackButton></BackButton>
+          </div>
+        </div>
         <div className="container">
-        <ul className="steps has-content-centered">
+        <ul className="steps has-content-centered mt-5">
         {steps.map((text, index) => (
             <li key={index} className={`steps-segment ${step === index + 1 ? 'is-active' : ''} `}>
                 <span className="steps-marker"></span>
@@ -59,9 +73,7 @@ export default function CsvStepper({
                 onSelectMultiple={onSelectedData}
                 selectMultipleButtonText={'Import selected records'}
                 updateData={() => {}}
-                isUploadEnabled={false}
                 isEditingEnabled={true}
-                uploadLink={null}
                 />
         </div>
         <div className={`content ${step !== 3 ? 'is-hidden' : ''}`}>
@@ -88,6 +100,6 @@ export default function CsvStepper({
         <button className={`button ${step === 1 ? 'is-hidden' : ''}`}  onClick={startAgain}>Start again</button>
         <button className={`button is-pulled-right ${step !== 3 ? 'is-hidden' : ''}`} onClick={doneMapping}>Next</button>
         </div>
-            </section>
+            </React.Fragment>
     )
 }
