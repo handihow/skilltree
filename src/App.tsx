@@ -7,6 +7,7 @@ import WarningModal from "./components/layout/WarningModal";
 import "./App.sass";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Loading from "./components/layout/Loading";
 
 const ProtectedRoute = React.lazy(() => import("./components/ProtectedRoute"));
 const Home = React.lazy(() => import("./components/Home"));
@@ -62,7 +63,7 @@ toast.configure();
 function App(props) {
   const { isAuthenticated, isVerifying } = props;
   return (
-    <Suspense fallback={<div className="pageloader is-primary is-active"><span className="title">Please wait...</span></div>}>
+    <Suspense fallback={<Loading></Loading>}>
       <div style={{ minHeight: "100%" }}>
         <NavBar />
         <Switch>

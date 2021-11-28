@@ -154,7 +154,6 @@ showTheProperty("file", "allowMultiple");
 interface ISurveyCreatorProps {
     quiz: IQuiz | undefined;
     dotest: Function;
-    goback: Function;
     builder: string;
     userId: string;
 }
@@ -216,14 +215,6 @@ class SurveyCreator extends Component<ISurveyCreatorProps> {
                 action: this.setDefault
             });
     }
-    this.surveyCreator
-            .toolbarItems
-            .push({
-                id: "go-back",
-                visible: true,
-                title: "Back",
-                action: this.props.goback
-            });
     
     this.surveyCreator.saveSurveyFunc =this.saveMySurvey;
 

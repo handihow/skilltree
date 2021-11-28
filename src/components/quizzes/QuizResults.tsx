@@ -5,7 +5,7 @@ import IQuiz from '../../models/quiz.model';
 import IAnswer from '../../models/answer.model';
 import { connect } from "react-redux";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { RouteComponentProps } from 'react-router-dom';
+import { Link, RouteComponentProps } from 'react-router-dom';
 import Loading from '../layout/Loading';
 import SurveyPage from "../surveyjs/Survey";
 import SurveyAnalytics from "../surveyjs/SurveyAnalytics";
@@ -108,16 +108,19 @@ class QuizResults extends Component<IQuizResultsProps, IQuizResultsState> {
         
           return (
           	this.state.doneLoading ?
-            <section className="section" style={{'minHeight': '100vh'}}>
-            <div className="container">
-              <div className="level is-mobile">
-                <div className="level-left">
+            <React.Fragment>
+            
+              <div className="level is-mobile has-background-light p-3 mb-0">
+                <div className="level-item has-text-centered">
                 <Header header={header} icon='poll-h'/>
                 
                 </div>
+                <div className="level-item has-text-centered">
+                  <Link className="button" to="/quizzes">Back</Link>
+                </div>
                 
               </div>
-              <div className="tabs">
+              <div className="tabs is-centered has-background-light">
 	          <ul>
 	              <li className={this.state.activeTab ==='individual' ? "is-active" : undefined}>
 	                  <a href="# " onClick={() => this.changeActiveTab('individual')}>Submission records</a>
@@ -130,6 +133,7 @@ class QuizResults extends Component<IQuizResultsProps, IQuizResultsState> {
                 </li>
 	          </ul>
 	          </div>
+            <div className="container">
 	          {this.state.answers.length === 0 && 
 	          	<article className="message is-primary">
 		            <div className="message-header">No answers yet.. </div>
@@ -193,7 +197,7 @@ class QuizResults extends Component<IQuizResultsProps, IQuizResultsState> {
                   }
                })} />}
             </div> 
-            </section>
+            </React.Fragment>
             : <Loading />    
           );
         }

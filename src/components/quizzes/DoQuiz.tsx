@@ -97,7 +97,7 @@ export class DoQuiz extends Component<IDoQuizProps,IDoQuizState> {
     onComplete(sender){
         const quizId = this.props.match.params.quizId;
         db.collection("answers").doc(quizId + '_' + this.props.user.uid).set({
-            isFinished: true,
+            isFinished: this.state.quiz?.user === this.props.user.uid ? false : true,
             lastUpdate: firebase.firestore.Timestamp.now(),
             correctAnswers: sender.getCorrectedAnswerCount(),
             incorrectAnswers: sender.getInCorrectedAnswerCount()

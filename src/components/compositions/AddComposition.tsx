@@ -53,8 +53,9 @@ export class AddComposition extends Component<IAddCompositionProps, IAddComposit
                 <section className="modal-card-body">
                     
                     <input 
-                        className="input" 
+                        className="input is-focused" 
                         type="text" 
+                        autoFocus
                         placeholder="Title new SkillTree..."
                         value={this.state.title}
                         onChange={this.onChange} />

@@ -55,7 +55,7 @@ export class AddQuiz extends Component<IAddQuizProps, IAddQuizState> {
                 <section className="modal-card-body">
                     
                     <input 
-                        className="input" 
+                        className="input is-focused" 
                         type="text" 
                         placeholder="Title New Quiz..."
                         autoFocus

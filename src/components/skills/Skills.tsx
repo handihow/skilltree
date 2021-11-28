@@ -431,8 +431,7 @@ class Skills extends Component<ISkillsProps, ISkillsState> {
             />
           </div>
           <div className="level-item">
-            {this.state.activeTab === "master" &&
-              !this.props.hasSelectedParentSkilltree && (
+            {!this.props.hasSelectedParentSkilltree && (
                 <Link to="/skills/upload-csv" className="button is-rounded">
                   <span className="icon">
                     <FontAwesomeIcon icon="plus" />

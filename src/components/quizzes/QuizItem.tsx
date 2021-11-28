@@ -77,7 +77,7 @@ export class QuizItem extends Component<IQuizItemProps, IQuizItemState> {
                 <div className="content">
                 <p>
                     <Link to={this.props.user.uid === this.props.quiz.user 
-                              ? "/quizzes/"+id :
+                              ? "/quizzes/"+id+"/builder/quiz" :
                               "quizzes/"+id+"/viewer"} data-tooltip="To quiz editor" style={{color: "black"}}> 
                     <strong>{title}</strong> 
                     </Link><small style={{marginLeft: "10px"}}>{username}</small>
