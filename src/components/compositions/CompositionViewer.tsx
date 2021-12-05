@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import { Component } from "react";
 import { db, storage } from "../../firebase/firebase";
 import CompositionDisplay from "../layout/CompositionDisplay";
 import Loading from "../layout/Loading";
@@ -152,7 +152,6 @@ export class CompositionViewer extends Component<
               }
         }
       >
-        <div style={{ maxHeight: "100%", overflow: "auto" }}>
           {this.state.skilltrees &&
             this.state.skilltrees.length > 0 &&
             this.state.composition && (
@@ -165,7 +164,6 @@ export class CompositionViewer extends Component<
                 monitoredUserId={this.props.match.params.userId}
               />
             )}
-        </div>
       </div>
     );
   }

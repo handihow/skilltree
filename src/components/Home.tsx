@@ -110,6 +110,10 @@ class Home extends Component<IHomeProps, IHomeState> {
   }
 
   addComposition = (title, theme, data) => {
+    if(!title){
+      toast.error("Please enter a title for the SkillTree");
+      return;
+    }
     this.setState({
       isAddingOrEditing: false,
     });
@@ -200,6 +204,10 @@ class Home extends Component<IHomeProps, IHomeState> {
   };
 
   updateCompositionTitle = (updatedTitle: string) => {
+    if(!updatedTitle || updatedTitle.length === 0) {
+      toast.error("Please enter a title");
+      return;
+    }
     db.collection("compositions")
       .doc(this.state.currentComposition?.id)
       .update({
@@ -304,11 +312,11 @@ class Home extends Component<IHomeProps, IHomeState> {
     } else {
       return (
         <React.Fragment>
-          <div className="level has-background-light mb-0 p-3 is-mobile">
-            <div className="level-item has-text-centered">
+          <div className="level has-background-light mb-3 p-3 is-mobile">
+            <div className="level-left">
               <Header header={header} image="/Skilltree_icons-04.svg" />
             </div>
-            <div className="level-item has-text-centered">
+            <div className="level-right">
               <button
                 className="is-rounded is-outlined button"
                 onClick={() => this.toggleIsAddingOrEditing()}
@@ -316,54 +324,15 @@ class Home extends Component<IHomeProps, IHomeState> {
                 <span className="icon">
                   <FontAwesomeIcon icon="plus" />
                 </span>
-                <span>Add Skilltree</span>
+                <span className="is-hidden-mobile">Add Skilltree</span>
               </button>
             </div>
           </div>
-
-          <div className="tabs is-centered has-background-light">
-            <ul>
-              <li
-                className={
-                  this.state.activeTab === "owned" ? "is-active" : undefined
-                }
-              >
-                <a href="# " onClick={() => this.changeActiveTab("owned")}>
-                  Your SkillTrees
-                </a>
-              </li>
-              <li
-                className={
-                  this.state.activeTab === "shared" ? "is-active" : undefined
-                }
-              >
-                <a href="# " onClick={() => this.changeActiveTab("shared")}>
-                  Shared SkillTrees
-                </a>
-              </li>
-              {this.props.user.hostedDomain && (
-                <li
-                  className={
-                    this.state.activeTab === "domain" ? "is-active" : undefined
-                  }
-                >
-                  <a href="# " onClick={() => this.changeActiveTab("domain")}>
-                    Skilltrees in {this.props.user.hostedDomain}
-                  </a>
-                </li>
-              )}
-            </ul>
-          </div>
-          <div className="container" style={{ minHeight: "100vh" }}>
+          <div className="container">
             {this.state.compositions && (
               <Compositions
                 compositions={
-                  this.state.activeTab === "owned"
-                    ? this.state.compositions
-                    : this.state.activeTab === "shared"
-                    ? this.state.sharedCompositions
-                    : this.state.hostedDomainCompositions
-                }
+                  this.state.compositions.concat(this.state.sharedCompositions.concat(this.state.hostedDomainCompositions))}
                 editCompositionTitle={this.toggleIsAddingOrEditing}
                 deleteComposition={this.toggleIsActive}
               />

@@ -171,7 +171,7 @@ class SurveyCreator extends Component<ISurveyCreatorProps> {
       options
     );
     this.surveyCreator.saveSurveyFunc = this.saveMySurvey;
-    this.surveyCreator.showToolbox = "right";
+    this.surveyCreator.showToolbox = "right"
     // Show property grid in the right container, combined with toolbox
     this.surveyCreator.showPropertyGrid = "right";
     // Make toolbox active by default

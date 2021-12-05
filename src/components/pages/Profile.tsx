@@ -16,7 +16,7 @@ export class Profile extends Component<IProfileProps> {
     
     render() {
         return (
-            
+            <div style={{height: "100vh"}}>
             <div className="card" style={{margin: 'auto', maxWidth: '600px', marginTop: '20px'}}>
             <div className="card-content">
                 <div className="media">
@@ -49,6 +49,7 @@ export class Profile extends Component<IProfileProps> {
                 <Link to="/profile/edit"  className="card-footer-item">Edit</Link>
                 <Link to="/profile/delete" className="card-footer-item">Delete</Link>
             </footer>
+            </div>
             </div>
 
         )

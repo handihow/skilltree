@@ -1,4 +1,3 @@
-import React from 'react'
 import CompositionItem from './CompositionItem';
 import IComposition from '../../models/composition.model';
 
@@ -22,14 +21,15 @@ export default function Compositions(props: ICompositionsProps) {
         </article>
         
              : 
-        <React.Fragment>
-        {props.compositions?.map((composition) => (
+        <div className="columns is-multiline">
+        {props.compositions?.map((composition, index) => (
+            <div key={index} className="column is-half-tablet is-one-third-desktop is-one-quarter-widescreen">
             <CompositionItem key={composition.id} composition={composition} 
             editCompositionTitle={props.editCompositionTitle}
             deleteComposition={props.deleteComposition}
-             />
+             /></div>
         ))}
-        </React.Fragment>
+        </div>
     )
 }
 

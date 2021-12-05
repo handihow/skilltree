@@ -30,14 +30,14 @@ export default function EditorMenu(props: IEditorMenuProps) {
     {'title': 'Settings', 'icon': 'cogs', 'clicked': 'toggleOptionsEditor', 'active': 'isVisibleOptionsEditor', 'tooltip': 'Settings for your skilltree'},
   ];
   return (
-    <aside className="menu has-background-light has-text-centered pt-4">
+    <aside className="menu has-background-light p-3">
       <Droppable droppableId="MENU" isDropDisabled={false}>
         {(provided) => (
           <ul className="menu-list" {...provided.droppableProps} ref={provided.innerRef}>
             
            <React.Fragment>
            {!props.hideDraggables &&
-           <p className="menu-label is-hidden-touch">
+           <p className="menu-label has-text-dark">
               Add Items
             </p>}
             {draggableMenuItems.map((item,index) => (
@@ -52,7 +52,7 @@ export default function EditorMenu(props: IEditorMenuProps) {
               ></DraggableMenuItem>
             ))}
             </React.Fragment>
-            <p className="menu-label is-hidden-touch">
+            <p className="menu-label has-text-dark">
               Appearance
             </p>
             {appearanceMenuItems.map((item, index) => (

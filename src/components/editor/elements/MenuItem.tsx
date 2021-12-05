@@ -14,7 +14,7 @@ export default function MenuItem({
         <div className="icon has-tooltip-right has-tooltip-primary" data-tooltip={isActive ? 'Click again to close editor' : tooltip}>
         <FontAwesomeIcon icon={icon} />
         </div>
-        <div className="is-hidden-touch is-capitalized is-size-7">{isActive ? 'Close' : title}</div></a>
+        <div className="is-size-7">{isActive ? 'Close' : title}</div></a>
     </li>
   )
 }

@@ -73,6 +73,7 @@ function App(props) {
             component={Home}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="true"
           />
           <ProtectedRoute
             exact
@@ -80,6 +81,7 @@ function App(props) {
             component={Quizzes}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="true"
           />
           <ProtectedRoute
             exact
@@ -87,6 +89,7 @@ function App(props) {
             component={Skills}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="true"
           />
           <ProtectedRoute
             exact
@@ -94,6 +97,7 @@ function App(props) {
             component={SkillsUploader}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="false"
           />
           <ProtectedRoute
             path="/skills/:skillId"
@@ -101,6 +105,7 @@ function App(props) {
             component={Skill}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="false"
           />
           <ProtectedRoute
             exact
@@ -108,6 +113,7 @@ function App(props) {
             component={Profile}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="true"
           />
           <ProtectedRoute
             exact
@@ -115,6 +121,7 @@ function App(props) {
             component={EditProfile}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="false"
           />
           <ProtectedRoute
             exact
@@ -122,6 +129,7 @@ function App(props) {
             component={DeleteProfile}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="false"
           />
           <ProtectedRoute
             path="/editor/:compositionId"
@@ -129,6 +137,7 @@ function App(props) {
             component={Editor}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="false"
           />
           <ProtectedRoute
             path="/compositions/:compositionId"
@@ -136,6 +145,7 @@ function App(props) {
             component={Composition}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="false"
           />
           <ProtectedRoute
             exact={true}
@@ -143,6 +153,7 @@ function App(props) {
             component={CompositionMonitor}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="false"
           />
           <ProtectedRoute
             exact={true}
@@ -150,54 +161,63 @@ function App(props) {
             component={CompositionAddStudents}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="false"
           />
           <ProtectedRoute
             path="/compositions/:compositionId/monitor/:userId"
             component={CompositionViewer}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="false"
           />
           <ProtectedRoute
             path="/compositions/:compositionId/unlock/:featureId"
             component={Payments}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="false"
           />
           <ProtectedRoute
             path="/compositions/:compositionId/confirmation/:featureId"
             component={PaymentConfirmation}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="false"
           />
           <ProtectedRoute
             path="/quizzes/:quizId/builder/:builder"
             component={QuizBuilder}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="false"
           />
           <ProtectedRoute
             path="/quizzes/:quizId/test"
             component={DoQuiz}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="false"
           />
           <ProtectedRoute
             path="/quizzes/:quizId/results"
             component={QuizResults}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="false"
           />
           <ProtectedRoute
             path="/quizzes/:quizId/result"
             component={QuizResult}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="false"
           />
           <ProtectedRoute
             path="/quizzes/:quizId/join"
             component={JoinQuiz}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
+            hasSidebar="false"
           />
           <Route
             path="/compositions/:compositionId/viewer"

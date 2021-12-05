@@ -111,6 +111,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
     this.prepareDeleteSkilltree = this.prepareDeleteSkilltree.bind(this);
     this.updateSkilltree = this.updateSkilltree.bind(this);
     this.deleteSkilltree = this.deleteSkilltree.bind(this);
+    this.addSkilltree = this.addSkilltree.bind(this);
     this.editSkill = this.editSkill.bind(this);
     this.updateSkill = this.updateSkill.bind(this);
     this.handleCompositionChange = this.handleCompositionChange.bind(this);
@@ -240,6 +241,12 @@ export class Editor extends Component<IEditorProps, IEditorState> {
     this.setState(defaultState);
   }
 
+  addSkilltree(){
+    this.setState({
+      showSkilltreeForm: true,
+    })
+  }
+
   async handleOnDragEnd(result) {
     this.setState({
       enableDropSkilltrees: false,
@@ -259,9 +266,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
       result.destination.droppableId.startsWith("EDITOR") &&
       result.draggableId === "skilltree"
     ) {
-      this.setState({
-        showSkilltreeForm: true,
-      });
+      this.addSkilltree();
     } else if (result.draggableId === "root-skill") {
       const currentSkilltree = this.getCurrentSkilltree(
         result.destination.droppableId.replace("SKILLTREE-", "")
@@ -489,25 +494,20 @@ export class Editor extends Component<IEditorProps, IEditorState> {
   };
 
   render() {
-    const editorDisplayStyles: React.CSSProperties = {
-      position: "relative",
-      height: "calc(100vh - 5rem - 30px)",
-      padding: "0px",
-      marginTop: "0.75rem",
-      backgroundColor: !this.state.hasBackgroundImage
-        ? "hsl(0, 0%, 48%)"
-        : "unset",
-      backgroundImage: this.state.hasBackgroundImage
-        ? `url(${this.state.backgroundImage})`
-        : "unset",
-      backgroundSize: this.state.hasBackgroundImage ? "cover" : "unset",
-    };
+    // const editorDisplayStyles: React.CSSProperties = {
+    //   position: "relative",
+    //   height: "calc(100vh - 5rem - 30px)",
+    //   padding: "0px",
+    //   marginTop: "0.75rem",
+    //   backgroundColor: !this.state.hasBackgroundImage
+    //     ? "hsl(0, 0%, 48%)"
+    //     : "unset",
+    //   backgroundImage: this.state.hasBackgroundImage
+    //     ? `url(${this.state.backgroundImage})`
+    //     : "unset",
+    //   backgroundSize: this.state.hasBackgroundImage ? "cover" : "unset",
+    // };
 
-    const backgroundAndThemeEditorStyles: React.CSSProperties = {
-      height: "calc(100vh - 5rem - 30px)",
-      overflowY: "auto",
-      overflowX: "hidden",
-    };
 
     if (this.state.toEditor) {
       return <Redirect to={"/"} />;
@@ -527,8 +527,8 @@ export class Editor extends Component<IEditorProps, IEditorState> {
             onDragEnd={this.handleOnDragEnd}
             onDragStart={this.handleOnDragStart}
           >
-            <div className="columns is-mobile mb-0 mt-0">
-              <div className="column is-1 has-background-light pr-0 pt-0">
+            <div className="columns is-mobile mt-0">
+              <div className="column is-narrow has-background-light">
                 <EditorMenu
                   id={this.props.match.params.compositionId}
                   hideDraggables={false}
@@ -543,7 +543,6 @@ export class Editor extends Component<IEditorProps, IEditorState> {
               {this.state.showBackgroundEditor && (
                 <div
                   className="column is-4"
-                  style={backgroundAndThemeEditorStyles}
                 >
                   <BackgroundEditor
                     doneUpdatingBackground={this.toggleBackgroundEditor}
@@ -554,7 +553,6 @@ export class Editor extends Component<IEditorProps, IEditorState> {
               {this.state.showOptionsEditor && (
                 <div
                   className="column is-4"
-                  style={backgroundAndThemeEditorStyles}
                 >
                   <OptionsEditor
                     composition={this.state.composition}
@@ -563,11 +561,11 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                 </div>
               )}
               <div
-                className="column pl-0 mt-0"
+                className="column mt-0"
                 style={{
-                  overflowY: "auto",
+                  overflowY: "scroll",
                   overflowX: "hidden",
-                  ...editorDisplayStyles,
+                  // ...editorDisplayStyles,
                 }}
               >
                 {this.state.composition && !this.state.showThemeEditor && (
@@ -579,6 +577,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                     isDropDisabledSkilltrees={!this.state.enableDropSkilltrees}
                     isDropDisabledSkills={!this.state.enableDropSkills}
                     isDropDisabledSkilltree={!this.state.enableDropInSkilltree}
+                    addSkilltree={this.addSkilltree}
                     editSkilltree={this.editSkilltree}
                     deleteSkilltree={this.prepareDeleteSkilltree}
                     editSkill={this.editSkill}

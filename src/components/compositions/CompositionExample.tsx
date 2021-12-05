@@ -82,14 +82,13 @@ export class CompositionExample extends Component<ICompositionExampleProps, ICom
                     width: '100%'
                 }
                 : undefined}>
-                <div style={{maxHeight:'100%',overflow:'auto'}}>
                 {this.state.skilltrees && this.state.skilltrees.length > 0 && this.state.composition && 
                 <CompositionDisplay
                 showController={false}
                 theme={this.state.composition.theme} 
                 skilltrees={this.state.skilltrees || []}
                 composition={this.state.composition}
-                title={this.state.composition?.title || ''} />}</div>
+                title={this.state.composition?.title || ''} />}
                 </div>
         )
     }

@@ -1,11 +1,13 @@
-import React, { Component } from "react";
+import { Component } from "react";
 import { connect } from "react-redux";
 import { showWarningModal, completedAfterWarning } from "../../../actions/ui";
-import { Droppable, Draggable } from "react-beautiful-dnd";
+import { Droppable } from "react-beautiful-dnd";
 
 import ISkilltree from "../../../models/skilltree.model";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import SortableTree from "react-sortable-tree";
+// import { SortableTreeWithoutDndContext as SortableTree } from 'react-sortable-tree';
+
 import ISkill from "../../../models/skill.model";
 import { db } from "../../../firebase/firebase";
 import {
@@ -53,13 +55,13 @@ class SkillTreeEditor extends Component<
       data: [],
       isMobile: window.innerWidth <= 760,
       allowSubscriptionUpdates: true,
-      destroyInProgress: false,
+      destroyInProgress: false
     };
     this.moveExistingSkill = this.moveExistingSkill.bind(this);
     this.prepareDeleteSkill = this.prepareDeleteSkill.bind(this);
   }
 
-  componentDidMount() {
+  getData(){
     const unsubscribe = db
       .collectionGroup("skills")
       .where("skilltree", "==", this.props.skilltree.id)
@@ -90,6 +92,10 @@ class SkillTreeEditor extends Component<
     this.setState({
       unsubscribe,
     });
+  }
+
+  componentDidMount() {
+    this.getData();
     // window.addEventListener("resize", () => this.setState({isMobile: window.innerWidth <= 760}));
   }
 
@@ -102,6 +108,14 @@ class SkillTreeEditor extends Component<
     if (this.props.hasDismissedWarning && !this.state.destroyInProgress) {
       this.deleteSkill();
     }
+    if(prevProps.index !== this.props.index) {
+      this.state.unsubscribe();
+      this.setState({
+        skills: []
+      });
+      this.getData();
+    }
+    
   }
 
   updateSortableTree(data) {
@@ -159,19 +173,7 @@ class SkillTreeEditor extends Component<
 
   render() {
     return (
-      <Draggable
-        isDragDisabled={this.state.isDragDisabledSkilltrees}
-        key={this.props.skilltree.id}
-        draggableId={"skilltree-" + this.props.skilltree.id}
-        index={this.props.index}
-        type="SKILLTREE"
-      >
-        {(provided) => (
-          <div
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-          >
+
             <Droppable
               droppableId={"SKILLTREE-" + this.props.skilltree.id}
               isDropDisabled={this.props.isDropDisabledSkilltree}
@@ -179,48 +181,15 @@ class SkillTreeEditor extends Component<
               {(provided, snapshot) => (
                 <div {...provided.droppableProps} ref={provided.innerRef}>
                   <div
-                    className="box m-3"
                     style={{
-                      width: this.state.isMobile ? 400 : 600,
                       backgroundColor: snapshot.isDraggingOver
                         ? "#d4823a"
-                        : "rgba(75, 74, 74, 0.6)",
+                        : "unset",
                     }}
                   >
-                    <div className="level is-mobile">
-                      <div className="level-left">
-                        <div className="title is-3 has-text-primary-light">
-                          {this.props.skilltree.title}
-                        </div>
-                      </div>
-                      <div className="level-right">
-                        <div className="buttons">
-                          <button
-                            className="button is-medium"
-                            onClick={() =>
-                              this.props.editSkilltree(this.props.skilltree)
-                            }
-                          >
-                            <span className="icon is-medium">
-                              <FontAwesomeIcon icon="edit"></FontAwesomeIcon>
-                            </span>
-                          </button>
-                          <button
-                            className="button is-medium"
-                            onClick={() =>
-                              this.props.deleteSkilltree(this.props.skilltree)
-                            }
-                          >
-                            <span className="icon is-medium">
-                              <FontAwesomeIcon icon="trash"></FontAwesomeIcon>
-                            </span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
                     <div className="content">
                       <div
-                        style={{ height: 500 }}
+                        style={{ height: "calc(100vh - 7rem)" }}
                         onMouseEnter={() =>
                           this.setState({ isDragDisabledSkilltrees: true })
                         }
@@ -241,7 +210,7 @@ class SkillTreeEditor extends Component<
                               >
                                 {(provided, snapshot) => (
                                   <div
-                                    className={`p-3 ${
+                                    className={`p-1 ${
                                       snapshot.isDraggingOver
                                         ? "has-background-info-light"
                                         : ""
@@ -251,7 +220,7 @@ class SkillTreeEditor extends Component<
                                   >
                                     <div
                                       className="level is-mobile"
-                                      style={{ width: "220px" }}
+                                      style={{ width: "240px" }}
                                     >
                                       <div className="level-left">
                                         <div className="title is-6">
@@ -300,9 +269,7 @@ class SkillTreeEditor extends Component<
                 </div>
               )}
             </Droppable>
-          </div>
-        )}
-      </Draggable>
+          
     );
   }
 }

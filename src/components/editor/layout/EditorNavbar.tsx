@@ -12,7 +12,7 @@ export default function EditorNavbar({
     <nav className="level has-background-grey-lighter mb-0 p-3 is-mobile">
       <div className="level-left">
         <div className="level-item">
-          <BackButton />
+          <NavLink to="/" className="button is-rounded">Back</NavLink>
         </div>
         <div className="level-item">
           <div className="level-item is-hidden-mobile">
@@ -21,7 +21,7 @@ export default function EditorNavbar({
                 <label className="label">Title</label>
               </div>
               <div className="field-body">
-                <p className="control" style={{ width: "250px" }}>
+                <p className="control box p-1" style={{ width: "250px" }}>
                   <input
                     className="input"
                     type="text"

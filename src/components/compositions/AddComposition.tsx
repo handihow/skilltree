@@ -1,6 +1,7 @@
-import React, { Component } from 'react'
+import { Component } from 'react'
 import {standardData, standardTheme} from '../../services/StandardData';
 import IComposition from '../../models/composition.model';
+import { toast } from "react-toastify";
 
 interface IAddCompositionProps {
     addComposition: Function;
@@ -39,6 +40,10 @@ export class AddComposition extends Component<IAddCompositionProps, IAddComposit
 
     onSubmit = (e) => {
         e.preventDefault();
+        if(this.state.title.length === 0) {
+            toast.error("Please enter a title for the SkillTree...");
+            return;
+        }
         if(this.props.isEditingTitle) {
             this.props.updateCompositionTitle(this.state.title);
         } else {
@@ -51,14 +56,14 @@ export class AddComposition extends Component<IAddCompositionProps, IAddComposit
         return (
             <form onSubmit={this.onSubmit}>
                 <section className="modal-card-body">
-                    
+                    <div className="control box p-1">
                     <input 
                         className="input is-focused" 
                         type="text" 
                         autoFocus
                         placeholder="Title new SkillTree..."
                         value={this.state.title}
-                        onChange={this.onChange} />
+                        onChange={this.onChange} /></div>
                         
                 </section>
                 <footer className="modal-card-foot">

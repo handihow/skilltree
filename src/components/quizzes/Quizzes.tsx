@@ -195,7 +195,7 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
       <Redirect to={"/quizzes/" + this.state.quizId + "/builder/quiz"} />
     ) : (
       <React.Fragment>
-        <div className="level has-background-light mb-0 p-3 is-mobile">
+        <div className="level has-background-light mb-3 p-3 is-mobile">
           <div className="level-item has-text-centered">
             <Header header={header} image="/QABlack.svg" />
           </div>
@@ -211,7 +211,7 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
             </button>
           </div>
         </div>
-        <div className="tabs is-centered has-background-light">
+        {/* <div className="tabs is-centered has-background-light pt-4">
           <ul>
             <li
               className={
@@ -243,14 +243,11 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
               </li>
             )}
           </ul>
-        </div>
+        </div> */}
         <div className="container" style={{ minHeight: "100vh" }}>
-          {((this.state.quizzes.length === 0 &&
-            this.state.activeTab === "owned") ||
-            (this.state.sharedQuizzes.length === 0 &&
-              this.state.activeTab === "shared") ||
-            (this.state.hostedDomainQuizzes.length === 0 &&
-              this.state.activeTab === "domain")) && (
+          {this.state.quizzes.length === 0 &&
+            this.state.sharedQuizzes.length === 0 &&
+            this.state.hostedDomainQuizzes.length === 0 && 
             <article className="message is-primary">
               <div className="message-header">No Quizzes yet.. </div>
               <div className="message-body">
@@ -261,8 +258,8 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
                 </div>
               </div>
             </article>
-          )}
-          {this.state.activeTab === "owned" &&
+          }
+          {
             this.state.quizzes?.map((quiz) => (
               <QuizItem
                 key={quiz.id}
@@ -271,7 +268,7 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
                 deleteQuiz={this.toggleIsActive}
               />
             ))}
-          {this.state.activeTab === "shared" &&
+          {
             this.state.sharedQuizzes?.map((quiz) => (
               <QuizItem
                 key={quiz.id}
@@ -280,7 +277,7 @@ class Quizzes extends Component<IQuizzesProps, IQuizzesState> {
                 deleteQuiz={() => {}}
               />
             ))}
-          {this.state.activeTab === "domain" &&
+          {
             this.state.hostedDomainQuizzes?.map((quiz) => (
               <QuizItem
                 key={quiz.id}

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { logoutUser } from "../../actions";
 import { connect } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { userInfo } from "os";
 
 interface INavbarProps {
   isLoggingOut: any;
@@ -47,11 +46,10 @@ class Navbar extends Component<INavbarProps, INavbarState> {
         >
           <div className="navbar-brand">
             <Link to="/" className="navbar-item">
-            <span className="icon is-large">
               <img
                 alt="SkillTree"
-                src="/SkillTree_logo_Skilltree_solo.svg"
-              ></img></span>
+                src="/SkillTree_logo.png"
+              ></img>
             </Link>
           </div>
           <div
