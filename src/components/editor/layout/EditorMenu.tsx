@@ -4,13 +4,12 @@ import React from 'react'
 import { Droppable } from 'react-beautiful-dnd';
 import DraggableMenuItem from '../elements/DraggableMenuItem';
 import MenuItem from '../elements/MenuItem';
+import MenuLinkItem from '../elements/MenuLinkItem';
 
 interface IEditorMenuProps {
   id: string;
   hideDraggables: boolean;
   hideSkillDraggables: boolean;
-  toggleBackgroundEditor: Function;
-  isVisibleBackgroundEditor: boolean;
   toggleThemeEditor: Function;
   isVisibleThemeEditor: boolean;
   toggleOptionsEditor: Function;
@@ -26,8 +25,11 @@ export default function EditorMenu(props: IEditorMenuProps) {
     {'title': 'Master-skills', 'icon': "th-list", 'tooltip': 'Import multiple skills from your skills list'}
   ];
   const draggableMenuItems =  props.hideDraggables ? [] : props.hideSkillDraggables ? [allDraggableMenuItems[0]] : allDraggableMenuItems;
+  const menuLinkItems = [
+    {'title': 'Background', 'icon': 'image', 'link': '/editor/' + props.id + '/background', 'tooltip': 'Customize the background of the composition'},
+  ];
   const appearanceMenuItems = [
-    {'title': 'Background', 'icon': 'image', 'clicked': 'toggleBackgroundEditor', 'active': 'isVisibleBackgroundEditor', 'tooltip': 'Customize the background of the composition'},
+    
     {'title': 'Theme', 'icon': 'sliders-h', 'clicked': 'toggleThemeEditor', 'active': 'isVisibleThemeEditor', 'tooltip': 'Customize the appearance of the skilltree'},
     {'title': 'Settings', 'icon': 'cogs', 'clicked': 'toggleOptionsEditor', 'active': 'isVisibleOptionsEditor', 'tooltip': 'Settings for your skilltree'},
   ];
@@ -42,6 +44,7 @@ export default function EditorMenu(props: IEditorMenuProps) {
            <p className="menu-label has-text-dark">
               Add Items
             </p>
+            
             {draggableMenuItems.map((item,index) => (
               <DraggableMenuItem
                 key={item.title?.toLowerCase()}
@@ -57,6 +60,16 @@ export default function EditorMenu(props: IEditorMenuProps) {
             <p className="menu-label has-text-dark">
               Appearance
             </p>
+            {menuLinkItems.map((item,index) => (
+              <MenuLinkItem
+                key={item.title?.toLowerCase()}
+                title={item.title}
+                index={index}
+                icon={item.icon}
+                tooltip={item.tooltip}
+                link={item.link}
+              ></MenuLinkItem>
+            ))}
             {appearanceMenuItems.map((item, index) => (
               <MenuItem 
                 key={index} 

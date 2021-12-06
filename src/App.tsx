@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense } from "react";
 
 import { Route, Switch } from "react-router-dom";
 import { connect } from "react-redux";
@@ -23,6 +23,7 @@ const DeleteProfile = React.lazy(
   () => import("./components/pages/DeleteProfile")
 );
 const Editor = React.lazy(() => import("./components/editor/Editor"));
+const BackgroundEditor = React.lazy(() => import("./components/editor/layout/BackgroundEditor"));
 const Composition = React.lazy(
   () => import("./components/compositions/Composition")
 );
@@ -135,6 +136,14 @@ function App(props) {
             path="/editor/:compositionId"
             exact
             component={Editor}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+            hasSidebar="false"
+          />
+          <ProtectedRoute
+            path="/editor/:compositionId/background"
+            exact
+            component={BackgroundEditor}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
             hasSidebar="false"

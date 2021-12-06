@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import FileUploader from "react-firebase-file-uploader";
 import { db, storage } from '../../firebase/firebase';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { toast } from 'react-toastify';
 
 interface IImageUploaderProps {
     compositionId: string;
@@ -53,20 +54,23 @@ export class ImageUploader extends Component<IImageUploaderProps, IImageUploader
             hasBackgroundImage: true,
         }, {merge: true})
         .then( _=> {
+            toast.info("Applied your uploaded image as background.")
             this.props.doneUpdatingBackground();
 
         })
     }
 
     cancelUseBackground = () => {
+        toast.warn("You cancelled custom upload image.")
         this.props.doneUpdatingBackground();
     }
 
     render() {
         return (
             <React.Fragment>
-            <label className="button is-primary is-medium is-primary is-outlined is-rounded has-tooltip-bottom" data-tooltip="Upload Image">
-            <FontAwesomeIcon icon='upload' />
+            <label className="button is-primary has-tooltip-bottom has-tooltip-multiline" data-tooltip="Upload Image">
+            <span className="icon"><FontAwesomeIcon icon='upload' /></span>
+            <span>Upload</span>
             <FileUploader
                 accept="image/*"
                 name="avatar"

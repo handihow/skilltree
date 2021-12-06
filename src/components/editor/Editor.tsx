@@ -31,7 +31,6 @@ import {
   importMultipleSkills,
 } from "../../services/SkillServices";
 import { v4 as uuid } from "uuid";
-import BackgroundEditor from "./layout/BackgroundEditor";
 import ThemeEditor from "./layout/ThemeEditor";
 import OptionsEditor from "./layout/OptionsEditor";
 import { setSkilltree, completedImporting } from "../../actions/editor";
@@ -72,7 +71,6 @@ interface IEditorState {
   isAddingRootSkillAtIndex: number;
   isPreparingToDestroy: boolean;
   destroyInProgress: boolean;
-  showBackgroundEditor: boolean;
   showThemeEditor: boolean;
   showOptionsEditor: boolean;
 }
@@ -90,7 +88,6 @@ const defaultState = {
   isAddingRootSkillAtIndex: -1,
   currentParentSkill: undefined,
   currentSkill: undefined,
-  showBackgroundEditor: false,
   showThemeEditor: false,
   showOptionsEditor: false,
   url: "",
@@ -463,22 +460,9 @@ export class Editor extends Component<IEditorProps, IEditorState> {
     this.resetDefaultState();
   }
 
-  toggleBackgroundEditor = async () => {
-    if (this.state.showBackgroundEditor && this.state.composition?.id) {
-      const composition = await getComposition(this.state.composition.id);
-      this.setCompositionBackground(composition || this.state.composition);
-    }
-    this.setState({
-      showBackgroundEditor: !this.state.showBackgroundEditor,
-      showThemeEditor: false,
-      showOptionsEditor: false,
-    });
-  };
-
   toggleThemeEditor = () => {
     this.setState({
       showThemeEditor: !this.state.showThemeEditor,
-      showBackgroundEditor: false,
       showOptionsEditor: false,
     });
   };
@@ -487,7 +471,6 @@ export class Editor extends Component<IEditorProps, IEditorState> {
     this.setState({
       showOptionsEditor: !this.state.showOptionsEditor,
       showThemeEditor: false,
-      showBackgroundEditor: false,
     });
   };
 
@@ -524,22 +507,10 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                   hideSkillDraggables={this.state.skilltrees && this.state.skilltrees.length > 0 ? false : true}
                   toggleThemeEditor={this.toggleThemeEditor}
                   isVisibleThemeEditor={this.state.showThemeEditor}
-                  toggleBackgroundEditor={this.toggleBackgroundEditor}
-                  isVisibleBackgroundEditor={this.state.showBackgroundEditor}
                   toggleOptionsEditor={this.toggleOptionsEditor}
                   isVisibleOptionsEditor={this.state.showOptionsEditor}
                 />
               </div>
-              {this.state.showBackgroundEditor && (
-                <div
-                  className="column is-4"
-                >
-                  <BackgroundEditor
-                    doneUpdatingBackground={this.toggleBackgroundEditor}
-                    compositionId={this.state.composition?.id || ""}
-                  />
-                </div>
-              )}
               {this.state.showOptionsEditor && (
                 <div
                   className="column is-4"
