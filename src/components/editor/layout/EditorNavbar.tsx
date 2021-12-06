@@ -21,7 +21,7 @@ export default function EditorNavbar({
                 <label className="label">Title</label>
               </div>
               <div className="field-body">
-                <p className="control box p-1" style={{ width: "250px" }}>
+                <p className="control box p-1" style={{ width: "280px" }}>
                   <input
                     className="input"
                     type="text"

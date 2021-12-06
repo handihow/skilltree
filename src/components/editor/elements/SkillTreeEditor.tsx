@@ -1,4 +1,4 @@
-import { Component } from "react";
+import React, { Component } from "react";
 import { connect } from "react-redux";
 import { showWarningModal, completedAfterWarning } from "../../../actions/ui";
 import { Droppable } from "react-beautiful-dnd";
@@ -18,7 +18,11 @@ import {
   deleteSkill,
   moveSkill,
   reorderSkills,
+  updateSkill,
 } from "../../../services/SkillServices";
+import { getNumberOfRootSkills } from "../../../services/SkillTreeServices";
+import { toast } from "react-toastify";
+import { v4 as uuid } from "uuid";
 
 interface ISkillTreeEditorProps {
   skilltree: ISkilltree;
@@ -41,7 +45,9 @@ interface ISkillTreeEditorState {
   unsubscribe?: any;
   isMobile: boolean;
   allowSubscriptionUpdates: boolean;
+  isPreparingToDestroy: boolean;
   destroyInProgress: boolean;
+  title: string;
 }
 
 class SkillTreeEditor extends Component<
@@ -55,13 +61,15 @@ class SkillTreeEditor extends Component<
       data: [],
       isMobile: window.innerWidth <= 760,
       allowSubscriptionUpdates: true,
-      destroyInProgress: false
+      isPreparingToDestroy: false,
+      destroyInProgress: false,
+      title: "",
     };
     this.moveExistingSkill = this.moveExistingSkill.bind(this);
     this.prepareDeleteSkill = this.prepareDeleteSkill.bind(this);
   }
 
-  getData(){
+  getData() {
     const unsubscribe = db
       .collectionGroup("skills")
       .where("skilltree", "==", this.props.skilltree.id)
@@ -105,17 +113,43 @@ class SkillTreeEditor extends Component<
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.hasDismissedWarning && !this.state.destroyInProgress) {
+    if (this.props.hasDismissedWarning && this.state.isPreparingToDestroy && !this.state.destroyInProgress) {
       this.deleteSkill();
     }
-    if(prevProps.index !== this.props.index) {
+    if (prevProps.index !== this.props.index) {
       this.state.unsubscribe();
       this.setState({
-        skills: []
+        skills: [],
       });
       this.getData();
     }
-    
+  }
+
+  handleTitleChange = ({ target }) => {
+    this.setState({
+      title: target.value,
+    });
+  };
+
+  async addRootSkill() {
+    if (this.state.title.length === 0) {
+      toast.error("Please enter the title of new skill");
+      return;
+    }
+    const order = await getNumberOfRootSkills(this.props.skilltree);
+    const skill: ISkill = {
+      id: uuid(),
+      title: this.state.title,
+      optional: false,
+      countChildren: 0,
+      links: [],
+      order
+    };
+    console.log(skill);
+    await updateSkill(skill, this.props.skilltree, undefined, order, false);
+    this.setState({
+      title: ''
+    });
   }
 
   updateSortableTree(data) {
@@ -142,6 +176,7 @@ class SkillTreeEditor extends Component<
   prepareDeleteSkill(skill: ISkill) {
     this.setState({
       currentSkill: skill,
+      isPreparingToDestroy: true,
       allowSubscriptionUpdates: true,
     });
     const { dispatch } = this.props;
@@ -159,7 +194,7 @@ class SkillTreeEditor extends Component<
     this.setState({
       destroyInProgress: true,
     });
-    // console.log('deleting skill');
+    console.log('deleting skill');
     await deleteSkill(
       this.state.currentSkill?.path || "",
       this.props.skilltree?.composition || ""
@@ -168,108 +203,127 @@ class SkillTreeEditor extends Component<
     dispatch(completedAfterWarning());
     this.setState({
       destroyInProgress: false,
+      isPreparingToDestroy: false
     });
   }
 
   render() {
     return (
-
-            <Droppable
-              droppableId={"SKILLTREE-" + this.props.skilltree.id}
-              isDropDisabled={this.props.isDropDisabledSkilltree}
+      <Droppable
+        droppableId={"SKILLTREE-" + this.props.skilltree.id}
+        isDropDisabled={this.props.isDropDisabledSkilltree}
+      >
+        {(provided, snapshot) => (
+          <div {...provided.droppableProps} ref={provided.innerRef}>
+            <div
+              style={{
+                backgroundColor: snapshot.isDraggingOver ? "#d4823a" : "unset",
+              }}
             >
-              {(provided, snapshot) => (
-                <div {...provided.droppableProps} ref={provided.innerRef}>
-                  <div
-                    style={{
-                      backgroundColor: snapshot.isDraggingOver
-                        ? "#d4823a"
-                        : "unset",
-                    }}
-                  >
-                    <div className="content">
-                      <div
-                        style={{ height: "calc(100vh - 7rem)" }}
-                        onMouseEnter={() =>
-                          this.setState({ isDragDisabledSkilltrees: true })
-                        }
-                        onMouseLeave={() =>
-                          this.setState({ isDragDisabledSkilltrees: false })
-                        }
-                      >
-                        <SortableTree
-                          getNodeKey={({ node }) => node.id}
-                          treeData={this.state.data}
-                          onChange={(data) => this.updateSortableTree(data)}
-                          onMoveNode={(data) => this.moveExistingSkill(data)}
-                          generateNodeProps={({ node }) => ({
-                            title: (
-                              <Droppable
-                                droppableId={"SKILL-" + node.id}
-                                isDropDisabled={this.props.isDropDisabledSkills}
-                              >
-                                {(provided, snapshot) => (
-                                  <div
-                                    className={`p-1 ${
-                                      snapshot.isDraggingOver
-                                        ? "has-background-info-light"
-                                        : ""
-                                    }`}
-                                    {...provided.droppableProps}
-                                    ref={provided.innerRef}
-                                  >
-                                    <div
-                                      className="level is-mobile"
-                                      style={{ width: "240px" }}
-                                    >
-                                      <div className="level-left">
-                                        <div className="title is-6">
-                                          {node.title}
-                                        </div>
-                                      </div>
-                                      <div className="level-right">
-                                        <div className="buttons">
-                                          <button
-                                            className="button is-small"
-                                            onClick={() =>
-                                              this.props.editSkill(
-                                                node,
-                                                this.state.skills
-                                              )
-                                            }
-                                          >
-                                            <span className="icon is-small">
-                                              <FontAwesomeIcon icon="edit"></FontAwesomeIcon>
-                                            </span>
-                                          </button>
-                                          <button
-                                            className="button is-small"
-                                            onClick={() =>
-                                              this.prepareDeleteSkill(node)
-                                            }
-                                          >
-                                            <span className="icon is-small">
-                                              <FontAwesomeIcon icon="trash"></FontAwesomeIcon>
-                                            </span>
-                                          </button>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    {provided.placeholder}
-                                  </div>
-                                )}
-                              </Droppable>
-                            ),
-                          })}
-                        />
+              <div className="content">
+                <div
+                  style={{ height: "calc(100vh - 7rem)" }}
+                  onMouseEnter={() =>
+                    this.setState({ isDragDisabledSkilltrees: true })
+                  }
+                  onMouseLeave={() =>
+                    this.setState({ isDragDisabledSkilltrees: false })
+                  }
+                >
+                  <React.Fragment>
+                    <div className="field has-addons">
+                      <div className="control">
+                        <input
+                          className="input is-focused"
+                          type="text"
+                          placeholder="Enter skill title"
+                          onChange={this.handleTitleChange}
+                          value={this.state.title}
+                        ></input>
+                      </div>
+                      <div className="control">
+                        <button
+                          className="button is-primary"
+                          onClick={() => this.addRootSkill()}
+                        >
+                          <FontAwesomeIcon icon="plus"></FontAwesomeIcon>
+                        </button>
                       </div>
                     </div>
-                  </div>
-                  {provided.placeholder}
+
+                    <SortableTree
+                      getNodeKey={({ node }) => node.id}
+                      treeData={this.state.data}
+                      onChange={(data) => this.updateSortableTree(data)}
+                      onMoveNode={(data) => this.moveExistingSkill(data)}
+                      generateNodeProps={({ node }) => ({
+                        title: (
+                          <Droppable
+                            droppableId={"SKILL-" + node.id}
+                            isDropDisabled={this.props.isDropDisabledSkills}
+                          >
+                            {(provided, snapshot) => (
+                              <div
+                                className={`p-1 ${
+                                  snapshot.isDraggingOver
+                                    ? "has-background-info-light"
+                                    : ""
+                                }`}
+                                {...provided.droppableProps}
+                                ref={provided.innerRef}
+                              >
+                                <div
+                                  className="level is-mobile"
+                                  style={{ width: "240px" }}
+                                >
+                                  <div className="level-left">
+                                    <div className="title is-6">
+                                      {node.title}
+                                    </div>
+                                  </div>
+                                  <div className="level-right">
+                                    <div className="buttons">
+                                      <button
+                                        className="button is-small"
+                                        onClick={() =>
+                                          this.props.editSkill(
+                                            node,
+                                            this.state.skills
+                                          )
+                                        }
+                                      >
+                                        <span className="icon is-small">
+                                          <FontAwesomeIcon icon="edit"></FontAwesomeIcon>
+                                        </span>
+                                      </button>
+                                      <button
+                                        className="button is-small"
+                                        onClick={() =>
+                                          this.prepareDeleteSkill(node)
+                                        }
+                                      >
+                                        <span className="icon is-small">
+                                          <FontAwesomeIcon icon="trash"></FontAwesomeIcon>
+                                        </span>
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                                {provided.placeholder}
+                              </div>
+                            )}
+                          </Droppable>
+                        ),
+                      })}
+                    />
+                  </React.Fragment>
                 </div>
-              )}
-            </Droppable>
-          
+              </div>
+            </div>
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
     );
   }
 }

@@ -87,14 +87,25 @@ class EditorDisplay extends Component<
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
                         >
-                          <div key={index} className="card mb-2 ml-2">
+                          <div
+                            key={index}
+                            className={
+                              this.state.selectedIndex === index
+                                ? "card mb-2 ml-2 has-background-light"
+                                : "card mb-2 ml-2"
+                            }
+                          >
                             <div className="card-header">
                               <a
                                 href="# "
                                 onClick={() =>
                                   this.setState({ selectedIndex: index })
                                 }
-                                className="card-header-title"
+                                className={
+                                  this.state.selectedIndex === index
+                                    ? "card-header-title has-text-primary"
+                                    : "card-header-title"
+                                }
                               >
                                 {skilltree.title}
                               </a>
@@ -150,15 +161,38 @@ class EditorDisplay extends Component<
                 </div>
               </div>
               <div className="column">
-                <SkillTreeEditor
-                  skilltree={this.props.skilltrees[this.state.selectedIndex]}
-                  index={this.state.selectedIndex}
-                  editSkilltree={this.props.editSkilltree}
-                  deleteSkilltree={this.props.deleteSkilltree}
-                  isDropDisabledSkills={this.props.isDropDisabledSkills}
-                  editSkill={this.props.editSkill}
-                  isDropDisabledSkilltree={this.props.isDropDisabledSkilltree}
-                ></SkillTreeEditor>
+                {this.props.skilltrees &&
+                this.props.skilltrees[this.state.selectedIndex] ? (
+                  <SkillTreeEditor
+                    skilltree={this.props.skilltrees[this.state.selectedIndex]}
+                    index={this.state.selectedIndex}
+                    editSkilltree={this.props.editSkilltree}
+                    deleteSkilltree={this.props.deleteSkilltree}
+                    isDropDisabledSkills={this.props.isDropDisabledSkills}
+                    editSkill={this.props.editSkill}
+                    isDropDisabledSkilltree={this.props.isDropDisabledSkilltree}
+                  ></SkillTreeEditor>
+                ) : (
+                  <div >
+                    <div className="card" style={{ maxWidth: "300px" }}>
+                      <div className="card-header">
+                        <div className="card-header-title">No skilltrees</div>
+                      </div>
+                      <div className="card-content">
+                        Start by adding a skilltree
+                      </div>
+                      <footer className="card-footer">
+                        <a
+                          className="card-footer-item"
+                          href="# "
+                          onClick={() => this.props.addSkilltree()}
+                        >
+                          Add
+                        </a>
+                      </footer>
+                    </div>
+                  </div>
+                )}
               </div>
               {provided.placeholder}
             </div>

@@ -70,6 +70,7 @@ interface IEditorState {
   enableDropInSkilltree: boolean;
   enableDropSkills: boolean;
   isAddingRootSkillAtIndex: number;
+  isPreparingToDestroy: boolean;
   destroyInProgress: boolean;
   showBackgroundEditor: boolean;
   showThemeEditor: boolean;
@@ -84,11 +85,11 @@ const defaultState = {
   enableDropSkilltrees: false,
   enableDropInSkilltree: false,
   enableDropSkills: true,
+  isPreparingToDestroy: false,
   destroyInProgress: false,
   isAddingRootSkillAtIndex: -1,
   currentParentSkill: undefined,
   currentSkill: undefined,
-  currentSkilltree: undefined,
   showBackgroundEditor: false,
   showThemeEditor: false,
   showOptionsEditor: false,
@@ -145,7 +146,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
   }
 
   componentDidUpdate(_prevProps) {
-    if (this.props.hasDismissedWarning && !this.state.destroyInProgress) {
+    if (this.props.hasDismissedWarning && this.state.isPreparingToDestroy && !this.state.destroyInProgress) {
       this.deleteSkilltree();
     }
   }
@@ -196,6 +197,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         });
         this.setState({
           skilltrees,
+          currentSkilltree: skilltrees[0]
         });
       });
     this.setState({
@@ -409,6 +411,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
     const { dispatch } = this.props;
     dispatch(completedAfterWarning());
     this.setState({
+      isPreparingToDestroy: false,
       destroyInProgress: false,
     });
   }
@@ -416,6 +419,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
   prepareDeleteSkilltree(skilltree: ISkilltree) {
     this.setState({
       currentSkilltree: skilltree,
+      isPreparingToDestroy: true
     });
     const { dispatch } = this.props;
     dispatch(
@@ -494,21 +498,6 @@ export class Editor extends Component<IEditorProps, IEditorState> {
   };
 
   render() {
-    // const editorDisplayStyles: React.CSSProperties = {
-    //   position: "relative",
-    //   height: "calc(100vh - 5rem - 30px)",
-    //   padding: "0px",
-    //   marginTop: "0.75rem",
-    //   backgroundColor: !this.state.hasBackgroundImage
-    //     ? "hsl(0, 0%, 48%)"
-    //     : "unset",
-    //   backgroundImage: this.state.hasBackgroundImage
-    //     ? `url(${this.state.backgroundImage})`
-    //     : "unset",
-    //   backgroundSize: this.state.hasBackgroundImage ? "cover" : "unset",
-    // };
-
-
     if (this.state.toEditor) {
       return <Redirect to={"/"} />;
     } else if (this.state.toSkillsTable) {
@@ -527,11 +516,12 @@ export class Editor extends Component<IEditorProps, IEditorState> {
             onDragEnd={this.handleOnDragEnd}
             onDragStart={this.handleOnDragStart}
           >
-            <div className="columns is-mobile mt-0">
-              <div className="column is-narrow has-background-light">
+            <div className="columns is-mobile mt-0" style={{minHeight: "90vh"}}>
+              <div className="column is-narrow has-background-light" >
                 <EditorMenu
                   id={this.props.match.params.compositionId}
                   hideDraggables={false}
+                  hideSkillDraggables={this.state.skilltrees && this.state.skilltrees.length > 0 ? false : true}
                   toggleThemeEditor={this.toggleThemeEditor}
                   isVisibleThemeEditor={this.state.showThemeEditor}
                   toggleBackgroundEditor={this.toggleBackgroundEditor}

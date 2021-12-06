@@ -8,6 +8,7 @@ import MenuItem from '../elements/MenuItem';
 interface IEditorMenuProps {
   id: string;
   hideDraggables: boolean;
+  hideSkillDraggables: boolean;
   toggleBackgroundEditor: Function;
   isVisibleBackgroundEditor: boolean;
   toggleThemeEditor: Function;
@@ -17,29 +18,30 @@ interface IEditorMenuProps {
 }
 
 export default function EditorMenu(props: IEditorMenuProps) {
-  const draggableMenuItems = [
+  const allDraggableMenuItems = [
     {'title': "Skilltree", 'img': "/Skilltree_icons-04.svg", 'tooltip': 'Add a skilltree'},
     {'title': "Root-skill", 'img': "/Skilltree_icons-05.svg",  'tooltip': 'Add skill to root of skilltree'},
     {'title': "Sibling-skill", 'img': "/Skilltree_icons-03.svg", 'tooltip': 'Add skill as sibling to skill'},
     {'title': 'Child-skill', 'img': "/Skilltree_icons-01.svg", 'tooltip': 'Add skill as child of skill' },
     {'title': 'Master-skills', 'icon': "th-list", 'tooltip': 'Import multiple skills from your skills list'}
   ];
+  const draggableMenuItems =  props.hideDraggables ? [] : props.hideSkillDraggables ? [allDraggableMenuItems[0]] : allDraggableMenuItems;
   const appearanceMenuItems = [
     {'title': 'Background', 'icon': 'image', 'clicked': 'toggleBackgroundEditor', 'active': 'isVisibleBackgroundEditor', 'tooltip': 'Customize the background of the composition'},
     {'title': 'Theme', 'icon': 'sliders-h', 'clicked': 'toggleThemeEditor', 'active': 'isVisibleThemeEditor', 'tooltip': 'Customize the appearance of the skilltree'},
     {'title': 'Settings', 'icon': 'cogs', 'clicked': 'toggleOptionsEditor', 'active': 'isVisibleOptionsEditor', 'tooltip': 'Settings for your skilltree'},
   ];
   return (
-    <aside className="menu has-background-light p-3">
+    <aside className="menu has-background-light p-3" style={{height: "100%"}}>
       <Droppable droppableId="MENU" isDropDisabled={false}>
         {(provided) => (
           <ul className="menu-list" {...provided.droppableProps} ref={provided.innerRef}>
-            
+           {!props.hideDraggables && 
            <React.Fragment>
-           {!props.hideDraggables &&
+           
            <p className="menu-label has-text-dark">
               Add Items
-            </p>}
+            </p>
             {draggableMenuItems.map((item,index) => (
               <DraggableMenuItem
                 key={item.title?.toLowerCase()}
@@ -51,7 +53,7 @@ export default function EditorMenu(props: IEditorMenuProps) {
                 tooltip={item.tooltip}
               ></DraggableMenuItem>
             ))}
-            </React.Fragment>
+            </React.Fragment>}
             <p className="menu-label has-text-dark">
               Appearance
             </p>

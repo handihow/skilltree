@@ -15,9 +15,9 @@ const ProtectedRoute = ({
       isVerifying ? (
         <div />
       ) : isAuthenticated ? (
-        <div className="columns is-gapless" style={{height: "calc(100vh-3.5rem)"}}>
+        <div className="columns is-gapless the-truth">
           <div className="column is-narrow is-hidden-mobile">{hasSidebar==="true" && <SideBar></SideBar>}</div>
-          <div className="column" style={{overflowY: "scroll", overflowX: "hidden"}}>
+          <div className="column" style={{minHeight: "90%"}}>
             <Component {...props} />
           </div>
         </div>

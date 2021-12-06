@@ -101,6 +101,9 @@ class Home extends Component<IHomeProps, IHomeState> {
   }
 
   componentWillUnmount() {
+    this.setState({
+      compositions: []
+    });
     if (this.state.unsubscribeOwned) {
       this.state.unsubscribeOwned();
     }

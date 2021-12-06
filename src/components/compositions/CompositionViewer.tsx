@@ -3,7 +3,7 @@ import { db, storage } from "../../firebase/firebase";
 import CompositionDisplay from "../layout/CompositionDisplay";
 import Loading from "../layout/Loading";
 import { skillArrayToSkillTree } from "../../services/StandardFunctions";
-import { RouteComponentProps } from "react-router-dom";
+import { Link, RouteComponentProps } from "react-router-dom";
 import ISkilltree from "../../models/skilltree.model";
 import IComposition from "../../models/composition.model";
 import ISkill from "../../models/skill.model";
@@ -23,7 +23,8 @@ interface ICompositionViewerState {
   composition?: IComposition;
   hasBackgroundImage: boolean;
   backgroundImage?: string;
-  skilltrees?: ISkilltree[];
+  skilltrees: ISkilltree[];
+  isLoading: boolean;
 }
 
 export class CompositionViewer extends Component<
@@ -33,7 +34,9 @@ export class CompositionViewer extends Component<
   constructor(props: ICompositionViewerProps) {
     super(props);
     this.state = {
+      skilltrees: [],
       hasBackgroundImage: false,
+      isLoading: true,
     };
   }
 
@@ -117,11 +120,16 @@ export class CompositionViewer extends Component<
                       hasBackgroundImage: true,
                       backgroundImage: url,
                       skilltrees: skilltrees,
+                      isLoading: false,
                     });
                     this.addSharedUser();
                   });
                 } else {
-                  this.setState({ composition, skilltrees: skilltrees });
+                  this.setState({
+                    composition,
+                    skilltrees: skilltrees,
+                    isLoading: false,
+                  });
                   this.addSharedUser();
                 }
               });
@@ -130,8 +138,20 @@ export class CompositionViewer extends Component<
   }
 
   render() {
-    return !this.state.skilltrees || this.state.skilltrees.length === 0 ? (
+    return this.state.isLoading ? (
       <Loading />
+    ) : this.state.skilltrees.length === 0 ? (
+      <div className="card mt-5" style={{ maxWidth: "350px", marginLeft: 'auto', marginRight: 'auto' }}>
+        <div className="card-header">
+          <div className="card-header-title">No content</div>
+        </div>
+        <div className="card-content">
+          This SkillTree does not contain any content
+        </div>
+        <footer className="card-footer">
+          <Link className="card-footer-item" to="/">To Homepage</Link>
+        </footer>
+      </div>
     ) : this.state.composition?.loggedInUsersOnly &&
       !this.props.isAuthenticated ? (
       <Login onCompositionPage={true} />
@@ -145,25 +165,27 @@ export class CompositionViewer extends Component<
                 position: "relative",
                 height: "calc(100vh - 3.5rem)",
                 padding: "0px",
+                overflow: "auto",
               }
             : {
                 backgroundColor: "hsl(0, 0%, 48%)",
                 height: "calc(100vh - 3.5rem)",
+                overflow: "auto",
               }
         }
       >
-          {this.state.skilltrees &&
-            this.state.skilltrees.length > 0 &&
-            this.state.composition && (
-              <CompositionDisplay
-                showController={true}
-                theme={this.state.composition?.theme}
-                skilltrees={this.state.skilltrees || []}
-                composition={this.state.composition}
-                title={this.state.composition?.title || ""}
-                monitoredUserId={this.props.match.params.userId}
-              />
-            )}
+        {this.state.skilltrees &&
+          this.state.skilltrees.length > 0 &&
+          this.state.composition && (
+            <CompositionDisplay
+              showController={true}
+              theme={this.state.composition?.theme}
+              skilltrees={this.state.skilltrees || []}
+              composition={this.state.composition}
+              title={this.state.composition?.title || ""}
+              monitoredUserId={this.props.match.params.userId}
+            />
+          )}
       </div>
     );
   }
