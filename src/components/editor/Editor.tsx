@@ -31,7 +31,6 @@ import {
   importMultipleSkills,
 } from "../../services/SkillServices";
 import { v4 as uuid } from "uuid";
-import ThemeEditor from "./layout/ThemeEditor";
 import OptionsEditor from "./layout/OptionsEditor";
 import { setSkilltree, completedImporting } from "../../actions/editor";
 import ShareLinkModal from "./elements/ShareLinkModal";
@@ -71,7 +70,6 @@ interface IEditorState {
   isAddingRootSkillAtIndex: number;
   isPreparingToDestroy: boolean;
   destroyInProgress: boolean;
-  showThemeEditor: boolean;
   showOptionsEditor: boolean;
 }
 
@@ -88,7 +86,6 @@ const defaultState = {
   isAddingRootSkillAtIndex: -1,
   currentParentSkill: undefined,
   currentSkill: undefined,
-  showThemeEditor: false,
   showOptionsEditor: false,
   url: "",
   showShareLinkModal: false,
@@ -460,23 +457,9 @@ export class Editor extends Component<IEditorProps, IEditorState> {
     this.resetDefaultState();
   }
 
-  toggleThemeEditor = () => {
-    this.setState({
-      showThemeEditor: !this.state.showThemeEditor,
-      showOptionsEditor: false,
-    });
-  };
-
   toggleOptionsEditor = () => {
     this.setState({
       showOptionsEditor: !this.state.showOptionsEditor,
-      showThemeEditor: false,
-    });
-  };
-
-  toggleShareLinkModal = () => {
-    this.setState({
-      showShareLinkModal: !this.state.showShareLinkModal,
     });
   };
 
@@ -493,7 +476,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
           <EditorNavbar
             composition={this.state.composition}
             changeCompositionTitle={this.handleCompositionChange}
-            toggleShareLinkModal={this.toggleShareLinkModal}
+            toggleShareLinkModal={this.toggleOptionsEditor}
           ></EditorNavbar>
           <DragDropContext
             onDragEnd={this.handleOnDragEnd}
@@ -505,22 +488,11 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                   id={this.props.match.params.compositionId}
                   hideDraggables={false}
                   hideSkillDraggables={this.state.skilltrees && this.state.skilltrees.length > 0 ? false : true}
-                  toggleThemeEditor={this.toggleThemeEditor}
-                  isVisibleThemeEditor={this.state.showThemeEditor}
                   toggleOptionsEditor={this.toggleOptionsEditor}
                   isVisibleOptionsEditor={this.state.showOptionsEditor}
                 />
               </div>
-              {this.state.showOptionsEditor && (
-                <div
-                  className="column is-4"
-                >
-                  <OptionsEditor
-                    composition={this.state.composition}
-                    handleChange={this.handleCompositionChange}
-                  />
-                </div>
-              )}
+              
               <div
                 className="column mt-0"
                 style={{
@@ -529,7 +501,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                   // ...editorDisplayStyles,
                 }}
               >
-                {this.state.composition && !this.state.showThemeEditor && (
+                {this.state.composition && (
                   <EditorDisplay
                     theme={this.state.composition.theme}
                     skilltrees={this.state.skilltrees || []}
@@ -544,16 +516,19 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                     editSkill={this.editSkill}
                   />
                 )}
-                {this.state.skilltrees &&
-                  this.state.skilltrees.length > 0 &&
-                  this.state.composition &&
-                  this.state.showThemeEditor && (
-                    <ThemeEditor
-                      compositionId={this.state.composition.id || ""}
-                      doneUpdatingTheme={this.toggleThemeEditor}
-                    />
-                  )}
               </div>
+              {this.state.showOptionsEditor && (
+                <div
+                  className="column is-4 has-background-light"
+                >
+                  <OptionsEditor
+                    composition={this.state.composition}
+                    handleChange={this.handleCompositionChange}
+                    url={this.state.url}
+                    toggleOptionsEditor={this.toggleOptionsEditor}
+                  />
+                </div>
+              )}
             </div>
           </DragDropContext>
           {this.state.showSkilltreeForm && (
@@ -580,12 +555,6 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                   ? this.state.currentSkill
                   : { id: uuid(), ...standardEmptySkill }
               }
-            />
-          )}
-          {this.state.showShareLinkModal && (
-            <ShareLinkModal
-              url={this.state.url}
-              toggleShareLinkModal={this.toggleShareLinkModal}
             />
           )}
         </React.Fragment>

@@ -128,6 +128,9 @@ class Home extends Component<IHomeProps, IHomeState> {
       user: this.props.user.uid,
       username: this.props.user.email,
       hasBackgroundImage: false,
+      canCopy: false,
+      loggedInUsersCanEdit: true,
+      loggedInUsersOnly: true,
       skillcount: 3,
       lastUpdate: firebase.firestore.Timestamp.now(),
     };

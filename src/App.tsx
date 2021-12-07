@@ -24,6 +24,7 @@ const DeleteProfile = React.lazy(
 );
 const Editor = React.lazy(() => import("./components/editor/Editor"));
 const BackgroundEditor = React.lazy(() => import("./components/editor/layout/BackgroundEditor"));
+const ThemeEditor = React.lazy(() => import("./components/editor/layout/ThemeEditor"));
 const Composition = React.lazy(
   () => import("./components/compositions/Composition")
 );
@@ -149,6 +150,14 @@ function App(props) {
             hasSidebar="false"
           />
           <ProtectedRoute
+            path="/editor/:compositionId/theme"
+            exact
+            component={ThemeEditor}
+            isAuthenticated={isAuthenticated}
+            isVerifying={isVerifying}
+            hasSidebar="false"
+          />
+          <ProtectedRoute
             path="/compositions/:compositionId"
             exact
             component={Composition}
@@ -162,7 +171,7 @@ function App(props) {
             component={CompositionMonitor}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
-            hasSidebar="false"
+            hasSidebar="true"
           />
           <ProtectedRoute
             exact={true}
@@ -170,7 +179,7 @@ function App(props) {
             component={CompositionAddStudents}
             isAuthenticated={isAuthenticated}
             isVerifying={isVerifying}
-            hasSidebar="false"
+            hasSidebar="true"
           />
           <ProtectedRoute
             path="/compositions/:compositionId/monitor/:userId"
