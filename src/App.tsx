@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 
 import { Route, Switch } from "react-router-dom";
 import { connect } from "react-redux";
-import WarningModal from "./components/layout/WarningModal";
+import Modal from "./components/modals/Modal";
 
 import "./App.sass";
 import { toast } from "react-toastify";
@@ -23,8 +23,12 @@ const DeleteProfile = React.lazy(
   () => import("./components/pages/DeleteProfile")
 );
 const Editor = React.lazy(() => import("./components/editor/Editor"));
-const BackgroundEditor = React.lazy(() => import("./components/editor/layout/BackgroundEditor"));
-const ThemeEditor = React.lazy(() => import("./components/editor/layout/ThemeEditor"));
+const BackgroundEditor = React.lazy(
+  () => import("./components/editor/layout/BackgroundEditor")
+);
+const ThemeEditor = React.lazy(
+  () => import("./components/editor/layout/ThemeEditor")
+);
 const Composition = React.lazy(
   () => import("./components/compositions/Composition")
 );
@@ -66,189 +70,187 @@ function App(props) {
   const { isAuthenticated, isVerifying } = props;
   return (
     <Suspense fallback={<Loading></Loading>}>
-      <div style={{ minHeight: "100%" }}>
-        <NavBar />
-        <Switch>
-          <ProtectedRoute
-            exact
-            path="/"
-            component={Home}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="true"
-          />
-          <ProtectedRoute
-            exact
-            path="/quizzes"
-            component={Quizzes}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="true"
-          />
-          <ProtectedRoute
-            exact
-            path="/skills"
-            component={Skills}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="true"
-          />
-          <ProtectedRoute
-            exact
-            path="/skills/upload-csv"
-            component={SkillsUploader}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="false"
-          />
-          <ProtectedRoute
-            path="/skills/:skillId"
-            exact
-            component={Skill}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="false"
-          />
-          <ProtectedRoute
-            exact
-            path="/profile"
-            component={Profile}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="true"
-          />
-          <ProtectedRoute
-            exact
-            path="/profile/edit"
-            component={EditProfile}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="false"
-          />
-          <ProtectedRoute
-            exact
-            path="/profile/delete"
-            component={DeleteProfile}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="false"
-          />
-          <ProtectedRoute
-            path="/editor/:compositionId"
-            exact
-            component={Editor}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="false"
-          />
-          <ProtectedRoute
-            path="/editor/:compositionId/background"
-            exact
-            component={BackgroundEditor}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="false"
-          />
-          <ProtectedRoute
-            path="/editor/:compositionId/theme"
-            exact
-            component={ThemeEditor}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="false"
-          />
-          <ProtectedRoute
-            path="/compositions/:compositionId"
-            exact
-            component={Composition}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="false"
-          />
-          <ProtectedRoute
-            exact={true}
-            path="/compositions/:compositionId/monitor"
-            component={CompositionMonitor}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="true"
-          />
-          <ProtectedRoute
-            exact={true}
-            path="/compositions/:compositionId/add-students"
-            component={CompositionAddStudents}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="true"
-          />
-          <ProtectedRoute
-            path="/compositions/:compositionId/monitor/:userId"
-            component={CompositionViewer}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="false"
-          />
-          <ProtectedRoute
-            path="/compositions/:compositionId/unlock/:featureId"
-            component={Payments}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="false"
-          />
-          <ProtectedRoute
-            path="/compositions/:compositionId/confirmation/:featureId"
-            component={PaymentConfirmation}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="false"
-          />
-          <ProtectedRoute
-            path="/quizzes/:quizId/builder/:builder"
-            component={QuizBuilder}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="false"
-          />
-          <ProtectedRoute
-            path="/quizzes/:quizId/test"
-            component={DoQuiz}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="false"
-          />
-          <ProtectedRoute
-            path="/quizzes/:quizId/results"
-            component={QuizResults}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="false"
-          />
-          <ProtectedRoute
-            path="/quizzes/:quizId/result"
-            component={QuizResult}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="false"
-          />
-          <ProtectedRoute
-            path="/quizzes/:quizId/join"
-            component={JoinQuiz}
-            isAuthenticated={isAuthenticated}
-            isVerifying={isVerifying}
-            hasSidebar="false"
-          />
-          <Route
-            path="/compositions/:compositionId/viewer"
-            component={CompositionViewer}
-          />
-          <Route path="/login" component={Login} />
-          <Route path="/recover" component={Recover} />
-          <Route path="/register" component={Register} />
-          <Route path="/about" component={About} />
-        </Switch>
-      </div>
+      <NavBar />
+      <Switch>
+        <ProtectedRoute
+          exact
+          path="/"
+          component={Home}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="true"
+        />
+        <ProtectedRoute
+          exact
+          path="/quizzes"
+          component={Quizzes}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="true"
+        />
+        <ProtectedRoute
+          exact
+          path="/skills"
+          component={Skills}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="true"
+        />
+        <ProtectedRoute
+          exact
+          path="/skills/upload-csv"
+          component={SkillsUploader}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="false"
+        />
+        <ProtectedRoute
+          path="/skills/:skillId"
+          exact
+          component={Skill}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="false"
+        />
+        <ProtectedRoute
+          exact
+          path="/profile"
+          component={Profile}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="true"
+        />
+        <ProtectedRoute
+          exact
+          path="/profile/edit"
+          component={EditProfile}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="false"
+        />
+        <ProtectedRoute
+          exact
+          path="/profile/delete"
+          component={DeleteProfile}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="false"
+        />
+        <ProtectedRoute
+          path="/editor/:compositionId"
+          exact
+          component={Editor}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="false"
+        />
+        <ProtectedRoute
+          path="/editor/:compositionId/background"
+          exact
+          component={BackgroundEditor}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="false"
+        />
+        <ProtectedRoute
+          path="/editor/:compositionId/theme"
+          exact
+          component={ThemeEditor}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="false"
+        />
+        <ProtectedRoute
+          path="/compositions/:compositionId"
+          exact
+          component={Composition}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="false"
+        />
+        <ProtectedRoute
+          exact={true}
+          path="/compositions/:compositionId/monitor"
+          component={CompositionMonitor}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="true"
+        />
+        <ProtectedRoute
+          exact={true}
+          path="/compositions/:compositionId/add-students"
+          component={CompositionAddStudents}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="true"
+        />
+        <ProtectedRoute
+          path="/compositions/:compositionId/monitor/:userId"
+          component={CompositionViewer}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="false"
+        />
+        <ProtectedRoute
+          path="/compositions/:compositionId/unlock/:featureId"
+          component={Payments}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="false"
+        />
+        <ProtectedRoute
+          path="/compositions/:compositionId/confirmation/:featureId"
+          component={PaymentConfirmation}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="false"
+        />
+        <ProtectedRoute
+          path="/quizzes/:quizId/builder/:builder"
+          component={QuizBuilder}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="false"
+        />
+        <ProtectedRoute
+          path="/quizzes/:quizId/test"
+          component={DoQuiz}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="false"
+        />
+        <ProtectedRoute
+          path="/quizzes/:quizId/results"
+          component={QuizResults}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="false"
+        />
+        <ProtectedRoute
+          path="/quizzes/:quizId/result"
+          component={QuizResult}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="false"
+        />
+        <ProtectedRoute
+          path="/quizzes/:quizId/join"
+          component={JoinQuiz}
+          isAuthenticated={isAuthenticated}
+          isVerifying={isVerifying}
+          hasSidebar="false"
+        />
+        <Route
+          path="/compositions/:compositionId/viewer"
+          component={CompositionViewer}
+        />
+        <Route path="/login" component={Login} />
+        <Route path="/recover" component={Recover} />
+        <Route path="/register" component={Register} />
+        <Route path="/about" component={About} />
+      </Switch>
       <Footer />
-      <WarningModal />
+      <Modal />
     </Suspense>
   );
 }
@@ -258,8 +260,6 @@ function mapStateToProps(state) {
     isAuthenticated: state.auth.isAuthenticated,
     isVerifying: state.auth.isVerifying,
     user: state.auth.user,
-    showWarningModal: state.showWarningModal,
-    warningMessage: state.warningMessage,
   };
 }
 

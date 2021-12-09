@@ -33,7 +33,7 @@ import {
 import { v4 as uuid } from "uuid";
 import OptionsEditor from "./layout/OptionsEditor";
 import { setSkilltree, completedImporting } from "../../actions/editor";
-import ShareLinkModal from "./elements/ShareLinkModal";
+import "animate.css";
 
 type TParams = { compositionId: string };
 
@@ -140,7 +140,11 @@ export class Editor extends Component<IEditorProps, IEditorState> {
   }
 
   componentDidUpdate(_prevProps) {
-    if (this.props.hasDismissedWarning && this.state.isPreparingToDestroy && !this.state.destroyInProgress) {
+    if (
+      this.props.hasDismissedWarning &&
+      this.state.isPreparingToDestroy &&
+      !this.state.destroyInProgress
+    ) {
       this.deleteSkilltree();
     }
   }
@@ -191,7 +195,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         });
         this.setState({
           skilltrees,
-          currentSkilltree: skilltrees[0]
+          currentSkilltree: skilltrees[0],
         });
       });
     this.setState({
@@ -237,10 +241,10 @@ export class Editor extends Component<IEditorProps, IEditorState> {
     this.setState(defaultState);
   }
 
-  addSkilltree(){
+  addSkilltree() {
     this.setState({
       showSkilltreeForm: true,
-    })
+    });
   }
 
   async handleOnDragEnd(result) {
@@ -413,7 +417,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
   prepareDeleteSkilltree(skilltree: ISkilltree) {
     this.setState({
       currentSkilltree: skilltree,
-      isPreparingToDestroy: true
+      isPreparingToDestroy: true,
     });
     const { dispatch } = this.props;
     dispatch(
@@ -460,6 +464,14 @@ export class Editor extends Component<IEditorProps, IEditorState> {
   toggleOptionsEditor = () => {
     this.setState({
       showOptionsEditor: !this.state.showOptionsEditor,
+      showSkillForm: false,
+    });
+  };
+
+  toggleSkillEditor = () => {
+    this.setState({
+      showOptionsEditor: false,
+      showSkillForm: !this.state.showSkillForm,
     });
   };
 
@@ -482,17 +494,24 @@ export class Editor extends Component<IEditorProps, IEditorState> {
             onDragEnd={this.handleOnDragEnd}
             onDragStart={this.handleOnDragStart}
           >
-            <div className="columns is-mobile mt-0" style={{minHeight: "90vh"}}>
-              <div className="column is-narrow has-background-light" >
+            <div
+              className="columns is-mobile mt-0"
+              style={{ minHeight: "90vh" }}
+            >
+              <div className="column is-narrow has-background-light">
                 <EditorMenu
                   id={this.props.match.params.compositionId}
                   hideDraggables={false}
-                  hideSkillDraggables={this.state.skilltrees && this.state.skilltrees.length > 0 ? false : true}
+                  hideSkillDraggables={
+                    this.state.skilltrees && this.state.skilltrees.length > 0
+                      ? false
+                      : true
+                  }
                   toggleOptionsEditor={this.toggleOptionsEditor}
                   isVisibleOptionsEditor={this.state.showOptionsEditor}
                 />
               </div>
-              
+
               <div
                 className="column mt-0"
                 style={{
@@ -518,14 +537,26 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                 )}
               </div>
               {this.state.showOptionsEditor && (
-                <div
-                  className="column is-4 has-background-light"
-                >
+                <div className="column is-4 has-background-light animate__animated animate__fadeInRight">
                   <OptionsEditor
                     composition={this.state.composition}
                     handleChange={this.handleCompositionChange}
                     url={this.state.url}
                     toggleOptionsEditor={this.toggleOptionsEditor}
+                  />
+                </div>
+              )}
+              {this.state.showSkillForm && (
+                <div className="column is-4 has-background-light animate__animated animate__fadeInRight">
+                  <SkillForm
+                    isEditing={this.state.isEditingSkill}
+                    updateSkill={this.updateSkill}
+                    toggleSkillEditor={this.toggleSkillEditor}
+                    skill={
+                      this.state.currentSkill
+                        ? this.state.currentSkill
+                        : { id: uuid(), ...standardEmptySkill }
+                    }
                   />
                 </div>
               )}
@@ -542,18 +573,6 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                 this.state.isEditingSkilltree
                   ? this.state.currentSkilltree?.order || 0
                   : this.state.skilltrees.length
-              }
-            />
-          )}
-          {this.state.showSkillForm && (
-            <SkillForm
-              isEditing={this.state.isEditingSkill}
-              updateSkill={this.updateSkill}
-              closeModal={this.resetDefaultState}
-              skill={
-                this.state.currentSkill
-                  ? this.state.currentSkill
-                  : { id: uuid(), ...standardEmptySkill }
               }
             />
           )}

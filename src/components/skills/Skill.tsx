@@ -345,7 +345,7 @@ class Skill extends Component<ISkillProps, ISkillState> {
             </div>
         </section>
         {this.state.showSkillForm &&
-        <SkillForm isEditing={true} updateSkill={this.updateSkill} closeModal={this.toggleSkillForm} skill={this.state.skill} />}
+        <SkillForm isEditing={true} updateSkill={this.updateSkill} toggleSkillEditor={this.toggleSkillForm} skill={this.state.skill} />}
         {this.state.showIconPicker && <IconPicker closeModal={this.toggleIconPicker} iconPicked={this.iconPicked} />}
         </React.Fragment>
         : <Loading />);    
