@@ -60,7 +60,7 @@ export class AddComposition extends Component<
           </div>
         </section>
         <footer className="modal-card-foot">
-        <button className="button" onClick={()=> this.props.dispatch(hideModal())}>
+        <button className="button" type="button" onClick={()=> this.props.dispatch(hideModal())}>
             Cancel
           </button>
           <button className="is-primary button">Save</button>

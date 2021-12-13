@@ -201,7 +201,7 @@ class Skill extends Component<ISkillProps, ISkillState> {
             "You are about to delete the Link " +
             this.state.skill.links[linkIndex].title +
             ". Are you sure?",
-          dismissedWarningFunc: this.deleteLink
+          dismissedWarningFunc: this.deleteLink,
         })
       );
     }
@@ -233,7 +233,7 @@ class Skill extends Component<ISkillProps, ISkillState> {
             countChildren: this.state.skill?.countChildren || 0,
             links: updatedLinks,
           },
-          linkId: undefined
+          linkId: undefined,
         });
       });
   };
@@ -270,169 +270,179 @@ class Skill extends Component<ISkillProps, ISkillState> {
       <Redirect to={"/skills"} />
     ) : this.state.doneLoading ? (
       <React.Fragment>
-        <section
-          className="section has-background-white-ter"
-          style={{ minHeight: "100vh" }}
-        >
-          <div className="container">
-            <div className="level">
-              <div className="level-left">
-                <div className="level-item">
-                  <h1 className="title">{this.state.skill?.title}</h1>
-                </div>
-                <div className="level-item">
-                  <h3 className="subtitle">{this.state.skill?.category}</h3>
-                </div>
-              </div>
-              <div className="level-right">
-                <div className="level-item">
-                  <button className="button" onClick={this.backToList}>
-                    Back
-                  </button>
-                </div>
-                <div className="level-item">
-                  <button className="button" onClick={this.toggleSkillForm}>
-                    Edit
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="title is-5">Description and icon</div>
-            <article className="media">
-              <figure className="media-left">
-                <p className="image is-64x64">
-                  <img
-                    src={
-                      this.state.skill?.icon
-                        ? this.state.skill.icon
-                        : "https://bulma.io/images/placeholders/128x128.png"
-                    }
-                    alt=""
-                  />
-                </p>
-              </figure>
-              <div className="media-content">
-                <div className="content">
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: this.state.skill?.description || "",
-                    }}
-                  />
-                </div>
-              </div>
-              <div className="media-right">
-                <button className="button" onClick={this.toggleIconPicker}>
-                  <span className="icon" data-tooltip="Edit skills icon">
-                    <FontAwesomeIcon icon="file-image" />
-                  </span>
-                </button>
-              </div>
-            </article>
-            <div className="title is-5 mt-5">Additional properties</div>
-            <div className="columns">
-              <div className="column">
-                <span className="mr-3">Tooltip direction: </span>
-                {this.state.skill?.tooltip ? "this.state.skill.tooltip" : "top"}
-              </div>
-              <div className="column">
-                <span className="mr-3">Count children: </span>
-                {this.state.skill?.countChildren
-                  ? this.state.skill.countChildren
-                  : 0}
-              </div>
-              <div className="column">
-                <span className="mr-3">Optional: </span>
-                {this.state.skill?.optional ? "Yes" : "No"}
-              </div>
-              {this.state.skill?.composition !== this.props.user.uid && (
-                <div className="column">
-                  <span className="mr-3">Composition: </span>
-                  <Link
-                    to={`/compositions/${this.state.skill?.composition}/viewer`}
-                  >
-                    View
-                  </Link>{" "}
-                  |
-                  <Link
-                    className="ml-2"
-                    to={`/editor/${this.state.skill?.composition}`}
-                  >
-                    Edit
-                  </Link>
-                </div>
-              )}
-            </div>
-            <div
-              className={`title is-5 ${
-                this.state.skill?.links?.length ? "" : "is-hidden"
-              }`}
-            >
-              Links
-            </div>
-            {this.state.skill?.links &&
-              this.state.skill.links.map((link) => (
-                <LinkCard
-                  key={link.id}
-                  link={link}
-                  deleteLink={this.prepareDeleteLink}
-                />
-              ))}
-            {this.state.userResults.length > 0 && (
-              <React.Fragment>
-                <div className="is-divider"></div>
-                <h1 className="title">Completion status</h1>
-                {this.state.userResults.map((r, index) => (
-                  <article key={index} className="media">
-                    <figure className="media-left">
-                      <p className="image is-64x64">
-                        <img src={r.photoURL} alt="" />
-                      </p>
-                    </figure>
-                    <div className="media-content">
-                      <div className="content">
-                        <strong>{r.displayName}</strong>
-                        <small className="ml-3">{r.email}</small>
-                        <div>
-                          Overall progress: {r.overallProgressOnComposition}{" "}
-                          skills completed
-                        </div>
-                        <Link
-                          to={`/compositions/${this.state.skill?.composition}/monitor/${r.uid}`}
-                        >
-                          Monitor results
-                        </Link>
-                      </div>
+        <div className="columns">
+          <div className="column">
+            <section className="section" style={{ minHeight: "100vh" }}>
+              <div className="container">
+                <div className="level">
+                  <div className="level-left">
+                    <div className="level-item">
+                      <h1 className="title">{this.state.skill?.title}</h1>
                     </div>
-                    <div className="media-right">
+                    <div className="level-item">
+                      <h3 className="subtitle">{this.state.skill?.category}</h3>
+                    </div>
+                  </div>
+                  <div className="level-right">
+                    <div className="level-item">
+                      <button className="button" onClick={this.backToList}>
+                        Back
+                      </button>
+                    </div>
+                    <div className="level-item">
+                      <button className="button" onClick={this.toggleSkillForm}>
+                        Edit
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="title is-5">Description and icon</div>
+                <article className="media">
+                  <figure className="media-left">
+                    <p className="image is-64x64">
+                      <img
+                        src={
+                          this.state.skill?.icon
+                            ? this.state.skill.icon
+                            : "https://bulma.io/images/placeholders/128x128.png"
+                        }
+                        alt=""
+                      />
+                    </p>
+                  </figure>
+                  <div className="media-content">
+                    <div className="content">
                       <div
-                        className={`icon ${
-                          r.skillStatus === "selected"
-                            ? "has-text-success"
-                            : "has-text-danger"
-                        }`}
-                        data-tooltip={"status: " + r.skillStatus}
-                      >
-                        <FontAwesomeIcon
-                          icon={
-                            r.skillStatus === "selected" ? "check" : "times"
-                          }
-                        />
-                      </div>
+                        dangerouslySetInnerHTML={{
+                          __html: this.state.skill?.description || "",
+                        }}
+                      />
                     </div>
-                  </article>
-                ))}
-              </React.Fragment>
-            )}
+                  </div>
+                  <div className="media-right">
+                    <button
+                      className="button has-tooltip-multiline has-tooltip-left"
+                      data-tooltip="Edit skills icon"
+                      onClick={this.toggleIconPicker}
+                    >
+                      <span className="icon ">
+                        <FontAwesomeIcon icon="file-image" />
+                      </span>
+                    </button>
+                  </div>
+                </article>
+                <div className="title is-5 mt-5">Additional properties</div>
+                <div className="columns">
+                  <div className="column">
+                    <span className="mr-3">Tooltip direction: </span>
+                    {this.state.skill?.tooltip
+                      ? "this.state.skill.tooltip"
+                      : "top"}
+                  </div>
+                  <div className="column">
+                    <span className="mr-3">Count children: </span>
+                    {this.state.skill?.countChildren
+                      ? this.state.skill.countChildren
+                      : 0}
+                  </div>
+                  <div className="column">
+                    <span className="mr-3">Optional: </span>
+                    {this.state.skill?.optional ? "Yes" : "No"}
+                  </div>
+                  {this.state.skill?.composition !== this.props.user.uid && (
+                    <div className="column">
+                      <span className="mr-3">Composition: </span>
+                      <Link
+                        to={`/compositions/${this.state.skill?.composition}/viewer`}
+                      >
+                        View
+                      </Link>{" "}
+                      |
+                      <Link
+                        className="ml-2"
+                        to={`/editor/${this.state.skill?.composition}`}
+                      >
+                        Edit
+                      </Link>
+                    </div>
+                  )}
+                </div>
+                <div
+                  className={`title is-5 ${
+                    this.state.skill?.links?.length ? "" : "is-hidden"
+                  }`}
+                >
+                  Links
+                </div>
+                {this.state.skill?.links &&
+                  this.state.skill.links.map((link) => (
+                    <LinkCard
+                      key={link.id}
+                      link={link}
+                      deleteLink={this.prepareDeleteLink}
+                    />
+                  ))}
+                {this.state.userResults.length > 0 && (
+                  <React.Fragment>
+                    <div className="is-divider"></div>
+                    <h1 className="title">Completion status</h1>
+                    {this.state.userResults.map((r, index) => (
+                      <article key={index} className="media">
+                        <figure className="media-left">
+                          <p className="image is-64x64">
+                            <img src={r.photoURL} alt="" />
+                          </p>
+                        </figure>
+                        <div className="media-content">
+                          <div className="content">
+                            <strong>{r.displayName}</strong>
+                            <small className="ml-3">{r.email}</small>
+                            <div>
+                              Overall progress: {r.overallProgressOnComposition}{" "}
+                              skills completed
+                            </div>
+                            <Link
+                              to={`/compositions/${this.state.skill?.composition}/monitor/${r.uid}`}
+                            >
+                              Monitor results
+                            </Link>
+                          </div>
+                        </div>
+                        <div className="media-right">
+                          <div
+                            className={`icon ${
+                              r.skillStatus === "selected"
+                                ? "has-text-success"
+                                : "has-text-danger"
+                            }`}
+                            data-tooltip={"status: " + r.skillStatus}
+                          >
+                            <FontAwesomeIcon
+                              icon={
+                                r.skillStatus === "selected" ? "check" : "times"
+                              }
+                            />
+                          </div>
+                        </div>
+                      </article>
+                    ))}
+                  </React.Fragment>
+                )}
+              </div>
+            </section>
           </div>
-        </section>
-        {this.state.showSkillForm && (
-          <SkillForm
-            isEditing={true}
-            updateSkill={this.updateSkill}
-            toggleSkillEditor={this.toggleSkillForm}
-            skill={this.state.skill}
-          />
-        )}
+          {this.state.showSkillForm && (
+            <div className="column is-4 animate__animated animate__fadeInRight">
+              <SkillForm
+                isEditing={true}
+                updateSkill={this.updateSkill}
+                toggleSkillEditor={this.toggleSkillForm}
+                skill={this.state.skill}
+              />
+            </div>
+          )}
+        </div>
+
         {this.state.showIconPicker && (
           <IconPicker
             closeModal={this.toggleIconPicker}

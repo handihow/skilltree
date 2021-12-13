@@ -30,7 +30,6 @@ interface IHomeState {
   unsubscribeOwned?: any;
   unsubscribeShared?: any;
   activeTab: string;
-  isActive: boolean;
   mustEditProfile: boolean;
   toEditor: boolean;
   compositionId: string;
@@ -52,7 +51,6 @@ class Home extends Component<IHomeProps, IHomeState> {
       compositions: [],
       sharedCompositions: [],
       hostedDomainCompositions: [],
-      isActive: false,
       mustEditProfile: mustEditProfile,
       toEditor: false,
       compositionId: "",
@@ -222,8 +220,13 @@ class Home extends Component<IHomeProps, IHomeState> {
       });
   };
 
-  delComposition = (composition) => {
-    this.toggleIsActive();
+  delComposition = () => {
+    if(!this.state.currentComposition){
+      toast.error("No active composition to be removed");
+      return;
+    }
+    const { dispatch } = this.props;
+    dispatch(hideModal());
     const toastId = uuid();
     toast.info(
       "Deleting skilltree and all related data is in progress... please wait",
@@ -232,7 +235,7 @@ class Home extends Component<IHomeProps, IHomeState> {
         autoClose: 10000,
       }
     );
-    const path = `compositions/${composition.id}`;
+    const path = `compositions/${this.state.currentComposition.id}`;
     const deleteFirestorePathRecursively = functions.httpsCallable(
       "deleteFirestorePathRecursively"
     );
@@ -263,9 +266,15 @@ class Home extends Component<IHomeProps, IHomeState> {
       });
   };
 
-  removeSharedSkilltree = (composition) => {
+  removeSharedSkilltree = () => {
+    if(!this.state.currentComposition){
+      toast.error("No active composition to be removed");
+      return;
+    }
+    const { dispatch } = this.props;
+    dispatch(hideModal());
     db.collection("compositions")
-      .doc(composition.id)
+      .doc(this.state.currentComposition.id)
       .update({
         sharedUsers: firebase.firestore.FieldValue.arrayRemove(
           this.props.user.uid
@@ -273,11 +282,9 @@ class Home extends Component<IHomeProps, IHomeState> {
       })
       .then((_) => {
         toast.info("Skill tree removed");
-        this.toggleIsActive();
       })
       .catch((e) => {
         toast.error("Something went wrong... " + e.message);
-        this.toggleIsActive();
       });
   };
 
@@ -288,9 +295,17 @@ class Home extends Component<IHomeProps, IHomeState> {
   };
 
   toggleIsActive = (composition?: IComposition) => {
+    const { dispatch } = this.props;
+    dispatch(showModal({
+      id: "warn",
+      title: "Are you sure?",
+      warningMessage: "You are about to delete skill tree page " + composition?.title + ". Do you want to delete?",
+      dismissedWarningFunc: this.props.user.uid === composition?.user
+      ? this.delComposition
+      : this.removeSharedSkilltree
+    }))
     this.setState({
       currentComposition: composition ? composition : undefined,
-      isActive: !this.state.isActive,
     });
   };
 
@@ -346,44 +361,7 @@ class Home extends Component<IHomeProps, IHomeState> {
               />
             )}
           </div>
-          <div className={`modal ${this.state.isActive ? "is-active" : ""}`}>
-            <div className="modal-background"></div>
-            <div className="modal-card">
-              <header className="modal-card-head">
-                <p className="modal-card-title">Are you sure?</p>
-                <button
-                  className="delete"
-                  aria-label="close"
-                  onClick={() => this.toggleIsActive()}
-                ></button>
-              </header>
-              <section className="modal-card-body">
-                You are about to delete skill tree page '
-                {this.state.currentComposition?.title}'. Do you want to delete?
-              </section>
-              <footer className="modal-card-foot">
-                <button
-                  className="button is-danger"
-                  onClick={
-                    this.props.user.uid === this.state.currentComposition?.user
-                      ? () => this.delComposition(this.state.currentComposition)
-                      : () =>
-                          this.removeSharedSkilltree(
-                            this.state.currentComposition
-                          )
-                  }
-                >
-                  Delete
-                </button>
-                <button
-                  className="button"
-                  onClick={() => this.toggleIsActive()}
-                >
-                  Cancel
-                </button>
-              </footer>
-            </div>
-          </div>
+          
         </React.Fragment>
       );
     }
