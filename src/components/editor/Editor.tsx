@@ -229,6 +229,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
   addSkilltree() {
     this.setState({
       showSkilltreeForm: true,
+      isEditingSkilltree: false
     });
   }
 

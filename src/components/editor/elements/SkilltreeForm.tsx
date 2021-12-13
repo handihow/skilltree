@@ -71,7 +71,10 @@ export class SkilltreeForm extends Component<
   onSubmit = (e: any) => {
     e.preventDefault();
     const skilltree: ISkilltree = {
-      id: this.props.skilltree?.id || uuid(),
+      id:
+        this.props.isEditing && this.props.skilltree
+          ? this.props.skilltree.id
+          : uuid(),
       title: this.state.title,
       description: this.state.description,
       collapsible: this.state.collapsible,
