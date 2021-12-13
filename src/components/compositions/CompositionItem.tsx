@@ -7,6 +7,7 @@ import IResult from "../../models/result.model";
 import { v4 as uuid } from "uuid";
 import { toast } from "react-toastify";
 import firebase from "firebase/app";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface ICompositionItemProps {
   composition: IComposition;
@@ -207,11 +208,11 @@ export class CompositionItem extends Component<
           <header className="card-header">
             <p className="card-header-title">{title}</p>
           </header>
-            <div className="card-image">
-              <figure className="image is-5by2">
-                <img src={this.state.thumbnail} alt="thumbnail"></img>
-              </figure>
-            </div>
+          <div className="card-image">
+            <figure className="image is-5by2">
+              <img src={this.state.thumbnail} alt="thumbnail"></img>
+            </figure>
+          </div>
         </Link>
         <div className="card-content">
           <div className="content">
@@ -230,39 +231,68 @@ export class CompositionItem extends Component<
             </div>
           </div>
         </div>
-        <footer className="card-footer">
-          <Link
-            to={"compositions/" + id + "/viewer"}
-            className="card-footer-item"
-          >
-            View
-          </Link>
-          {(this.props.composition.canCopy || isOwner) && (
-            <a
-              className="card-footer-item"
-              href="# "
-              onClick={() => this.copyComposition(this.props.composition)}
-            >
-              Copy
-            </a>
-          )}
-          {isOwner && (
-            <Link to={"/editor/" + id} className="card-footer-item">
-              Edit
-            </Link>
-          )}
-          {isOwner && (
-            <a
-              onClick={this.props.deleteComposition.bind(
-                this,
-                this.props.composition
-              )}
-              href="# "
-              className="card-footer-item"
-            >
-              Delete
-            </a>
-          )}
+        <footer className="card-footer is-justify-content-end	is-flex">
+          <div className="dropdown is-hoverable is-right">
+            <div className="dropdown-trigger">
+              <button
+                className="button"
+                aria-haspopup="true"
+                aria-controls="dropdown-menu4"
+              >
+                <span className="icon is-small">
+                  <FontAwesomeIcon icon="ellipsis-v"></FontAwesomeIcon>
+                </span>
+              </button>
+            </div>
+            <div className="dropdown-menu" id="dropdown-menu4" role="menu">
+              <div className="dropdown-content">
+                <Link
+                  to={"compositions/" + id + "/viewer"}
+                  className="dropdown-item"
+                >
+                  <span className="icon mr-2">
+                    <FontAwesomeIcon icon="eye"></FontAwesomeIcon>
+                  </span>
+                  <span>View</span>
+                </Link>
+                {(this.props.composition.canCopy || isOwner) && (
+                  <a
+                    className="dropdown-item"
+                    href="# "
+                    onClick={() => this.copyComposition(this.props.composition)}
+                  >
+                    <span className="icon mr-2">
+                      <FontAwesomeIcon icon="copy"></FontAwesomeIcon>
+                    </span>
+                    <span>Copy</span>
+                  </a>
+                )}
+                {isOwner && (
+                  <Link to={"/editor/" + id} className="dropdown-item">
+                    <span className="icon mr-2">
+                      <FontAwesomeIcon icon="pen"></FontAwesomeIcon>
+                    </span>
+                    <span>Edit</span>
+                  </Link>
+                )}
+                {isOwner && (
+                  <a
+                    onClick={this.props.deleteComposition.bind(
+                      this,
+                      this.props.composition
+                    )}
+                    href="# "
+                    className="dropdown-item"
+                  >
+                    <span className="icon mr-2">
+                      <FontAwesomeIcon icon="trash"></FontAwesomeIcon>
+                    </span>
+                    <span>Delete</span>
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
         </footer>
       </div>
     );

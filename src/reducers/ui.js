@@ -2,9 +2,6 @@ import {
     SHOW_MODAL,
     HIDE_MODAL,
     DISMISSED_MODAL,
-    SHOW_WARNING_MODAL,
-    HIDE_WARNING_MODAL,
-    DISMISSED_WARNING,
     WARNING_ACTION_COMPLETED
   } from "../actions/";
   
@@ -13,8 +10,6 @@ const uiReducer = (
       showModal: false,
       dismissedModal: false,
       modalProperties: {},
-      showWarningModal: false,
-      warningMessage: '',
       hasDismissedWarning: false
     },
     action
@@ -24,7 +19,7 @@ const uiReducer = (
         return {
           ...state,
           showModal: true,
-          modalProperties: action.modalProperties
+          modalProperties: action.modalProperties,
         };
       case HIDE_MODAL:
         return {
@@ -39,29 +34,12 @@ const uiReducer = (
           dismissedModal: true,
           modalProperties: {}
         };
-      case SHOW_WARNING_MODAL:
-        return {
-          ...state,
-          showWarningModal: true,
-          warningMessage: action.warningMessage
-        };
-      case HIDE_WARNING_MODAL:
-        return {
-          ...state,
-          showWarningModal: false,
-          warningMessage: '',
-        };
-      case DISMISSED_WARNING:
-        return {
-          ...state,
-          hasDismissedWarning: true
-        };
       case WARNING_ACTION_COMPLETED:
         return {
           ...state,
-          showWarningModal: false,
+          showModal: false,
           warningMessage: '',
-          hasDismissedWarning: false
+          hasDismissedWarning: true
         };
       default:
         return state;

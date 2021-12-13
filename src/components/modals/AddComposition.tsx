@@ -2,13 +2,15 @@ import { Component } from "react";
 import { standardData, standardTheme } from "../../services/StandardData";
 import IComposition from "../../models/composition.model";
 import { toast } from "react-toastify";
+import { connect } from "react-redux";
+import { hideModal } from "../../actions/ui";
 
 interface IAddCompositionProps {
   addComposition: Function;
   isEditingTitle: boolean;
-  isHidden: boolean;
   composition?: IComposition;
   updateCompositionTitle: Function;
+  dispatch: any;
 }
 
 interface IAddCompositionState {
@@ -22,20 +24,8 @@ export class AddComposition extends Component<
   constructor(props: IAddCompositionProps) {
     super(props);
     this.state = {
-      title: "",
+      title: props.isEditingTitle && props.composition ? props.composition.title : "",
     };
-  }
-
-  componentDidUpdate(prevProps) {
-    if (!prevProps.isEditingTitle && this.props.isEditingTitle) {
-      this.setState({
-        title: this.props.composition?.title || "",
-      });
-    } else if (!prevProps.isHidden && this.props.isHidden) {
-      this.setState({
-        title: "",
-      });
-    }
   }
 
   onChange = (e) => this.setState({ title: e.target.value });
@@ -70,6 +60,9 @@ export class AddComposition extends Component<
           </div>
         </section>
         <footer className="modal-card-foot">
+        <button className="button" onClick={()=> this.props.dispatch(hideModal())}>
+            Cancel
+          </button>
           <button className="is-primary button">Save</button>
         </footer>
       </form>
@@ -77,4 +70,4 @@ export class AddComposition extends Component<
   }
 }
 
-export default AddComposition;
+export default connect()(AddComposition);

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { showWarningModal, completedAfterWarning } from "../../../actions/ui";
+import { showModal, hideModal } from "../../../actions/ui";
 import { Droppable } from "react-beautiful-dnd";
 
 import ISkilltree from "../../../models/skilltree.model";
@@ -33,7 +33,6 @@ interface ISkillTreeEditorProps {
   isDropDisabledSkilltree: boolean;
   isDropDisabledSkills: boolean;
   dispatch: any;
-  hasDismissedWarning: boolean;
 }
 
 interface ISkillTreeEditorState {
@@ -45,8 +44,6 @@ interface ISkillTreeEditorState {
   unsubscribe?: any;
   isMobile: boolean;
   allowSubscriptionUpdates: boolean;
-  isPreparingToDestroy: boolean;
-  destroyInProgress: boolean;
   title: string;
 }
 
@@ -61,8 +58,6 @@ class SkillTreeEditor extends Component<
       data: [],
       isMobile: window.innerWidth <= 760,
       allowSubscriptionUpdates: true,
-      isPreparingToDestroy: false,
-      destroyInProgress: false,
       title: "",
     };
     this.moveExistingSkill = this.moveExistingSkill.bind(this);
@@ -113,9 +108,6 @@ class SkillTreeEditor extends Component<
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.hasDismissedWarning && this.state.isPreparingToDestroy && !this.state.destroyInProgress) {
-      this.deleteSkill();
-    }
     if (prevProps.index !== this.props.index) {
       this.state.unsubscribe();
       this.setState({
@@ -143,12 +135,12 @@ class SkillTreeEditor extends Component<
       optional: false,
       countChildren: 0,
       links: [],
-      order
+      order,
     };
     console.log(skill);
     await updateSkill(skill, this.props.skilltree, undefined, order, false);
     this.setState({
-      title: ''
+      title: "",
     });
   }
 
@@ -176,35 +168,34 @@ class SkillTreeEditor extends Component<
   prepareDeleteSkill(skill: ISkill) {
     this.setState({
       currentSkill: skill,
-      isPreparingToDestroy: true,
       allowSubscriptionUpdates: true,
     });
     const { dispatch } = this.props;
     dispatch(
-      showWarningModal(
-        "You are about to delete the Skill " +
+      showModal({
+        id: "warn",
+        title: "Are you sure",
+        warningMessage:
+          "You are about to delete the Skill " +
           skill?.title +
-          " including all related child skills. You cannot undo this. Are you sure?"
-      )
+          " including all related child skills. You cannot undo this. Are you sure?",
+        dismissedWarningFunc: this.deleteSkill
+      })
     );
   }
 
   async deleteSkill() {
-    if (!this.state.currentSkill) return;
-    this.setState({
-      destroyInProgress: true,
-    });
-    console.log('deleting skill');
+    if (!this.state.currentSkill) {
+      toast.error("You have not selected any skill to be destroyed..");
+      return;
+    }
+    toast.info("Please wait for skill to be removed...");
+    const { dispatch } = this.props;
+    dispatch(hideModal());
     await deleteSkill(
       this.state.currentSkill?.path || "",
       this.props.skilltree?.composition || ""
     );
-    const { dispatch } = this.props;
-    dispatch(completedAfterWarning());
-    this.setState({
-      destroyInProgress: false,
-      isPreparingToDestroy: false
-    });
   }
 
   render() {
@@ -328,10 +319,4 @@ class SkillTreeEditor extends Component<
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    hasDismissedWarning: state.ui.hasDismissedWarning,
-  };
-}
-
-export default connect(mapStateToProps)(SkillTreeEditor);
+export default connect()(SkillTreeEditor);

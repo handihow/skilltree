@@ -4,6 +4,8 @@ import YouTubeForm from "./YouTubeForm";
 import LinkForm from "./LinkForm";
 import LinkQuiz from "./LinkQuiz";
 import { hideModal } from "../../actions/ui";
+import AddComposition from "./AddComposition";
+import WarningModal from "./WarningModal";
 
 function Modal(props: {
   dispatch: any;
@@ -26,6 +28,9 @@ function Modal(props: {
             onClick={() => dispatch(hideModal())}
           ></button>
         </header>
+        {modalProperties?.id === "warn" && (
+          <WarningModal warningMessage={modalProperties.warningMessage} dismissedWarningFunc={modalProperties.dismissedWarningFunc} />
+        )}
         {modalProperties?.id === "file" && (
           <LinkFileUploader addLink={modalProperties.addLink} />
         )}
@@ -37,6 +42,14 @@ function Modal(props: {
         )}
         {modalProperties?.id === "quiz" && (
           <LinkQuiz addQuiz={modalProperties.addQuiz} />
+        )}
+        {modalProperties?.id === "skilltree" && (
+          <AddComposition
+          addComposition={modalProperties.addComposition}
+          isEditingTitle={modalProperties.isEditingTitle}
+          composition={modalProperties.currentComposition}
+          updateCompositionTitle={modalProperties.updateCompositionTitle}
+        />
         )}
       </div>
     </div>

@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import Compositions from "./compositions/Compositions";
-import AddComposition from "./compositions/AddComposition";
 import Header from "./layout/Header";
 import { db, functions } from "../firebase/firebase";
 import { v4 as uuid } from "uuid";
@@ -15,23 +14,23 @@ import firebase from "firebase/app";
 import { Redirect } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getRelevantUserIds } from "../services/UserServices";
+import { showModal, hideModal } from "../actions/ui";
 
 interface IHomeProps {
   isAuthenticated: boolean;
   user: any;
+  dispatch: any;
 }
 
 interface IHomeState {
   compositions: IComposition[];
   sharedCompositions: IComposition[];
   hostedDomainCompositions: IComposition[];
-  isEditingTitle: boolean;
   currentComposition?: IComposition;
   unsubscribeOwned?: any;
   unsubscribeShared?: any;
   activeTab: string;
   isActive: boolean;
-  isAddingOrEditing: boolean;
   mustEditProfile: boolean;
   toEditor: boolean;
   compositionId: string;
@@ -53,9 +52,7 @@ class Home extends Component<IHomeProps, IHomeState> {
       compositions: [],
       sharedCompositions: [],
       hostedDomainCompositions: [],
-      isEditingTitle: false,
       isActive: false,
-      isAddingOrEditing: false,
       mustEditProfile: mustEditProfile,
       toEditor: false,
       compositionId: "",
@@ -102,7 +99,7 @@ class Home extends Component<IHomeProps, IHomeState> {
 
   componentWillUnmount() {
     this.setState({
-      compositions: []
+      compositions: [],
     });
     if (this.state.unsubscribeOwned) {
       this.state.unsubscribeOwned();
@@ -113,13 +110,11 @@ class Home extends Component<IHomeProps, IHomeState> {
   }
 
   addComposition = (title, theme, data) => {
-    if(!title){
+    if (!title) {
       toast.error("Please enter a title for the SkillTree");
       return;
     }
-    this.setState({
-      isAddingOrEditing: false,
-    });
+    this.props.dispatch(hideModal());
     const compositionId = uuid();
     const newComposition: IComposition = {
       id: compositionId,
@@ -210,7 +205,7 @@ class Home extends Component<IHomeProps, IHomeState> {
   };
 
   updateCompositionTitle = (updatedTitle: string) => {
-    if(!updatedTitle || updatedTitle.length === 0) {
+    if (!updatedTitle || updatedTitle.length === 0) {
       toast.error("Please enter a title");
       return;
     }
@@ -222,9 +217,7 @@ class Home extends Component<IHomeProps, IHomeState> {
       })
       .then((_) => {
         this.setState({
-          isEditingTitle: false,
           currentComposition: undefined,
-          isAddingOrEditing: false,
         });
       });
   };
@@ -302,11 +295,17 @@ class Home extends Component<IHomeProps, IHomeState> {
   };
 
   toggleIsAddingOrEditing = (composition?: IComposition) => {
-    this.setState({
-      isAddingOrEditing: !this.state.isAddingOrEditing,
-      isEditingTitle: composition ? true : false,
-      currentComposition: composition ? composition : undefined,
-    });
+    const { dispatch } = this.props;
+    dispatch(
+      showModal({
+        id: "skilltree",
+        title: composition ? "Edit skilltree" : "Add skilltree",
+        addComposition: this.addComposition,
+        isEditingTitle: composition ? true : false,
+        composition: composition,
+        updateCompositionTitle: this.updateCompositionTitle,
+      })
+    );
   };
 
   render() {
@@ -337,8 +336,11 @@ class Home extends Component<IHomeProps, IHomeState> {
           <div className="container">
             {this.state.compositions && (
               <Compositions
-                compositions={
-                  this.state.compositions.concat(this.state.sharedCompositions.concat(this.state.hostedDomainCompositions))}
+                compositions={this.state.compositions.concat(
+                  this.state.sharedCompositions.concat(
+                    this.state.hostedDomainCompositions
+                  )
+                )}
                 editCompositionTitle={this.toggleIsAddingOrEditing}
                 deleteComposition={this.toggleIsActive}
               />
@@ -380,35 +382,6 @@ class Home extends Component<IHomeProps, IHomeState> {
                   Cancel
                 </button>
               </footer>
-            </div>
-          </div>
-          <div
-            className={`modal ${
-              this.state.isAddingOrEditing ? "is-active" : ""
-            }`}
-          >
-            <div className="modal-background"></div>
-            <div className="modal-card">
-              <header className="modal-card-head">
-                <p className="modal-card-title">
-                  {this.state.isEditingTitle
-                    ? "Edit skilltree title"
-                    : "Add skilltree"}
-                </p>
-                <button
-                  className="delete"
-                  aria-label="close"
-                  onClick={() => this.toggleIsAddingOrEditing()}
-                ></button>
-              </header>
-
-              <AddComposition
-                addComposition={this.addComposition}
-                isEditingTitle={this.state.isEditingTitle}
-                composition={this.state.currentComposition}
-                updateCompositionTitle={this.updateCompositionTitle}
-                isHidden={this.state.isAddingOrEditing}
-              />
             </div>
           </div>
         </React.Fragment>

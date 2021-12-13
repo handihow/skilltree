@@ -21,7 +21,7 @@ import {
   getNumberOfRootSkills,
   getNumberSkills,
 } from "../../services/SkillTreeServices";
-import { showWarningModal, completedAfterWarning } from "../../actions/ui";
+import { showModal, hideModal } from "../../actions/ui";
 import { standardEmptySkill } from "../../services/StandardData";
 import SkillForm from "./elements/SkillForm";
 import ISkill from "../../models/skill.model";
@@ -41,7 +41,6 @@ interface IEditorProps extends RouteComponentProps<TParams> {
   user: any;
   isAuthenticated: boolean;
   dispatch: any;
-  hasDismissedWarning: boolean;
   hasStartedImportingSkills: boolean;
   selectedSkills: ISkill[];
   parentSkilltree: ISkilltree;
@@ -68,8 +67,6 @@ interface IEditorState {
   enableDropInSkilltree: boolean;
   enableDropSkills: boolean;
   isAddingRootSkillAtIndex: number;
-  isPreparingToDestroy: boolean;
-  destroyInProgress: boolean;
   showOptionsEditor: boolean;
 }
 
@@ -81,8 +78,6 @@ const defaultState = {
   enableDropSkilltrees: false,
   enableDropInSkilltree: false,
   enableDropSkills: true,
-  isPreparingToDestroy: false,
-  destroyInProgress: false,
   isAddingRootSkillAtIndex: -1,
   currentParentSkill: undefined,
   currentSkill: undefined,
@@ -137,16 +132,6 @@ export class Editor extends Component<IEditorProps, IEditorState> {
     }
     this.setCompositionBackground(composition);
     this.subscribeSkilltreeChanges();
-  }
-
-  componentDidUpdate(_prevProps) {
-    if (
-      this.props.hasDismissedWarning &&
-      this.state.isPreparingToDestroy &&
-      !this.state.destroyInProgress
-    ) {
-      this.deleteSkilltree();
-    }
   }
 
   setCompositionBackground(composition: IComposition) {
@@ -396,36 +381,36 @@ export class Editor extends Component<IEditorProps, IEditorState> {
   }
 
   async deleteSkilltree() {
-    if (!this.state.composition?.id || !this.state.currentSkilltree) return;
-    this.setState({
-      destroyInProgress: true,
-    });
+    if (!this.state.composition?.id || !this.state.currentSkilltree){
+      toast.error("No composition or skilltree is selected");
+      return;
+    } 
+    const { dispatch } = this.props;
+    dispatch(hideModal());
+    toast.info("Please wait for skilltree to be removed...");
     const countSkills = await getNumberSkills(this.state.currentSkilltree);
     await deleteSkilltree(
       this.state.composition?.id,
       this.state.currentSkilltree,
       countSkills
     );
-    const { dispatch } = this.props;
-    dispatch(completedAfterWarning());
-    this.setState({
-      isPreparingToDestroy: false,
-      destroyInProgress: false,
-    });
   }
 
   prepareDeleteSkilltree(skilltree: ISkilltree) {
     this.setState({
       currentSkilltree: skilltree,
-      isPreparingToDestroy: true,
     });
     const { dispatch } = this.props;
     dispatch(
-      showWarningModal(
-        "You are about to delete the SkillTree " +
+      showModal({
+        id: "warn",
+        title: "Are you sure?",
+        warningMessage:
+          "You are about to delete the SkillTree " +
           skilltree?.title +
-          " including all related skills. You cannot undo this. Are you sure?"
-      )
+          " including all related skills. You cannot undo this. Are you sure?",
+        dismissedWarningFunc: this.deleteSkilltree
+      })
     );
   }
 
@@ -586,7 +571,6 @@ function mapStateToProps(state) {
   return {
     isAuthenticated: state.auth.isAuthenticated,
     user: state.auth.user,
-    hasDismissedWarning: state.ui.hasDismissedWarning,
     parentSkilltree: state.editor.parentSkilltree,
     hasStartedImportingSkills: state.editor.hasStartedImportingSkills,
     selectedSkills: state.editor.selectedSkills,

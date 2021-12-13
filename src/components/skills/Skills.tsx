@@ -12,7 +12,7 @@ import { propertyInArrayEqual } from "../../services/StandardFunctions";
 import { getRelevantUserIds } from "../../services/UserServices";
 import Header from "../layout/Header";
 import { v4 as uuid } from "uuid";
-import { showWarningModal, completedAfterWarning } from "../../actions/ui";
+import { showModal, hideModal } from "../../actions/ui";
 import { startedImporting } from "../../actions/editor";
 import ISkilltree from "../../models/skilltree.model";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -20,7 +20,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 interface ISkillsProps {
   isAuthenticated: boolean;
   user: any;
-  hasDismissedWarning: boolean;
   parentSkilltree: ISkilltree;
   hasSelectedParentSkilltree: boolean;
   dispatch: any;
@@ -34,7 +33,6 @@ interface ISkillsState {
   showEditMultipleModal: boolean;
   categoryTitle: string;
   activeTab: string;
-  destroyInProgress: boolean;
   toEditor: boolean;
 }
 
@@ -101,7 +99,6 @@ class Skills extends Component<ISkillsProps, ISkillsState> {
       doneLoading: false,
       showEditMultipleModal: false,
       categoryTitle: "",
-      destroyInProgress: false,
       toEditor: false,
     };
     this.prepareDeleteSkills = this.prepareDeleteSkills.bind(this);
@@ -246,12 +243,6 @@ class Skills extends Component<ISkillsProps, ISkillsState> {
     });
   };
 
-  componentDidUpdate(_prevProps) {
-    if (this.props.hasDismissedWarning && !this.state.destroyInProgress) {
-      this.deleteMasterSkills();
-    }
-  }
-
   onEdit = (items) => {
     //check if items have a common title
     let categoryTitle = "";
@@ -355,20 +346,24 @@ class Skills extends Component<ISkillsProps, ISkillsState> {
   prepareDeleteSkills() {
     const { dispatch } = this.props;
     dispatch(
-      showWarningModal(
-        "You are about to delete " +
+      showModal({
+        id: "warn",
+        title: "Are you sure?",
+        warningMessage:
+          "You are about to delete " +
           this.state.selectedSkills.length +
-          " skills from your master list. You cannot undo this. Are you sure?"
-      )
+          " skills from your master list. You cannot undo this. Are you sure?",
+        dismissedWarningFunc: this.deleteMasterSkills
+      })
     );
   }
 
   deleteMasterSkills = () => {
+
     if (!this.state.selectedSkills || this.state.selectedSkills.length === 0)
       return;
-    this.setState({
-      destroyInProgress: true,
-    });
+    const { dispatch } = this.props;
+    dispatch(hideModal());
     const batch = db.batch();
     this.state.selectedSkills.forEach((skill) => {
       if (skill.path) {
@@ -381,10 +376,7 @@ class Skills extends Component<ISkillsProps, ISkillsState> {
         toast.info(
           "Deleted " + this.state.selectedSkills.length + " successfully"
         );
-        const { dispatch } = this.props;
-        dispatch(completedAfterWarning());
         this.setState({
-          destroyInProgress: false,
           showEditMultipleModal: false,
           selectedSkills: [],
           skills: this.state.skills.filter(
@@ -432,13 +424,13 @@ class Skills extends Component<ISkillsProps, ISkillsState> {
           </div>
           <div className="level-item">
             {!this.props.hasSelectedParentSkilltree && (
-                <Link to="/skills/upload-csv" className="button is-rounded">
-                  <span className="icon">
-                    <FontAwesomeIcon icon="plus" />
-                  </span>
-                  <span>Upload</span>
-                </Link>
-              )}
+              <Link to="/skills/upload-csv" className="button is-rounded">
+                <span className="icon">
+                  <FontAwesomeIcon icon="plus" />
+                </span>
+                <span>Upload</span>
+              </Link>
+            )}
           </div>
         </div>
 
