@@ -21,9 +21,9 @@ export default function Compositions(props: ICompositionsProps) {
         </article>
         
              : 
-        <div className="columns is-multiline">
+        <div style={{display: "grid", gap:"1rem", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))"}}>
         {props.compositions?.map((composition, index) => (
-            <div key={index} className="column is-half-tablet is-one-third-desktop is-one-quarter-widescreen">
+            <div key={index} className="is-flex is-justify-content-center">
             <CompositionItem key={composition.id} composition={composition} 
             editCompositionTitle={props.editCompositionTitle}
             deleteComposition={props.deleteComposition}

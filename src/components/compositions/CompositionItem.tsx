@@ -203,14 +203,14 @@ export class CompositionItem extends Component<
     const { id, title, username } = this.props.composition;
     const isOwner = this.props.user.uid === this.props.composition.user;
     return (
-      <div className="card">
+      <div className="card" style={{width: "280px"}}>
         <Link to={isOwner ? "/editor/" + id : "compositions/" + id + "/viewer"}>
           <header className="card-header">
             <p className="card-header-title">{title}</p>
           </header>
           <div className="card-image">
-            <figure className="image is-5by2">
-              <img src={this.state.thumbnail} alt="thumbnail"></img>
+            <figure className="image">
+              <img src={this.state.thumbnail} alt="thumbnail"  style={{height: "200px"}}></img>
             </figure>
           </div>
         </Link>
