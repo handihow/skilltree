@@ -221,7 +221,7 @@ class Home extends Component<IHomeProps, IHomeState> {
   };
 
   delComposition = () => {
-    if(!this.state.currentComposition){
+    if (!this.state.currentComposition) {
       toast.error("No active composition to be removed");
       return;
     }
@@ -267,7 +267,7 @@ class Home extends Component<IHomeProps, IHomeState> {
   };
 
   removeSharedSkilltree = () => {
-    if(!this.state.currentComposition){
+    if (!this.state.currentComposition) {
       toast.error("No active composition to be removed");
       return;
     }
@@ -296,14 +296,20 @@ class Home extends Component<IHomeProps, IHomeState> {
 
   toggleIsActive = (composition?: IComposition) => {
     const { dispatch } = this.props;
-    dispatch(showModal({
-      id: "warn",
-      title: "Are you sure?",
-      warningMessage: "You are about to delete skill tree page " + composition?.title + ". Do you want to delete?",
-      dismissedWarningFunc: this.props.user.uid === composition?.user
-      ? this.delComposition
-      : this.removeSharedSkilltree
-    }))
+    dispatch(
+      showModal({
+        id: "warn",
+        title: "Are you sure?",
+        warningMessage:
+          "You are about to delete skill tree page " +
+          composition?.title +
+          ". Do you want to delete?",
+        dismissedWarningFunc:
+          this.props.user.uid === composition?.user
+            ? this.delComposition
+            : this.removeSharedSkilltree,
+      })
+    );
     this.setState({
       currentComposition: composition ? composition : undefined,
     });
@@ -351,6 +357,7 @@ class Home extends Component<IHomeProps, IHomeState> {
           <div className="container">
             {this.state.compositions && (
               <Compositions
+                addComposition={this.toggleIsAddingOrEditing}
                 compositions={this.state.compositions.concat(
                   this.state.sharedCompositions.concat(
                     this.state.hostedDomainCompositions
@@ -361,7 +368,6 @@ class Home extends Component<IHomeProps, IHomeState> {
               />
             )}
           </div>
-          
         </React.Fragment>
       );
     }

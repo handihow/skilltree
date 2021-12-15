@@ -265,7 +265,7 @@ class SkillTreeEditor extends Component<
                               >
                                 <div
                                   className="level is-mobile"
-                                  style={{ width: "240px" }}
+                                  style={{ width: "280px" }}
                                 >
                                   <div className="level-left">
                                     <div className="title is-6">
