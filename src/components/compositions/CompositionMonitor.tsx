@@ -189,16 +189,15 @@ export class CompositionMonitor extends Component<
         <div className="level p-4 has-background-light">
           <div className="level-left">
             <div className="level-item">
-              <Header
-                header={this.state.composition?.title || ""}
-                icon="users"
-              ></Header>
+              <Link to={"/editor/" + this.state.composition?.id}>
+                <Header
+                  header={this.state.composition?.title || ""}
+                  icon="arrow-left"
+                ></Header>
+              </Link>
             </div>
           </div>
           <div className="level-right">
-            <div className="level-item">
-              <BackButton />
-            </div>
             <div className="level-item">
               {this.state.composition && (
                 <Link
@@ -255,7 +254,7 @@ export class CompositionMonitor extends Component<
                     ></div>
                     <div className="column">
                       <button
-                        className="button"
+                        className="button has-tooltip-multiline"
                         onClick={this.copyToClipboard}
                         data-tooltip="Copy link to clipboard"
                       >
@@ -265,13 +264,6 @@ export class CompositionMonitor extends Component<
                   </div>
                 </div>
               </article>
-              <h5 className="title is-5">
-                Watch the video for more information
-              </h5>
-              <YouTube
-                videoId="nO3VHR9aezc"
-                opts={{ height: "300", width: "550" }}
-              />
             </React.Fragment>
           )}
           {this.state.composition &&

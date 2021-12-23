@@ -14,11 +14,6 @@ export default function SideBar() {
           </NavLink>
         </li>
         <li>
-          <NavLink activeClassName="is-active" to="/quizzes">
-            Quizzes
-          </NavLink>
-        </li>
-        <li>
           <NavLink activeClassName="is-active" to="/skills">
             Skills
           </NavLink>

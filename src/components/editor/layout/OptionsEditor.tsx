@@ -8,10 +8,6 @@ const copyToClipboard = (url) => {
   toast.info("Link copied to clipboard!");
 };
 
-const openEmailClient = (url) => {
-  window.location.href = `mailto:?subject=Link%20to%20my%20skilltree&body=${url}`;
-};
-
 export default function OptionsEditor({ composition, handleChange, url, toggleOptionsEditor }) {
   return (
     <div className="m-3">
@@ -158,18 +154,6 @@ export default function OptionsEditor({ composition, handleChange, url, toggleOp
                   <FontAwesomeIcon icon="copy" />
                 </span>
                 <span>Copy link</span>
-              </button>
-            </div>
-            <div className="level-item">
-              <button
-                className="button has-tooltip-multiline"
-                onClick={() => openEmailClient(url)}
-                data-tooltip="Open new email with link"
-              >
-                <span className="icon">
-                  <FontAwesomeIcon icon="envelope" />
-                </span>
-                <span>Email link</span>
               </button>
             </div>
           </div>

@@ -1,4 +1,3 @@
-import React from 'react'
 import SkillContent from '../components/layout/SkillContent';
 import ISkill from '../models/skill.model';
 
@@ -18,9 +17,7 @@ const constructSkill = (skill: ISkill, skills: ISkill[], isViewing: boolean) => 
                 content: <SkillContent 
                     description={skill.description} 
                     links={skill.links ? skill.links : []}
-                    optional={skill.optional ? true : false}
-                    hasQuiz={skill.hasQuiz ? true : false}
-                    quizId={skill.quizId || ''}/>,
+                    optional={skill.optional ? true : false}/>,
                 direction: skill.direction ? skill.direction : 'top'
             } ,
             children: filterChildren(skill, skills, isViewing),
@@ -69,9 +66,7 @@ const addToSkillArray = (arr, child, parent, isViewing: boolean) => {
             content: <SkillContent 
                         description={child.tooltip.description} 
                         links={child.tooltip.links} 
-                        optional={child.optional ? true : false}
-                        hasQuiz={child.hasQuiz ? true : false}
-                        quizId={child.quizId || ''}/> ,
+                        optional={child.optional ? true : false}/> ,
             description: child.tooltip.description,
             links: child.tooltip.links,
         },

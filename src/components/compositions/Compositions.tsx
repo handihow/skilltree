@@ -9,6 +9,9 @@ interface ICompositionsProps {
 }
 
 export default function Compositions(props: ICompositionsProps) {
+  const compositions = props.compositions.filter(
+    (value, index, self) => index === self.findIndex((t) => t.id === value.id)
+  );
   return (
     <div
       style={{
@@ -38,10 +41,9 @@ export default function Compositions(props: ICompositionsProps) {
           </div>
         </a>
       </div>
-      {props.compositions?.map((composition, index) => (
-        <div key={index} className="is-flex is-justify-content-center">
+      {compositions.map((composition) => (
+        <div key={composition.id} className="is-flex is-justify-content-center">
           <CompositionItem
-            key={composition.id}
             composition={composition}
             editCompositionTitle={props.editCompositionTitle}
             deleteComposition={props.deleteComposition}

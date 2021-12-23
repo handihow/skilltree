@@ -9,5 +9,4 @@ export default interface ILink {
     description?: string;
     imageUrl?: string;
     filename?: string;
-    isQuizLink?: boolean;
 }

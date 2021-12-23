@@ -2,7 +2,6 @@ import { connect } from "react-redux";
 import LinkFileUploader from "./LinkFileUploader";
 import YouTubeForm from "./YouTubeForm";
 import LinkForm from "./LinkForm";
-import LinkQuiz from "./LinkQuiz";
 import { hideModal } from "../../actions/ui";
 import AddComposition from "./AddComposition";
 import WarningModal from "./WarningModal";
@@ -39,9 +38,6 @@ function Modal(props: {
         )}
         {modalProperties?.id === "link" && (
           <LinkForm addLink={modalProperties.addLink} />
-        )}
-        {modalProperties?.id === "quiz" && (
-          <LinkQuiz addQuiz={modalProperties.addQuiz} />
         )}
         {modalProperties?.id === "skilltree" && (
           <AddComposition

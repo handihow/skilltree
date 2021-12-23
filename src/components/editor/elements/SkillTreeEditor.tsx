@@ -62,6 +62,7 @@ class SkillTreeEditor extends Component<
     };
     this.moveExistingSkill = this.moveExistingSkill.bind(this);
     this.prepareDeleteSkill = this.prepareDeleteSkill.bind(this);
+    this.deleteSkill = this.deleteSkill.bind(this);
   }
 
   getData() {

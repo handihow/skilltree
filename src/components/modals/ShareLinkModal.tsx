@@ -8,10 +8,6 @@ const copyToClipboard = (url) => {
     
 }
 
-const openEmailClient = (url) => {
-    window.location.href = `mailto:?subject=Link%20to%20my%20skilltree&body=${url}`;
-}
-
 export default function ShareLinkModal({url, toggleShareLinkModal}) {
     return (
         <div className='modal is-active'>
@@ -44,16 +40,12 @@ export default function ShareLinkModal({url, toggleShareLinkModal}) {
                         </div>
                     </div>
                 </div>
-                <p>You can also open a new email with the link.</p>
             </section>
             <footer className="modal-card-foot">
                 <button className="button" 
                   onClick={() => toggleShareLinkModal()}>Cancel</button>
                 <button className="button is-info" onClick={() => copyToClipboard(url)}>
                     Copy link to clipboard
-                </button>
-                <button className="button is-primary" onClick={() => openEmailClient(url)}>
-                    New email with link
                 </button>
             </footer>
         </div>

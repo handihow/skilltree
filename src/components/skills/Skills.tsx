@@ -412,7 +412,7 @@ class Skills extends Component<ISkillsProps, ISkillsState> {
     ) : this.state.doneLoading ? (
       <React.Fragment>
         <div className="level has-background-light mb-0 p-3 is-mobile">
-          <div className="level-item has-text-centered">
+          <div className="level-left">
             <Header
               icon="list"
               header={
@@ -422,7 +422,7 @@ class Skills extends Component<ISkillsProps, ISkillsState> {
               }
             />
           </div>
-          <div className="level-item">
+          <div className="level-right">
             {!this.props.hasSelectedParentSkilltree && (
               <Link to="/skills/upload-csv" className="button is-rounded">
                 <span className="icon">

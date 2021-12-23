@@ -35,20 +35,6 @@ const Composition = React.lazy(
 const CompositionViewer = React.lazy(
   () => import("./components/compositions/CompositionViewer")
 );
-const Payments = React.lazy(() => import("./components/payments/Payments"));
-const PaymentConfirmation = React.lazy(
-  () => import("./components/payments/PaymentConfirmation")
-);
-const Quizzes = React.lazy(() => import("./components/quizzes/Quizzes"));
-const QuizBuilder = React.lazy(
-  () => import("./components/quizzes/QuizBuilder")
-);
-const DoQuiz = React.lazy(() => import("./components/quizzes/DoQuiz"));
-const QuizResults = React.lazy(
-  () => import("./components/quizzes/QuizResults")
-);
-const QuizResult = React.lazy(() => import("./components/quizzes/QuizResult"));
-const JoinQuiz = React.lazy(() => import("./components/quizzes/JoinQuiz"));
 const Skills = React.lazy(() => import("./components/skills/Skills"));
 const SkillsUploader = React.lazy(
   () => import("./components/skills/SkillsUploader")
@@ -82,14 +68,6 @@ function App(props) {
         />
         <ProtectedRoute
           exact
-          path="/quizzes"
-          component={Quizzes}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-          hasSidebar="true"
-        />
-        <ProtectedRoute
-          exact
           path="/skills"
           component={Skills}
           isAuthenticated={isAuthenticated}
@@ -102,7 +80,7 @@ function App(props) {
           component={SkillsUploader}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
-          hasSidebar="false"
+          hasSidebar="true"
         />
         <ProtectedRoute
           path="/skills/:skillId"
@@ -187,55 +165,6 @@ function App(props) {
         <ProtectedRoute
           path="/compositions/:compositionId/monitor/:userId"
           component={CompositionViewer}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-          hasSidebar="false"
-        />
-        <ProtectedRoute
-          path="/compositions/:compositionId/unlock/:featureId"
-          component={Payments}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-          hasSidebar="false"
-        />
-        <ProtectedRoute
-          path="/compositions/:compositionId/confirmation/:featureId"
-          component={PaymentConfirmation}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-          hasSidebar="false"
-        />
-        <ProtectedRoute
-          path="/quizzes/:quizId/builder/:builder"
-          component={QuizBuilder}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-          hasSidebar="false"
-        />
-        <ProtectedRoute
-          path="/quizzes/:quizId/test"
-          component={DoQuiz}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-          hasSidebar="false"
-        />
-        <ProtectedRoute
-          path="/quizzes/:quizId/results"
-          component={QuizResults}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-          hasSidebar="false"
-        />
-        <ProtectedRoute
-          path="/quizzes/:quizId/result"
-          component={QuizResult}
-          isAuthenticated={isAuthenticated}
-          isVerifying={isVerifying}
-          hasSidebar="false"
-        />
-        <ProtectedRoute
-          path="/quizzes/:quizId/join"
-          component={JoinQuiz}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
           hasSidebar="false"

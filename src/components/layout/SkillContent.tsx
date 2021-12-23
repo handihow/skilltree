@@ -20,11 +20,6 @@ export default function SkillContent(props) {
                     </li>
                 ))}
             </ul>
-            {props.hasQuiz && 
-                <div className="buttons" style={{marginTop:'10px'}}>
-                <NavLink to={"/quizzes/"+props.quizId+"/test"} className="button is-primary is-inverted">
-                    View Quiz</NavLink>
-                </div>}
         </React.Fragment>
     )
 }

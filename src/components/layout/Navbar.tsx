@@ -76,20 +76,6 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                     </div>
                     <div className="navbar-item">
                       <Link
-                        to="/quizzes"
-                        className="button is-fullwidth"
-                      >
-                        <span className="icon">
-                          <img
-                            src="/QABlack.svg"
-                            alt=""
-                          ></img>
-                        </span>
-                        <span>Your quizzes</span>
-                      </Link>
-                    </div>
-                    <div className="navbar-item">
-                      <Link
                         to="/skills"
                         className="button is-fullwidth"
                       >

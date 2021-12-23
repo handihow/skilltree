@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import ILink from "../../models/link.model";
 import { toast } from "react-toastify";
 import { v4 as uuid } from "uuid";
-import urlMetadata from "url-metadata";
 import normalize from "normalize-url";
 import { connect } from "react-redux";
 import { hideModal } from "../../actions/ui";
@@ -49,48 +48,23 @@ export class LinkForm extends Component<ILinkFormProps, ILinkFormState> {
   startScraping = () => {
     if (this.state.url) {
       const normalizedUrl = normalize(this.state.url, { forceHttps: true });
-      urlMetadata(normalizedUrl).then(
-        (metadata) => {
-          // success handler
-          console.log(metadata);
-          const link: ILink = {
-            id: uuid(),
-            iconName: "link",
-            iconPrefix: "fas",
-            reference: normalizedUrl,
-            title: metadata.title,
-            description: metadata.description,
-            imageUrl:
-              metadata.image !== ""
-                ? metadata.image
-                : "https://cdn.pixabay.com/photo/2014/04/02/14/08/mouse-306274_1280.png",
-          };
-          this.setState({
-            link: link,
-            doneScraping: true,
-          });
-        },
-        (error) => {
-          // failure handler
-          toast.error(
-            "Could not find information about the link. Set title and description manually."
-          );
-          const link: ILink = {
-            id: uuid(),
-            iconName: "link",
-            iconPrefix: "fas",
-            reference: normalizedUrl,
-            title: normalizedUrl,
-            description: "",
-            imageUrl:
-              "https://cdn.pixabay.com/photo/2014/04/02/14/08/mouse-306274_1280.png",
-          };
-          this.setState({
-            link: link,
-            doneScraping: true,
-          });
-        }
-      );
+      const link: ILink = {
+        id: uuid(),
+        iconName: "link",
+        iconPrefix: "fas",
+        reference: normalizedUrl,
+        title: normalizedUrl,
+        description: "",
+        imageUrl:
+          "https://cdn.pixabay.com/photo/2014/04/02/14/08/mouse-306274_1280.png",
+      };
+      this.setState({
+        link: link,
+        doneScraping: true,
+        url: normalizedUrl
+      });
+    } else {
+      toast.error("Please enter a valid url...");
     }
   };
 
@@ -120,19 +94,17 @@ export class LinkForm extends Component<ILinkFormProps, ILinkFormState> {
                 value={this.state.url ? this.state.url : ""}
               />
               <p className="help">
-                Enter a valid url and then click on search to find information
-                about the link
+                Enter a valid url and then click add
               </p>
             </div>
             <div className="control">
               <button className="button" onClick={this.startScraping}>
-                Search
+                Add
               </button>
             </div>
           </div>
           {this.state.doneScraping && (
             <React.Fragment>
-              <h6 className="title is-6">Found information about url</h6>
               <div>
                 You can now click save to add it to the skill, or change the
                 title and description first.

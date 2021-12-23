@@ -82,6 +82,7 @@ export const updateSkilltree = (skilltree: ISkilltree,
 }
 
 export const deleteSkilltree = (compositionId: string, skilltree: ISkilltree, numberOfSkillsInSkilltree: number) => {
+    console.log(numberOfSkillsInSkilltree);
     const skilltreePath = `compositions/${compositionId}/skilltrees/${skilltree?.id}`;
     const deleteFirestorePathRecursively = functions.httpsCallable('deleteFirestorePathRecursively');
     return deleteFirestorePathRecursively({

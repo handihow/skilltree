@@ -12,9 +12,6 @@ export default interface ISkill {
     optional: boolean;
     direction?: string;
     countChildren: number;
-    hasQuiz?: boolean;
-    quizId?: string;
-    quizTitle?: string;
     category?: string;
     reference?: string;
     //properties to track the parent and path

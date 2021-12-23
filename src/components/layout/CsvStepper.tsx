@@ -30,13 +30,13 @@ export default function CsvStepper({
     return (
         <React.Fragment>
         <div className="level has-background-light mb-0 p-3 is-mobile">
-          <div className="level-item has-text-centered">
+          <div className="level-left">
             <Header
               icon="upload"
               header="Upload skills from csv"
             />
           </div>
-          <div className="level-item">
+          <div className="level-right">
             <BackButton></BackButton>
           </div>
         </div>

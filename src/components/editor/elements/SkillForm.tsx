@@ -4,12 +4,10 @@ import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import LinkCard from "../../layout/LinkCard";
 import ISkill from "../../../models/skill.model";
-import IQuiz from "../../../models/quiz.model";
 import ILink from "../../../models/link.model";
 import { db } from "../../../firebase/firebase";
 import RichTextEditor from "react-rte";
-import { toolbarConfig, quizImage } from "../../../services/StandardData";
-import firebase from "firebase/app";
+import { toolbarConfig } from "../../../services/StandardData";
 import { connect } from "react-redux";
 import { showModal } from "../../../actions/ui";
 
@@ -27,8 +25,6 @@ interface ISkillFormState {
   optional: boolean;
   direction: string;
   links: ILink[];
-  hasQuiz: boolean;
-  quizId: string;
 }
 
 export class SkillForm extends Component<ISkillFormProps, ISkillFormState> {
@@ -49,9 +45,7 @@ export class SkillForm extends Component<ISkillFormProps, ISkillFormState> {
       links:
         this.props.skill?.links && this.props.skill.links.length > 0
           ? this.props.skill.links
-          : [],
-      hasQuiz: this.props.skill?.hasQuiz || false,
-      quizId: this.props.skill?.quizId || "",
+          : []
     };
   }
 
@@ -68,11 +62,6 @@ export class SkillForm extends Component<ISkillFormProps, ISkillFormState> {
   toggleFileModal = () => {
     const { dispatch } = this.props;
     dispatch(showModal({id: "file", title: "Upload file", addLink: this.addLink}));
-  };
-
-  toggleQuizModal = () => {
-    const { dispatch } = this.props;
-    dispatch(showModal({id: "quiz", title: "Add Quiz or Select Existing", addQuiz: this.addQuiz}));
   };
 
   handleTitleChange = (e: React.FormEvent<HTMLInputElement>) => {
@@ -114,7 +103,7 @@ export class SkillForm extends Component<ISkillFormProps, ISkillFormState> {
         if (
           isEmpty(link.title) ||
           isEmpty(link.iconName) ||
-          (!isURL(link.reference) && !link.isQuizLink)
+          !isURL(link.reference)
         ) {
           hasError = true;
           toast.error(
@@ -157,54 +146,9 @@ export class SkillForm extends Component<ISkillFormProps, ISkillFormState> {
   };
 
   deleteLink = (id: string) => {
-    const linkIndex = this.state.links.findIndex((l) => l.id === id);
-    const isQuizLink =
-      linkIndex > -1 ? this.state.links[linkIndex].isQuizLink : false;
-    if (isQuizLink) {
-      this.removeQuiz();
-    }
     this.setState({
       links: [...this.state.links.filter((l) => l.id !== id)],
     });
-  };
-
-  addQuiz = (quiz: IQuiz) => {
-    if (this.props.skill?.path) {
-      db.doc(this.props.skill.path)
-        .update({
-          hasQuiz: true,
-          quizId: quiz.id,
-          icon: quizImage,
-          quizTitle: quiz.title,
-        })
-        .then((_) => {
-          this.setState({
-            hasQuiz: true,
-            quizId: quiz.id,
-          });
-        });
-    }
-  };
-
-  removeQuiz = () => {
-    if (this.props.skill?.path) {
-      db.doc(this.props.skill.path)
-        .update({
-          hasQuiz: false,
-          icon: firebase.firestore.FieldValue.delete(),
-          quizId: firebase.firestore.FieldValue.delete(),
-          quizTitle: firebase.firestore.FieldValue.delete(),
-        })
-        .then((_) => {
-          this.setState({
-            hasQuiz: false,
-            quizId: "",
-          });
-          toast(
-            "Quiz was unlinked from this skill. You can still find it in your list of Quizzes."
-          );
-        });
-    }
   };
 
   render() {
@@ -342,36 +286,8 @@ export class SkillForm extends Component<ISkillFormProps, ISkillFormState> {
                 <FontAwesomeIcon icon={"link"} />
               </span>
             </button>
-            {!this.state.hasQuiz && (
-              <button
-                className="button has-tooltip-multiline"
-                data-tooltip="Add quiz"
-                onClick={this.toggleQuizModal}
-                type="button"
-              >
-                <span className="icon is-small">
-                  <FontAwesomeIcon icon={"poll-h"} />
-                </span>
-              </button>
-            )}
           </div>
           <ul style={{ listStyleType: "none", marginTop: "10px", marginBottom: "10px" }}>
-            {this.state.hasQuiz && (
-              <LinkCard
-                link={{
-                  imageUrl: quizImage,
-                  id: this.state.quizId,
-                  iconName: "poll-h",
-                  iconPrefix: "fas",
-                  reference: "/quizzes/" + this.state.quizId + "/results",
-                  title: this.props.skill?.quizTitle || "Quiz",
-                  description:
-                    "This skill has a quiz! You can check the quiz results by clicking on the title.",
-                  isQuizLink: true,
-                }}
-                deleteLink={this.removeQuiz}
-              />
-            )}
             {this.state.links.length > 0 &&
               this.state.links.map((link, index) => (
                 <LinkCard
