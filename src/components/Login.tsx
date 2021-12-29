@@ -77,7 +77,7 @@ class Login extends Component<ILoginProps, ILoginState> {
     } else {
       return (
         <React.Fragment>
-          {this.props.onCompositionPage ? (
+          {this.props.onCompositionPage && (
             <section className="hero is-primary">
               <div className="hero-body">
                 <div className="container has-text-centered">
@@ -88,99 +88,93 @@ class Login extends Component<ILoginProps, ILoginState> {
                 </div>
               </div>
             </section>
-          ) : (
-            <div className="level has-background-light p-3 mb-2">
-              <div className="level-item has-text-centered">
-                  <Header header="Log in" icon="sign-in-alt"></Header>
-              </div>
-            </div>
           )}
-            <div
-              className="container has-text-centered box"
-              style={{ maxWidth: "350px" }}
-            >
-              <div className="buttons">
-                <LoginButton
-                  icon="google"
-                  iconPrefix="fab"
-                  buttonText="Sign in with Google"
-                  onClick={this.handleLoginWithGoogle}
-                  color="is-danger"
-                />
-                <LoginButton
-                  icon="microsoft"
-                  iconPrefix="fab"
-                  buttonText="Sign in with Microsoft"
-                  onClick={this.handleLoginWithMicrosoft}
-                  color="is-info"
-                />
-              </div>
+          <div
+            className="container has-text-centered box"
+            style={{ maxWidth: "350px", marginTop: "20px" }}
+          >
+            <div className="buttons">
+              <LoginButton
+                icon="google"
+                iconPrefix="fab"
+                buttonText="Sign in with Google"
+                onClick={this.handleLoginWithGoogle}
+                color="is-danger"
+              />
+              <LoginButton
+                icon="microsoft"
+                iconPrefix="fab"
+                buttonText="Sign in with Microsoft"
+                onClick={this.handleLoginWithMicrosoft}
+                color="is-info"
+              />
+            </div>
 
-              <div style={{ margin: "10px 0" }}>
-                <hr style={hrStyle} />
-                <span style={{ verticalAlign: "middle", padding: "0 10px" }}>
-                  OR
+            <div style={{ margin: "10px 0" }}>
+              <hr style={hrStyle} />
+              <span style={{ verticalAlign: "middle", padding: "0 10px" }}>
+                OR
+              </span>
+              <hr style={hrStyle} />
+            </div>
+            <div className="field">
+              <label className="label" htmlFor="email">
+                Email
+              </label>
+              <div className="control has-icons-left">
+                <input
+                  className="input"
+                  name="email"
+                  type="email"
+                  placeholder="email"
+                  required
+                  autoFocus
+                  onChange={this.handleEmailChange}
+                />
+                <span className="icon is-small is-left">
+                  <FontAwesomeIcon icon="envelope"></FontAwesomeIcon>
                 </span>
-                <hr style={hrStyle} />
-              </div>
-              <div className="field">
-                <label className="label" htmlFor="email">
-                  Email
-                </label>
-                <div className="control has-icons-left">
-                  <input
-                    className="input"
-                    name="email"
-                    type="email"
-                    placeholder="email"
-                    required
-                    autoFocus
-                    onChange={this.handleEmailChange}
-                  />
-                  <span className="icon is-small is-left">
-                    <FontAwesomeIcon icon="envelope"></FontAwesomeIcon>
-                  </span>
-                </div>
-              </div>
-
-              <div className="field">
-                <label className="label" htmlFor="password">
-                  Password
-                </label>
-                <div className="control has-icons-left">
-                  <input
-                    className="input"
-                    name="password"
-                    type="password"
-                    placeholder="password"
-                    required
-                    onChange={this.handlePasswordChange}
-                  />
-                  <span className="icon is-small is-left">
-                    <FontAwesomeIcon icon="lock"></FontAwesomeIcon>
-                  </span>
-                </div>
-              </div>
-
-              <div className="field">
-                <LoginButton
-                  icon="sign-in-alt"
-                  iconPrefix="fas"
-                  buttonText="Sign In"
-                  onClick={this.handleSubmit}
-                  color="is-primary"
-                />
-              </div>
-              <div>
-                <Link to="/register">Click here to create an account</Link>
-              </div>
-              <div>
-                <Link to="/recover">Forgot password?</Link>
-              </div>
-              <div>
-                <Link to="/about">Learn more about this application</Link>
               </div>
             </div>
+
+            <div className="field">
+              <label className="label" htmlFor="password">
+                Password
+              </label>
+              <div className="control has-icons-left">
+                <input
+                  className="input"
+                  name="password"
+                  type="password"
+                  placeholder="password"
+                  required
+                  onChange={this.handlePasswordChange}
+                />
+                <span className="icon is-small is-left">
+                  <FontAwesomeIcon icon="lock"></FontAwesomeIcon>
+                </span>
+              </div>
+            </div>
+
+            <div className="field">
+              <LoginButton
+                icon="sign-in-alt"
+                iconPrefix="fas"
+                buttonText="Sign In"
+                onClick={this.handleSubmit}
+                color="is-primary"
+              />
+            </div>
+            <div>
+              <Link to="/register">Click here to create an account</Link>
+            </div>
+            <div>
+              <Link to="/recover">Forgot password?</Link>
+            </div>
+            <div>
+              <a href="https://easyskilltree.com">Learn more about this application</a>
+            </div>
+          </div>
         </React.Fragment>
       );
     }

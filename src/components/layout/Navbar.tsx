@@ -45,12 +45,12 @@ class Navbar extends Component<INavbarProps, INavbarState> {
           aria-label="main navigation"
         >
           <div className="navbar-brand">
-            <Link to="/" className="navbar-item">
+            <a href="https://easyskilltree.com" className="navbar-item">
               <img
                 alt="SkillTree"
                 src="/SkillTree_logo.png"
               ></img>
-            </Link>
+            </a>
           </div>
           <div
             className="navbar-menu is-active"
@@ -89,7 +89,7 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                     <div className="navbar-item">
                       <a
                         className="button is-fullwidth"
-                        href="https://github.com/handihow/skilltree/issues"
+                        href="https://easyskilltree.com/log-a-support-ticket/"
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -102,7 +102,7 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                     <div className="navbar-item">
                       <a
                         className="button is-fullwidth"
-                        href="https://github.com/handihow/skilltree/wiki"
+                        href="https://easyskilltree.com/knowledge-base/"
                         target="_blank"
                         rel="noreferrer"
                       >

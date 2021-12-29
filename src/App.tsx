@@ -14,9 +14,7 @@ const Home = React.lazy(() => import("./components/Home"));
 const Login = React.lazy(() => import("./components/Login"));
 const Recover = React.lazy(() => import("./components/Recover"));
 const Register = React.lazy(() => import("./components/Register"));
-const About = React.lazy(() => import("./components/pages/About"));
 const NavBar = React.lazy(() => import("./components/layout/Navbar"));
-const Footer = React.lazy(() => import("./components/layout/Footer"));
 const Profile = React.lazy(() => import("./components/pages/Profile"));
 const EditProfile = React.lazy(() => import("./components/pages/EditProfile"));
 const DeleteProfile = React.lazy(
@@ -176,9 +174,7 @@ function App(props) {
         <Route path="/login" component={Login} />
         <Route path="/recover" component={Recover} />
         <Route path="/register" component={Register} />
-        <Route path="/about" component={About} />
       </Switch>
-      <Footer />
       <Modal />
     </Suspense>
   );

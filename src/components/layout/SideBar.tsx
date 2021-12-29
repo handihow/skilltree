@@ -23,7 +23,7 @@ export default function SideBar() {
       <ul className="menu-list">
         <li>
           <a
-            href="https://github.com/handihow/skilltree/issues"
+            href="https://easyskilltree.com/log-a-support-ticket/"
             target="_blank"
             rel="noreferrer"
           >
@@ -32,7 +32,7 @@ export default function SideBar() {
         </li>
         <li>
           <a
-            href="https://github.com/handihow/skilltree/wiki"
+            href="https://easyskilltree.com/knowledge-base/"
             target="_blank"
             rel="noreferrer"
           >
