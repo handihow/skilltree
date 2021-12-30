@@ -209,7 +209,7 @@ exports.secret = functions.https.onCall((data, context) => {
           await addCompositionToResults(user, compositionId);
           await addUserToCompositionSharedUsers(user, compositionId);
         } catch(err){
-          errorMessages.push(err.message);
+          errorMessages.push("Error creating user with email address " + email + ".");
         }
       }
     }
