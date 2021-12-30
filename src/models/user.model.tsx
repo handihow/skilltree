@@ -8,6 +8,6 @@ export default interface IUser {
     hostedDomain?: string;
     creationTime?: any;
     lastSignInTime?: any;
-    isTeacher?: boolean;
-    isStudent?: boolean;
+    type?: string;
+    organisation?: string;
 }

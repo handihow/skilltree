@@ -1,67 +1,99 @@
-import React, { Component } from 'react'
+import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 interface IProfileProps {
-    isAuthenticated: boolean;
-    user: any;
+  isAuthenticated: boolean;
+  user: any;
 }
 
-
 export class Profile extends Component<IProfileProps> {
-    constructor(props: IProfileProps) {
-        super(props);
-        this.state = {}
-    }
-    
-    render() {
-        return (
-            <div style={{height: "100vh"}}>
-            <div className="card" style={{margin: 'auto', maxWidth: '600px', marginTop: '20px'}}>
-            <div className="card-content">
-                <div className="media">
-                <div className="media-left">
-                    <figure className="image is-64x64 is-rounded">
-                    <img alt="" 
-                    src={this.props.user?.photoURL ? 
-                        this.props.user.photoURL :
-                        `https://eu.ui-avatars.com/api/?name=${this.props.user.displayName}`}/>
-                    </figure>
-                </div>
-                <div className="media-content">
-                    <p className="title is-4">{this.props.user?.displayName}</p>
-                    <p className="subtitle is-6">{this.props.user?.email}</p>
-                </div>
-                </div>
-                <div className="content">
-                <p>
-                    If you contact the service desk, please note that your unique user reference is: 
-                </p>
-                <p><strong>{this.props.user?.uid}</strong></p>
-                <hr></hr>
-                <p>Hosted domain: {this.props.user?.hostedDomain}</p>
-                <p>Email verified: {this.props.user?.emailVerified ? 'Yes' : 'No'}</p>
-                <p>Record created: {this.props.user?.creationTime}</p>
-                <p>Last sign in: {this.props.user?.lastSignInTime}</p>
-                </div>
-            </div>
-            <footer className="card-footer">
-                <Link to="/profile/edit"  className="card-footer-item">Edit</Link>
-                <Link to="/profile/delete" className="card-footer-item">Delete</Link>
-            </footer>
-            </div>
-            </div>
+  constructor(props: IProfileProps) {
+    super(props);
+    this.state = {};
+  }
 
-        )
-    }
+  render() {
+    const isPremium = process.env.REACT_APP_ENVIRONMENT_ID !== "free";
+    return (
+      <div style={{ height: "100vh" }}>
+        <div
+          className="card"
+          style={{ margin: "auto", maxWidth: "600px", marginTop: "20px" }}
+        >
+          <div className="card-content">
+            <div className="media">
+              <div className="media-left">
+                <figure className="image is-64x64 is-rounded">
+                  <img
+                    alt=""
+                    src={
+                      this.props.user?.photoURL
+                        ? this.props.user.photoURL
+                        : `https://eu.ui-avatars.com/api/?name=${this.props.user.displayName}`
+                    }
+                  />
+                </figure>
+              </div>
+              <div className="media-content">
+                <p className="title is-4">{this.props.user?.displayName}</p>
+                <p className="subtitle is-6">{this.props.user?.email}</p>
+              </div>
+            </div>
+            <div className="content">
+              {isPremium ? (
+                <p>
+                  Your profile is managed by: {this.props.user?.organisation}
+                </p>
+              ) : (
+                <React.Fragment>
+                  <p>
+                    If you contact the service desk, please note that your
+                    unique user reference is:
+                  </p>
+                  <p>
+                    <strong>{this.props.user?.uid}</strong>
+                  </p>
+                </React.Fragment>
+              )}
+              <hr></hr>
+              {!isPremium && (
+                <p>Hosted domain: {this.props.user?.hostedDomain}</p>
+              )}
+              <p>
+                Email verified: {this.props.user?.emailVerified ? "Yes" : "No"}
+              </p>
+              <p>Record created: {this.props.user?.creationTime}</p>
+              <p>Last sign in: {this.props.user?.lastSignInTime}</p>
+              {isPremium && (
+                <React.Fragment>
+                  <p>Organisation: {this.props.user?.organisation}</p>
+                  <p>You are a {this.props.user?.type}.</p>
+                </React.Fragment>
+              )}
+            </div>
+          </div>
+          {!isPremium && (
+            <footer className="card-footer">
+              <Link to="/profile/edit" className="card-footer-item">
+                Edit
+              </Link>
+              <Link to="/profile/delete" className="card-footer-item">
+                Delete
+              </Link>
+            </footer>
+          )}
+        </div>
+      </div>
+    );
+  }
 }
 
 function mapStateToProps(state) {
-    return {
-      isAuthenticated: state.auth.isAuthenticated,
-      user: state.auth.user
-    };
-  }
+  return {
+    isAuthenticated: state.auth.isAuthenticated,
+    user: state.auth.user,
+  };
+}
 
-
-export default connect(mapStateToProps)(Profile)
+export default connect(mapStateToProps)(Profile);

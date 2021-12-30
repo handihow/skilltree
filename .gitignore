@@ -5,6 +5,8 @@
 /.pnp
 .pnp.js
 
+#environment files
+/environments
 #firebase connection
 /src/firebase/firebase.tsx
 .firebase*
