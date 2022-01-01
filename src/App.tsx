@@ -51,7 +51,7 @@ const CompositionMonitor = React.lazy(
 toast.configure();
 
 function App(props) {
-  const { isAuthenticated, isVerifying } = props;
+  const { isAuthenticated, isVerifying, user } = props;
   return (
     <Suspense fallback={<Loading></Loading>}>
       <NavBar />
@@ -62,6 +62,7 @@ function App(props) {
           component={Home}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
+          user={user}
           hasSidebar="true"
         />
         <ProtectedRoute
@@ -70,6 +71,7 @@ function App(props) {
           component={Skills}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
+          user={user}
           hasSidebar="true"
         />
         <ProtectedRoute
@@ -78,6 +80,7 @@ function App(props) {
           component={SkillsUploader}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
+          user={user}
           hasSidebar="true"
         />
         <ProtectedRoute
@@ -86,6 +89,7 @@ function App(props) {
           component={Skill}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
+          user={user}
           hasSidebar="false"
         />
         <ProtectedRoute
@@ -94,6 +98,7 @@ function App(props) {
           component={Profile}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
+          user={user}
           hasSidebar="true"
         />
         <ProtectedRoute
@@ -102,6 +107,7 @@ function App(props) {
           component={EditProfile}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
+          user={user}
           hasSidebar="false"
         />
         <ProtectedRoute
@@ -110,6 +116,7 @@ function App(props) {
           component={DeleteProfile}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
+          user={user}
           hasSidebar="false"
         />
         <ProtectedRoute
@@ -118,6 +125,7 @@ function App(props) {
           component={Editor}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
+          user={user}
           hasSidebar="false"
         />
         <ProtectedRoute
@@ -126,6 +134,7 @@ function App(props) {
           component={BackgroundEditor}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
+          user={user}
           hasSidebar="false"
         />
         <ProtectedRoute
@@ -134,6 +143,7 @@ function App(props) {
           component={ThemeEditor}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
+          user={user}
           hasSidebar="false"
         />
         <ProtectedRoute
@@ -142,6 +152,7 @@ function App(props) {
           component={Composition}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
+          user={user}
           hasSidebar="false"
         />
         <ProtectedRoute
@@ -150,6 +161,7 @@ function App(props) {
           component={CompositionMonitor}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
+          user={user}
           hasSidebar="true"
         />
         <ProtectedRoute
@@ -158,6 +170,7 @@ function App(props) {
           component={CompositionAddStudents}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
+          user={user}
           hasSidebar="true"
         />
         <ProtectedRoute
@@ -165,6 +178,7 @@ function App(props) {
           component={CompositionViewer}
           isAuthenticated={isAuthenticated}
           isVerifying={isVerifying}
+          user={user}
           hasSidebar="false"
         />
         <Route

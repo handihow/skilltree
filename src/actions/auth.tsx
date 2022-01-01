@@ -6,6 +6,7 @@ import {
   app,
 } from "../firebase/firebase";
 import { toast } from "react-toastify";
+import IUser, { IFLContent } from "../models/user.model";
 import firebase from "firebase";
 
 export const LOGIN_REQUEST = "LOGIN_REQUEST";
@@ -145,70 +146,116 @@ export const verifyAuth = () => (dispatch) => {
   dispatch(verifyRequest());
   myFirebase.auth().onAuthStateChanged(async (user) => {
     if (user !== null) {
-      let organisation: string = "";
-      let displayName = user.displayName || "";
-      let hostedDomain: string = "";
-      let type: string = "";
-      const provider = user?.providerData[0]?.providerId || null;
+      let signedInUser;
       if (process.env.REACT_APP_ENVIRONMENT_ID !== "free") {
-        const flamelinkUser = await app.users.get({ uid: user.uid });
-        if (!flamelinkUser) {
-          //not supposed to be on the app
-          logoutUser();
-          return;
-        }
-        const school = await app.content.get({ schemaKey: "school" });
-        organisation = school.name;
-        displayName = flamelinkUser.displayName;
-        hostedDomain = flamelinkUser.email.split("@").pop() || "";
-        const userDocRef = db.collection("fl_users").doc(user.uid);
-        const schoolUser = await app.content.getByField({
-          schemaKey: "user",
-          field: "flamelinkUser",
-          value: userDocRef,
-        });
-        for (const id in schoolUser){
-          type = schoolUser[id].type;
-        }
-      } else if (
-        provider &&
-        provider === "google.com" &&
-        user.email &&
-        !["gmail.com", "googlemail.com"].includes(
-          user.email.split("@").pop() || ""
-        )
-      ) {
-        hostedDomain = user.email.split("@").pop() || "";
-      } else if (
-        provider &&
-        provider === "microsoft.com" &&
-        user.email &&
-        !["outlook.com", "live.com", "hotmail.com"].includes(
-          user.email.split("@").pop() || ""
-        )
-      ) {
-        hostedDomain = user.email.split("@").pop() || "";
+        signedInUser = await constructPremiumUser(user);
+      } else {
+        signedInUser = constructFreeUser(user);
       }
-      //create or update user record in firestore db
-      const signedInUser = {
-        uid: user.uid,
-        email: user.email,
-        displayName,
-        photoURL: user.photoURL
-          ? user.photoURL
-          : `https://eu.ui-avatars.com/api/?name=${displayName}`,
-        emailVerified:
-          process.env.REACT_APP__ID === "free" ? user.emailVerified : true,
-        hostedDomain,
-        provider,
-        organisation,
-        type,
-        creationTime: user?.metadata?.creationTime || null,
-        lastSignInTime: user?.metadata?.lastSignInTime || null,
-      };
+      if (!signedInUser) return;
       db.collection("users").doc(user.uid).set(signedInUser, { merge: true });
       dispatch(receiveLogin(signedInUser));
     }
     dispatch(verifySuccess());
   });
+};
+
+const mapToFlamelinkContent = (content: IFLContent) => {
+  return {
+    id: content.id,
+    name: content.name,
+  };
+}
+
+const constructPremiumUser = async (user: firebase.User) => {
+  const flamelinkUser = await app.users.get({ uid: user.uid });
+  const school = await app.content.get({ schemaKey: "school" });
+  if (!flamelinkUser || !school) {
+    //not supposed to be on the app
+    toast.error(
+      "We could not find a connected premium account. Please use the free version of SkillTree."
+    );
+    logoutUser();
+    return null;
+  }
+  const organisation = school.name;
+  const displayName = flamelinkUser.displayName;
+  const hostedDomain = flamelinkUser.email.split("@").pop() || "";
+  const userDocRef = db.collection("fl_users").doc(user.uid);
+  const schoolUser = await app.content.getByField({
+    schemaKey: "user",
+    field: "flamelinkUser",
+    value: userDocRef,
+  });
+  for (const id in schoolUser) {
+    const userData = await app.content.get({
+      schemaKey: "user",
+      entryId: id,
+      populate: ["groups", "programs", "subjects"],
+    });
+    const type = userData.type;
+    const subjects = userData.subjects.map((s) => s.name).join(", ");
+    const groups = userData.groups.map((g) => g.name).join(", ");
+    const programs = userData.programs.map((p) => p.name).join(", ");
+    const flUserContent = {
+      subjects: userData.subjects.map(mapToFlamelinkContent),
+      groups: userData.groups.map(mapToFlamelinkContent),
+      programs: userData.programs.map(mapToFlamelinkContent),
+    };
+    const signedInUser: IUser = {
+      uid: user.uid,
+      email: flamelinkUser.email,
+      displayName,
+      photoURL: `https://eu.ui-avatars.com/api/?name=${displayName}`,
+      emailVerified: true,
+      hostedDomain,
+      provider: "password",
+      organisation,
+      type,
+      subjects,
+      groups,
+      programs,
+      flUserContent,
+      creationTime: user?.metadata?.creationTime || null,
+      lastSignInTime: user?.metadata?.lastSignInTime || null,
+    };
+    return signedInUser;
+  }
+};
+
+const constructFreeUser = (user: firebase.User) => {
+  let hostedDomain = "";
+  const provider = user?.providerData[0]?.providerId || "password";
+  if (
+    provider &&
+    provider === "google.com" &&
+    user.email &&
+    !["gmail.com", "googlemail.com"].includes(user.email.split("@").pop() || "")
+  ) {
+    hostedDomain = user.email.split("@").pop() || "";
+  } else if (
+    provider &&
+    provider === "microsoft.com" &&
+    user.email &&
+    !["outlook.com", "live.com", "hotmail.com"].includes(
+      user.email.split("@").pop() || ""
+    )
+  ) {
+    hostedDomain = user.email.split("@").pop() || "";
+  }
+  //create or update user record in firestore db
+  const signedInUser: IUser = {
+    uid: user.uid,
+    email: user.email || "",
+    displayName: user.displayName || "",
+    photoURL: user.photoURL
+      ? user.photoURL
+      : `https://eu.ui-avatars.com/api/?name=${user.displayName}`,
+    emailVerified: user.emailVerified,
+    hostedDomain,
+    provider,
+    creationTime: user?.metadata?.creationTime || null,
+    lastSignInTime: user?.metadata?.lastSignInTime || null,
+  };
+  return signedInUser;
 };

@@ -57,6 +57,7 @@ class Login extends Component<ILoginProps, ILoginState> {
 
   render() {
     const { isAuthenticated } = this.props;
+    const isPremium = process.env.REACT_APP_ENVIRONMENT_ID !== "free";
     const LoginButton = ({ icon, iconPrefix, buttonText, onClick, color }) => (
       <div className="field">
         <p
@@ -71,7 +72,9 @@ class Login extends Component<ILoginProps, ILoginState> {
         </p>
       </div>
     );
-    if (isAuthenticated) {
+    if (isAuthenticated && isPremium) {
+      return <Redirect to="/groups" />;
+    } else if(isAuthenticated){
       return <Redirect to="/" />;
     } else {
       return (
@@ -92,30 +95,34 @@ class Login extends Component<ILoginProps, ILoginState> {
             className="container has-text-centered box"
             style={{ maxWidth: "350px", marginTop: "20px" }}
           >
-            <div className="buttons">
-              <LoginButton
-                icon="google"
-                iconPrefix="fab"
-                buttonText="Sign in with Google"
-                onClick={this.handleLoginWithGoogle}
-                color="is-danger"
-              />
-              <LoginButton
-                icon="microsoft"
-                iconPrefix="fab"
-                buttonText="Sign in with Microsoft"
-                onClick={this.handleLoginWithMicrosoft}
-                color="is-info"
-              />
-            </div>
+            {!isPremium && (
+              <React.Fragment>
+                <div className="buttons">
+                  <LoginButton
+                    icon="google"
+                    iconPrefix="fab"
+                    buttonText="Sign in with Google"
+                    onClick={this.handleLoginWithGoogle}
+                    color="is-danger"
+                  />
+                  <LoginButton
+                    icon="microsoft"
+                    iconPrefix="fab"
+                    buttonText="Sign in with Microsoft"
+                    onClick={this.handleLoginWithMicrosoft}
+                    color="is-info"
+                  />
+                </div>
 
-            <div style={{ margin: "10px 0" }}>
-              <hr style={hrStyle} />
-              <span style={{ verticalAlign: "middle", padding: "0 10px" }}>
-                OR
-              </span>
-              <hr style={hrStyle} />
-            </div>
+                <div style={{ margin: "10px 0" }}>
+                  <hr style={hrStyle} />
+                  <span style={{ verticalAlign: "middle", padding: "0 10px" }}>
+                    OR
+                  </span>
+                  <hr style={hrStyle} />
+                </div>
+              </React.Fragment>
+            )}
             <div className="field">
               <label className="label" htmlFor="email">
                 Email
@@ -164,14 +171,19 @@ class Login extends Component<ILoginProps, ILoginState> {
                 color="is-primary"
               />
             </div>
-            <div>
-              <Link to="/register">Click here to create an account</Link>
-            </div>
+
+            {!isPremium && (
+              <div>
+                <Link to="/register">Click here to create an account</Link>
+              </div>
+            )}
             <div>
               <Link to="/recover">Forgot password?</Link>
             </div>
             <div>
-              <a href="https://easyskilltree.com">Learn more about this application</a>
+              <a href="https://easyskilltree.com">
+                Learn more about this application
+              </a>
             </div>
           </div>
         </React.Fragment>

@@ -6,6 +6,7 @@ const ProtectedRoute = ({
   component: Component,
   isAuthenticated,
   isVerifying,
+  user,
   hasSidebar,
   ...rest
 }) => (
@@ -15,9 +16,11 @@ const ProtectedRoute = ({
       isVerifying ? (
         <div />
       ) : isAuthenticated ? (
-        <div className="columns is-gapless mb-0" style={{minHeight: "90vh"}}>
-          <div className="column is-narrow is-hidden-mobile">{hasSidebar==="true" && <SideBar></SideBar>}</div>
-          <div className="column" style={{minHeight: "90%"}}>
+        <div className="columns is-gapless mb-0" style={{ minHeight: "90vh" }}>
+          <div className="column is-narrow is-hidden-mobile">
+            {hasSidebar === "true" && <SideBar user={user}></SideBar>}
+          </div>
+          <div className="column" style={{ minHeight: "90%" }}>
             <Component {...props} />
           </div>
         </div>

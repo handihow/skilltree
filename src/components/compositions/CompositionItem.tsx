@@ -185,16 +185,22 @@ export class CompositionItem extends Component<
         .doc(this.props.user.uid)
         .get()
         .then((snapShot) => {
-          const result = snapShot.data() as IResult;
-          let progress = 0;
-          try {
-            progress = result.progress[this.props.composition.id || ""];
-          } catch (e) {
-            console.error(e);
+          if (!snapShot.exists) {
+            this.setState({
+              progress: 0,
+            });
+          } else {
+            const result = snapShot.data() as IResult;
+            let progress = 0;
+            try {
+              progress = result.progress[this.props.composition.id || ""];
+            } catch (e) {
+              console.error(e);
+            }
+            this.setState({
+              progress: progress ? progress : 0,
+            });
           }
-          this.setState({
-            progress: progress ? progress : 0,
-          });
         });
     }
   }
@@ -203,14 +209,18 @@ export class CompositionItem extends Component<
     const { id, title, username } = this.props.composition;
     const isOwner = this.props.user.uid === this.props.composition.user;
     return (
-      <div className="card" style={{width: "280px"}}>
+      <div className="card" style={{ width: "280px" }}>
         <Link to={isOwner ? "/editor/" + id : "compositions/" + id + "/viewer"}>
           <header className="card-header">
             <p className="card-header-title">{title}</p>
           </header>
           <div className="card-image">
             <figure className="image">
-              <img src={this.state.thumbnail} alt="thumbnail"  style={{height: "200px"}}></img>
+              <img
+                src={this.state.thumbnail}
+                alt="thumbnail"
+                style={{ height: "200px" }}
+              ></img>
             </figure>
           </div>
         </Link>

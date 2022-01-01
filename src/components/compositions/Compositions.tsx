@@ -20,7 +20,7 @@ export default function Compositions(props: ICompositionsProps) {
         gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
       }}
     >
-      <div className="is-flex is-justify-content-center">
+      <div className="is-flex">
         <a
           href="# "
           onClick={() => props.addComposition()}
@@ -42,7 +42,7 @@ export default function Compositions(props: ICompositionsProps) {
         </a>
       </div>
       {compositions.map((composition) => (
-        <div key={composition.id} className="is-flex is-justify-content-center">
+        <div key={composition.id} className="is-flex">
           <CompositionItem
             composition={composition}
             editCompositionTitle={props.editCompositionTitle}

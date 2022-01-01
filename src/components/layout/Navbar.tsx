@@ -37,6 +37,7 @@ class Navbar extends Component<INavbarProps, INavbarState> {
 
   render() {
     const { isLoggingOut, logoutError, isAuthenticated, user } = this.props;
+    const isPremium = process.env.REACT_APP_ENVIRONMENT_ID !== "free";
     return (
       <React.Fragment>
         <div
@@ -46,15 +47,10 @@ class Navbar extends Component<INavbarProps, INavbarState> {
         >
           <div className="navbar-brand">
             <a href="https://easyskilltree.com" className="navbar-item">
-              <img
-                alt="SkillTree"
-                src="/SkillTree_logo.png"
-              ></img>
+              <img alt="SkillTree" src="/SkillTree_logo.png"></img>
             </a>
           </div>
-          <div
-            className="navbar-menu is-active"
-          >
+          <div className="navbar-menu is-active">
             <div className="navbar-end">
               {isAuthenticated ? (
                 <div className="navbar-item has-dropdown is-hoverable">
@@ -62,29 +58,45 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                     {/* <span className="icon is-large">
                       <FontAwesomeIcon icon="user-circle" />
                     </span> */}
-                    
-                      <img className="is-rounded" src={user.photoURL} alt=""></img>
+
+                    <img
+                      className="is-rounded"
+                      src={user.photoURL}
+                      alt=""
+                    ></img>
                   </div>
                   <div className="navbar-dropdown is-right">
-                  <div className="navbar-item">
-                      <Link to="/" className="button is-fullwidth">
-                        <span className="icon">
-                          <img src="/Skilltree_icons-04.svg" alt=""></img>
-                        </span>
-                        <span>Your SkillTrees</span>
-                      </Link>
-                    </div>
-                    <div className="navbar-item">
-                      <Link
-                        to="/skills"
-                        className="button is-fullwidth"
-                      >
-                        <span className="icon">
-                          <FontAwesomeIcon icon="th-list" />
-                        </span>
-                        <span>Your skills</span>
-                      </Link>
-                    </div>
+                    {isPremium ? (
+                      <React.Fragment>
+                        <div className="navbar-item">
+                          <Link to="/" className="button is-fullwidth">
+                            <span className="icon">
+                            <FontAwesomeIcon icon="users" />
+                            </span>
+                            <span>Your Groups</span>
+                          </Link>
+                        </div>
+                      </React.Fragment>
+                    ) : (
+                      <React.Fragment>
+                        <div className="navbar-item">
+                          <Link to="/" className="button is-fullwidth">
+                            <span className="icon">
+                              <img src="/Skilltree_icons-04.svg" alt=""></img>
+                            </span>
+                            <span>Your SkillTrees</span>
+                          </Link>
+                        </div>
+                        <div className="navbar-item">
+                          <Link to="/skills" className="button is-fullwidth">
+                            <span className="icon">
+                              <FontAwesomeIcon icon="th-list" />
+                            </span>
+                            <span>Your skills</span>
+                          </Link>
+                        </div>
+                      </React.Fragment>
+                    )}
                     <hr className="dropdown-divider"></hr>
                     <div className="navbar-item">
                       <a
