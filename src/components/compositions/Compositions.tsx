@@ -18,6 +18,7 @@ export default function Compositions(props: ICompositionsProps) {
         display: "grid",
         gap: "1rem",
         gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+        marginBottom: "150px"
       }}
     >
       <div className="is-flex">
