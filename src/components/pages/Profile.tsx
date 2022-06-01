@@ -14,7 +14,6 @@ export class Profile extends Component<IProfileProps> {
   }
 
   render() {
-    const isPremium = process.env.REACT_APP_ENVIRONMENT_ID !== "free";
     const tableRows = [
       {
         title: "Email verified",
@@ -36,31 +35,31 @@ export class Profile extends Component<IProfileProps> {
         key: "hostedDomain",
         premium: false,
       },
-      {
-        title: "Organisation",
-        key: "organisation",
-        premium: true,
-      },
-      {
-        title: "Type",
-        key: "type",
-        premium: true,
-      },
-      {
-        title: "Subjects",
-        key: "subjects",
-        premium: true,
-      },
-      {
-        title: "Groups",
-        key: "groups",
-        premium: true,
-      },
-      {
-        title: "Programs",
-        key: "programs",
-        premium: true,
-      },
+      // {
+      //   title: "Organisation",
+      //   key: "organisation",
+      //   premium: true,
+      // },
+      // {
+      //   title: "Type",
+      //   key: "type",
+      //   premium: true,
+      // },
+      // {
+      //   title: "Subjects",
+      //   key: "subjects",
+      //   premium: true,
+      // },
+      // {
+      //   title: "Groups",
+      //   key: "groups",
+      //   premium: true,
+      // },
+      // {
+      //   title: "Programs",
+      //   key: "programs",
+      //   premium: true,
+      // },
     ];
     return (
       <div style={{ height: "100vh" }}>
@@ -88,17 +87,7 @@ export class Profile extends Component<IProfileProps> {
               </div>
             </div>
             <div className="content has-text-dark">
-              {isPremium ? (
-                <React.Fragment>
-                  <p>
-                    Your profile is managed by {this.props.user?.organisation}.
-                  </p>
-                  <p>
-                    Please contact your SkillTree account manager in case of
-                    irregularities concerning your account.
-                  </p>
-                </React.Fragment>
-              ) : (
+              
                 <React.Fragment>
                   <p>
                     If you contact the service desk, please note that your
@@ -108,12 +97,10 @@ export class Profile extends Component<IProfileProps> {
                     <strong>{this.props.user?.uid}</strong>
                   </p>
                 </React.Fragment>
-              )}
               <table className="table is-fullwidth is-striped">
                 <tbody>
                   {tableRows.map(
                     (tr) =>
-                      (!tr.premium || (tr.premium && isPremium)) && (
                         <tr>
                           <td>{tr.title}</td>
                           <td>
@@ -126,13 +113,11 @@ export class Profile extends Component<IProfileProps> {
                               : ""}
                           </td>
                         </tr>
-                      )
-                  )}
+                      )}
                 </tbody>
               </table>
             </div>
           </div>
-          {!isPremium && (
             <footer className="card-footer">
               <Link to="/profile/edit" className="card-footer-item">
                 Edit
@@ -141,7 +126,6 @@ export class Profile extends Component<IProfileProps> {
                 Delete
               </Link>
             </footer>
-          )}
         </div>
       </div>
     );

@@ -37,7 +37,6 @@ class Navbar extends Component<INavbarProps, INavbarState> {
 
   render() {
     const { isLoggingOut, logoutError, isAuthenticated, user } = this.props;
-    const isPremium = process.env.REACT_APP_ENVIRONMENT_ID !== "free";
     return (
       <React.Fragment>
         <div
@@ -66,18 +65,7 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                     ></img>
                   </div>
                   <div className="navbar-dropdown is-right">
-                    {isPremium ? (
-                      <React.Fragment>
-                        <div className="navbar-item">
-                          <Link to="/" className="button is-fullwidth">
-                            <span className="icon">
-                            <FontAwesomeIcon icon="users" />
-                            </span>
-                            <span>Your Groups</span>
-                          </Link>
-                        </div>
-                      </React.Fragment>
-                    ) : (
+                    
                       <React.Fragment>
                         <div className="navbar-item">
                           <Link to="/" className="button is-fullwidth">
@@ -96,7 +84,7 @@ class Navbar extends Component<INavbarProps, INavbarState> {
                           </Link>
                         </div>
                       </React.Fragment>
-                    )}
+                  
                     <hr className="dropdown-divider"></hr>
                     <div className="navbar-item">
                       <a

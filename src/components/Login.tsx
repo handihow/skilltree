@@ -1,15 +1,15 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import { Redirect, Link } from "react-router-dom";
-import { loginUser, loginWithGoogle, loginWithMicrosoft } from "../actions";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { Redirect, Link } from 'react-router-dom';
+import { loginUser, loginWithGoogle, loginWithMicrosoft } from '../actions';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const hrStyle = {
-  display: "inline-block",
+  display: 'inline-block',
   margin: 0,
   padding: 0,
-  verticalAlign: "middle",
-  width: "100px",
+  verticalAlign: 'middle',
+  width: '100px',
 };
 
 interface ILoginProps {
@@ -27,7 +27,7 @@ interface ILoginState {
 class Login extends Component<ILoginProps, ILoginState> {
   constructor(props: ILoginProps) {
     super(props);
-    this.state = { email: "", password: "" };
+    this.state = { email: '', password: '' };
   }
 
   handleEmailChange = ({ target }) => {
@@ -57,12 +57,11 @@ class Login extends Component<ILoginProps, ILoginState> {
 
   render() {
     const { isAuthenticated } = this.props;
-    const isPremium = process.env.REACT_APP_ENVIRONMENT_ID !== "free";
     const LoginButton = ({ icon, iconPrefix, buttonText, onClick, color }) => (
       <div className="field">
         <p
           className={`control button is-medium ${color}`}
-          style={{ width: "300px" }}
+          style={{ width: '300px' }}
           onClick={onClick}
         >
           <span className="icon">
@@ -72,9 +71,7 @@ class Login extends Component<ILoginProps, ILoginState> {
         </p>
       </div>
     );
-    if (isAuthenticated && isPremium) {
-      return <Redirect to="/groups" />;
-    } else if(isAuthenticated){
+    if (isAuthenticated) {
       return <Redirect to="/" />;
     } else {
       return (
@@ -93,36 +90,35 @@ class Login extends Component<ILoginProps, ILoginState> {
           )}
           <div
             className="container has-text-centered box"
-            style={{ maxWidth: "350px", marginTop: "20px" }}
+            style={{ maxWidth: '350px', marginTop: '20px' }}
           >
-            {!isPremium && (
-              <React.Fragment>
-                <div className="buttons">
-                  <LoginButton
-                    icon="google"
-                    iconPrefix="fab"
-                    buttonText="Sign in with Google"
-                    onClick={this.handleLoginWithGoogle}
-                    color="is-danger"
-                  />
-                  <LoginButton
-                    icon="microsoft"
-                    iconPrefix="fab"
-                    buttonText="Sign in with Microsoft"
-                    onClick={this.handleLoginWithMicrosoft}
-                    color="is-info"
-                  />
-                </div>
+            <React.Fragment>
+              <div className="buttons">
+                <LoginButton
+                  icon="google"
+                  iconPrefix="fab"
+                  buttonText="Sign in with Google"
+                  onClick={this.handleLoginWithGoogle}
+                  color="is-danger"
+                />
+                <LoginButton
+                  icon="microsoft"
+                  iconPrefix="fab"
+                  buttonText="Sign in with Microsoft"
+                  onClick={this.handleLoginWithMicrosoft}
+                  color="is-info"
+                />
+              </div>
 
-                <div style={{ margin: "10px 0" }}>
-                  <hr style={hrStyle} />
-                  <span style={{ verticalAlign: "middle", padding: "0 10px" }}>
-                    OR
-                  </span>
-                  <hr style={hrStyle} />
-                </div>
-              </React.Fragment>
-            )}
+              <div style={{ margin: '10px 0' }}>
+                <hr style={hrStyle} />
+                <span style={{ verticalAlign: 'middle', padding: '0 10px' }}>
+                  OR
+                </span>
+                <hr style={hrStyle} />
+              </div>
+            </React.Fragment>
+
             <div className="field">
               <label className="label" htmlFor="email">
                 Email
@@ -172,11 +168,10 @@ class Login extends Component<ILoginProps, ILoginState> {
               />
             </div>
 
-            {!isPremium && (
-              <div>
-                <Link to="/register">Click here to create an account</Link>
-              </div>
-            )}
+            <div>
+              <Link to="/register">Click here to create an account</Link>
+            </div>
+
             <div>
               <Link to="/recover">Forgot password?</Link>
             </div>

@@ -26,7 +26,6 @@
     "flamelink": "^1.0.0-rc.1",
     "font-picker-react": "^3.5.2",
     "generate-password": "^1.6.0",
-    "node-sass": "^7.0.1",
     "normalize-url": "^4.5.0",
     "react": "^16.14.0",
     "react-addons-update": "^15.6.3",
@@ -49,6 +48,7 @@
     "react-youtube": "^7.13.1",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
+    "sass": "^1.52.1",
     "uuid": "^8.3.2",
     "validator": "^13.7.0",
     "youtube-search": "^1.1.6"
@@ -59,11 +59,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "deploy": "firebase deploy --only hosting",
-    "functions": "firebase deploy --only functions",
-    "start:free": "env-cmd -f ./environments/.free.env react-scripts start",
-    "build:free": "env-cmd -f ./environments/.free.env npm run-script build",
-    "start:rcn": "env-cmd -f ./environments/.rcn.env react-scripts start",
-    "build:rcn": "env-cmd -f ./environments/.rcn.env npm run-script build"
+    "functions": "firebase deploy --only functions"
   },
   "eslintConfig": {
     "extends": "react-app"
