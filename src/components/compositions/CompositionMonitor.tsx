@@ -9,8 +9,6 @@ import Header from "../layout/Header";
 import firebase from "firebase/app";
 import ReactImageFallback from "react-image-fallback";
 import { CSVLink } from "react-csv";
-import YouTube from "react-youtube";
-import BackButton from "../layout/BackButton";
 
 type TParams = { compositionId: string };
 
@@ -117,6 +115,7 @@ export class CompositionMonitor extends Component<
                 });
               },
               (error) => {
+                console.error(error.message);
                 toast.error(error.message);
               }
             );
